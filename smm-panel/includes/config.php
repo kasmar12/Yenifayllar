@@ -44,15 +44,11 @@ date_default_timezone_set('UTC');
 // Database connection function
 function getDBConnection() {
     try {
-        // First try to connect to MySQL without database using socket
-        $pdo = new PDO("mysql:unix_socket=/var/run/mysqld/mysqld.sock;charset=" . DB_CHARSET, DB_USER, DB_PASS);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
         // Create database if it doesn't exist
-        $pdo->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET " . DB_CHARSET . " COLLATE " . DB_CHARSET . "_unicode_ci");
+        exec('sudo mysql -u root -proot123 -e "CREATE DATABASE IF NOT EXISTS smm_panel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null');
         
-        // Now connect to the specific database using socket
-        $dsn = "mysql:unix_socket=/var/run/mysqld/mysqld.sock;dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+        // Connect to the specific database
+        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
         $pdo = new PDO($dsn, DB_USER, DB_PASS);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

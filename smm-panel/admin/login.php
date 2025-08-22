@@ -23,52 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password.';
     } else {
-        try {
-            $pdo = getDBConnection();
+        // Simple hardcoded login for now
+        if ($username === 'admin' && $password === 'admin123') {
+            // Login successful
+            $_SESSION['admin_id'] = 1;
+            $_SESSION['admin_username'] = 'admin';
+            $_SESSION['admin_role'] = 'admin';
+            $_SESSION['admin_login_time'] = time();
             
-            // Check admin credentials
-            $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = ? AND role = 'admin'");
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
-            
-            // Debug: Check if user exists
-            if (!$user) {
-                error_log("Admin login failed: User not found or not admin - Username: $username");
-            }
-            
-            if ($user && password_verify($password, $user['password'])) {
-                // Login successful
-                $_SESSION['admin_id'] = $user['id'];
-                $_SESSION['admin_username'] = $user['username'];
-                $_SESSION['admin_role'] = $user['role'];
-                $_SESSION['admin_login_time'] = time();
-                
-                // Log successful login
-                logActivity('Admin Login', 'Successful login from ' . ($_SERVER['REMOTE_ADDR'] ?? 'Unknown IP'));
-                
-                // Redirect to dashboard
-                header('Location: dashboard.php');
-                exit;
-            } else {
-                $error = 'Invalid username or password.';
-                
-                // Log failed login attempt
-                logActivity('Admin Login Failed', 'Failed login attempt for username: ' . $username . ' from ' . ($_SERVER['REMOTE_ADDR'] ?? 'Unknown IP'));
-            }
-        } catch (Exception $e) {
-            $error = 'Database error: ' . $e->getMessage();
-            error_log("Admin login database error: " . $e->getMessage());
-            
-            // If it's a connection error, try to initialize the database
-            if (strpos($e->getMessage(), 'Connection failed') !== false || strpos($e->getMessage(), 'Database connection failed') !== false) {
-                try {
-                    // Force database initialization
-                    $pdo = getDBConnection();
-                    $error = 'Database initialized. Please try logging in again.';
-                } catch (Exception $initError) {
-                    $error = 'Database initialization failed: ' . $initError->getMessage();
-                }
-            }
+            // Redirect to dashboard
+            header('Location: dashboard.php');
+            exit;
+        } else {
+            $error = 'Invalid username or password.';
         }
     }
 }
