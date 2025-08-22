@@ -245,30 +245,23 @@ function initializeDatabase() {
                 CREATE TABLE IF NOT EXISTS categories (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     name VARCHAR(100) NOT NULL,
-                    slug VARCHAR(100) UNIQUE NOT NULL,
                     description TEXT,
-                    is_active BOOLEAN DEFAULT TRUE,
-                    sort_order INT DEFAULT 0,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    status ENUM('active', 'inactive') DEFAULT 'active',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ",
             'services' => "
                 CREATE TABLE IF NOT EXISTS services (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     category_id INT NOT NULL,
-                    api_service_id VARCHAR(100) NOT NULL,
+                    api_service_id INT NOT NULL,
                     name VARCHAR(200) NOT NULL,
                     description TEXT,
                     price DECIMAL(10,4) NOT NULL DEFAULT 0.0000,
                     min_quantity INT NOT NULL DEFAULT 1,
-                    max_quantity INT NOT NULL DEFAULT 1000000,
-                    dripfeed BOOLEAN DEFAULT FALSE,
-                    refill BOOLEAN DEFAULT FALSE,
-                    is_active BOOLEAN DEFAULT TRUE,
-                    sort_order INT DEFAULT 0,
+                    max_quantity INT NOT NULL DEFAULT 10000,
+                    status ENUM('active', 'inactive') DEFAULT 'active',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
                 )
             ",
@@ -280,12 +273,8 @@ function initializeDatabase() {
                     link VARCHAR(500) NOT NULL,
                     quantity INT NOT NULL,
                     price DECIMAL(10,4) NOT NULL,
-                    total_price DECIMAL(10,4) NOT NULL,
-                    status ENUM('pending', 'processing', 'completed', 'canceled', 'refunded') DEFAULT 'pending',
-                    api_order_id VARCHAR(100),
-                    api_response TEXT,
-                    user_ip VARCHAR(45),
-                    user_agent TEXT,
+                    status ENUM('pending', 'processing', 'completed', 'cancelled', 'error') DEFAULT 'pending',
+                    smm_order_id VARCHAR(100),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
@@ -313,33 +302,30 @@ function initializeDatabase() {
         
         if (!$stmt->fetch()) {
             $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, 'admin')");
-            $stmt->execute(['admin', $adminPassword, 'admin@smmpanel.com']);
+            $stmt = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'admin')");
+            $stmt->execute(['admin', $adminPassword]);
         }
         
         // Insert default categories if not exists
         $defaultCategories = [
-            ['Instagram', 'instagram', 'Instagram services including followers, likes, and views', 1],
-            ['TikTok', 'tiktok', 'TikTok services including followers, likes, and views', 2],
-            ['YouTube', 'youtube', 'YouTube services including subscribers and views', 3],
-            ['Twitter', 'twitter', 'Twitter services including followers and likes', 4],
-            ['Facebook', 'facebook', 'Facebook services including page likes and post engagement', 5]
+            ['Instagram', 'Instagram services including followers, likes, and views'],
+            ['TikTok', 'TikTok services including followers, likes, and views'],
+            ['YouTube', 'YouTube services including subscribers and views']
         ];
         
         foreach ($defaultCategories as $category) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO categories (name, slug, description, sort_order) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT IGNORE INTO categories (name, description) VALUES (?, ?)");
             $stmt->execute($category);
         }
         
         // Insert default services if not exists
         $defaultServices = [
-            [1, 'instagram_followers', 'Instagram Followers', 'High quality Instagram followers', 0.5000, 100, 100000],
-            [1, 'instagram_likes', 'Instagram Likes', 'Real Instagram likes for posts', 0.3000, 50, 50000],
-            [1, 'instagram_views', 'Instagram Views', 'Instagram video views', 0.2000, 100, 100000],
-            [2, 'tiktok_followers', 'TikTok Followers', 'Real TikTok followers', 0.8000, 100, 50000],
-            [2, 'tiktok_likes', 'TikTok Likes', 'TikTok video likes', 0.4000, 100, 100000],
-            [3, 'youtube_subscribers', 'YouTube Subscribers', 'Real YouTube subscribers', 2.5000, 100, 10000],
-            [3, 'youtube_views', 'YouTube Views', 'YouTube video views', 0.1000, 1000, 1000000]
+            [1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000],
+            [1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000],
+            [1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000],
+            [2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000],
+            [2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000],
+            [3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000]
         ];
         
         foreach ($defaultServices as $service) {
