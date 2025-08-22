@@ -8,7 +8,7 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'smm_panel');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'root123');
 define('DB_CHARSET', 'utf8mb4');
 
 // Application Configuration
