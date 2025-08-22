@@ -332,12 +332,12 @@ function initializeDatabase() {
         $stmt = $pdo->query("SELECT COUNT(*) FROM services");
         if ($stmt->fetchColumn() == 0) {
             $defaultServices = [
-                [1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000],
-                [1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000],
-                [1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000],
-                [2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000],
-                [2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000],
-                [3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000]
+                [1, 1, 'Instagram Followers', 'High quality Instagram followers', 0.0010, 1000, 100000],
+                [1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 0.0010, 1000, 100000],
+                [1, 3, 'Instagram Views', 'Instagram video views', 0.0010, 1000, 100000],
+                [2, 4, 'TikTok Followers', 'Real TikTok followers', 0.0010, 1000, 100000],
+                [2, 5, 'TikTok Likes', 'TikTok video likes', 0.0010, 1000, 100000],
+                [3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 0.0010, 1000, 100000]
             ];
             
             foreach ($defaultServices as $service) {
@@ -355,7 +355,7 @@ function initializeDatabase() {
                 ['aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'],
                 ['site_name', 'SMM Panel', 'Website name'],
                 ['site_description', 'Professional SMM Services', 'Website description'],
-                ['currency', 'USD', 'Default currency'],
+                ['currency', 'AZN', 'Default currency'],
                 ['timezone', 'UTC', 'Default timezone']
             ];
             

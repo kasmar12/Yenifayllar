@@ -86,27 +86,27 @@ WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'YouTube');
 
 -- Insert default services - Only if not exists
 INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
-SELECT 1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000
+SELECT 1, 1, 'Instagram Followers', 'High quality Instagram followers', 0.0010, 1000, 100000
 WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'Instagram Followers');
 
 INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
-SELECT 1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000
+SELECT 1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 0.0010, 1000, 100000
 WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'Instagram Likes');
 
 INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
-SELECT 1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000
+SELECT 1, 3, 'Instagram Views', 'Instagram video views', 0.0010, 1000, 100000
 WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'Instagram Views');
 
 INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
-SELECT 2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000
+SELECT 2, 4, 'TikTok Followers', 'Real TikTok followers', 0.0010, 1000, 100000
 WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'TikTok Followers');
 
 INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
-SELECT 2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000
+SELECT 2, 5, 'TikTok Likes', 'TikTok video likes', 0.0010, 1000, 100000
 WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'TikTok Likes');
 
 INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
-SELECT 3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000
+SELECT 3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 0.0010, 1000, 100000
 WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'YouTube Subscribers');
 
 -- Insert default settings - Only if not exists
@@ -131,7 +131,7 @@ SELECT 'site_description', 'Professional SMM Services', 'Website description'
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'site_description');
 
 INSERT INTO settings (setting_key, setting_value, description) 
-SELECT 'currency', 'USD', 'Default currency'
+SELECT 'currency', 'AZN', 'Default currency'
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'currency');
 
 INSERT INTO settings (setting_key, setting_value, description) 
