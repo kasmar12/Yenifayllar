@@ -43,13 +43,26 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 30,
     CURLOPT_SSL_VERIFYPEER => false,
-    CURLOPT_USERAGENT => 'SMM-Order-System/1.0'
+    CURLOPT_USERAGENT => 'SMM-Order-System/1.0',
+    CURLOPT_FOLLOWLOCATION => true,  // Follow redirects
+    CURLOPT_MAXREDIRS => 5,          // Maximum redirects to follow
+    CURLOPT_HTTPHEADER => [
+        'Accept: application/json',
+        'Content-Type: application/x-www-form-urlencoded'
+    ]
 ]);
 
 // Execute cURL request
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
+
+// Debug information (remove in production)
+if (defined('DEBUG_MODE') && DEBUG_MODE) {
+    error_log("AY.Live API Debug - URL: " . $ayliveApiUrl);
+    error_log("AY.Live API Debug - HTTP Code: " . $httpCode);
+    error_log("AY.Live API Debug - Response: " . $response);
+}
 
 // Close cURL session
 curl_close($ch);
@@ -59,9 +72,9 @@ if ($curlError) {
     die('Error: Failed to connect to AY.Live API: ' . htmlspecialchars($curlError));
 }
 
-// Check HTTP response code
-if ($httpCode !== 200) {
-    die('Error: AY.Live API returned HTTP code ' . $httpCode);
+// Check HTTP response code (allow redirects)
+if ($httpCode < 200 || $httpCode >= 400) {
+    die('Error: AY.Live API returned HTTP code ' . $httpCode . '. Response: ' . htmlspecialchars($response));
 }
 
 // Parse JSON response
@@ -75,6 +88,11 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 // Check if API call was successful
 if (isset($data['status']) && $data['status'] === 'success' && isset($data['shortenedUrl'])) {
     // Success - redirect to shortened ad link
+    $shortenedUrl = $data['shortenedUrl'];
+    header('Location: ' . $shortenedUrl);
+    exit;
+} elseif (isset($data['shortenedUrl'])) {
+    // Some APIs return shortenedUrl directly without status
     $shortenedUrl = $data['shortenedUrl'];
     header('Location: ' . $shortenedUrl);
     exit;

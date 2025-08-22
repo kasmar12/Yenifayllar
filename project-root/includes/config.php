@@ -15,4 +15,7 @@ define("SMM_API_URL", "https://smm-provider.com/api/v2");
 
 // Your domain for verification callback
 define("VERIFY_URL", "https://yourdomain.com/public/verify.php");
+
+// Debug mode (set to false in production)
+define("DEBUG_MODE", true);
 ?>
