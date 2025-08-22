@@ -1,0 +1,44 @@
+{
+    "name": "smm-panel/web-application",
+    "description": "Full-stack PHP web application for SMM Panel with admin dashboard",
+    "type": "project",
+    "keywords": ["smm", "panel", "php", "admin", "dashboard"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SMM Panel Developer",
+            "email": "developer@example.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-session": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SmmPanel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SmmPanel\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "post-install-cmd": [
+            "echo 'SMM Panel application installed successfully!'"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
