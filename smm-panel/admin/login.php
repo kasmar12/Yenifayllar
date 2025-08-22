@@ -27,16 +27,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo = getDBConnection();
             
             // Check admin credentials
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND role = 'admin' AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = ? AND role = 'admin'");
             $stmt->execute([$username]);
             $user = $stmt->fetch();
+            
+            // Debug: Check if user exists
+            if (!$user) {
+                error_log("Admin login failed: User not found or not admin - Username: $username");
+            }
             
             if ($user && password_verify($password, $user['password'])) {
                 // Login successful
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_id'] = $user['id'];
                 $_SESSION['admin_username'] = $user['username'];
-                $_SESSION['admin_email'] = $user['email'];
+                $_SESSION['admin_role'] = $user['role'];
                 $_SESSION['admin_login_time'] = time();
                 
                 // Log successful login
@@ -53,6 +58,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } catch (Exception $e) {
             $error = 'Database error: ' . $e->getMessage();
+            error_log("Admin login database error: " . $e->getMessage());
+            
+            // If it's a connection error, try to initialize the database
+            if (strpos($e->getMessage(), 'Connection failed') !== false || strpos($e->getMessage(), 'Database connection failed') !== false) {
+                try {
+                    // Force database initialization
+                    $pdo = getDBConnection();
+                    $error = 'Database initialized. Please try logging in again.';
+                } catch (Exception $initError) {
+                    $error = 'Database initialization failed: ' . $initError->getMessage();
+                }
+            }
         }
     }
 }
