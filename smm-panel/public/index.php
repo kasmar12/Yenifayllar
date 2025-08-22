@@ -279,7 +279,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-info" id="priceDisplay" style="display: none;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span><strong>Total Price:</strong></span>
-                                <span class="fw-bold" id="totalPrice">$0.0000</span>
+                                <span class="fw-bold" id="totalPrice">AZN 0</span>
                             </div>
                         </div>
 
@@ -360,7 +360,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const quantity = parseInt(document.getElementById('quantity').value) || 0;
                 const totalPrice = price * quantity;
                 
-                document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(4);
+                // Format price without trailing zeros
+                const formattedPrice = totalPrice.toFixed(4).replace(/\.?0+$/, '');
+                document.getElementById('totalPrice').textContent = 'AZN ' + formattedPrice;
                 document.getElementById('priceDisplay').style.display = 'block';
             }
         }

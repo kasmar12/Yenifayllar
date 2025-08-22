@@ -219,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </tr>
                                     <tr>
                                         <td><strong>Total Price:</strong></td>
-                                        <td class="text-success fw-bold">$<?php echo number_format($order['total_price'], 4); ?></td>
+                                        <td class="text-success fw-bold">AZN <?php echo rtrim(rtrim(number_format($order['total_price'], 4), '0'), '.'); ?></td>
                                     </tr>
                                 </table>
                             </div>

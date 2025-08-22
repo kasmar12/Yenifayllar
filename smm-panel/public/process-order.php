@@ -147,7 +147,7 @@ try {
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Total Price:</strong></p>
-                                    <p class="text-success fw-bold">$<?php echo number_format($pendingOrder['total_price'], 4); ?></p>
+                                    <p class="text-success fw-bold">AZN <?php echo rtrim(rtrim(number_format($pendingOrder['total_price'], 4), '0'), '.'); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -203,7 +203,7 @@ try {
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Total Price:</strong></p>
-                                    <p class="text-muted">$<?php echo number_format($pendingOrder['total_price'], 4); ?></p>
+                                    <p class="text-muted">AZN <?php echo rtrim(rtrim(number_format($pendingOrder['total_price'], 4), '0'), '.'); ?></p>
                                 </div>
                             </div>
                         </div>

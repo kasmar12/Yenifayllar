@@ -210,8 +210,13 @@ function generateOrderID() {
 }
 
 // Format price function
-function formatPrice($price, $currency = 'USD') {
-    return $currency . ' ' . number_format($price, 4);
+function formatPrice($price, $currency = 'AZN') {
+    // Remove trailing zeros after decimal point
+    $formatted = number_format($price, 4);
+    $formatted = rtrim($formatted, '0');
+    $formatted = rtrim($formatted, '.');
+    
+    return $currency . ' ' . $formatted;
 }
 
 // Log function
