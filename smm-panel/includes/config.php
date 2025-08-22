@@ -52,11 +52,16 @@ function getDBConnection() {
         exec('sudo mysql -u root -proot123 -e "CREATE DATABASE IF NOT EXISTS smm_panel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null');
         
         // Connect to the specific database
-        $dsn = "mysql:host=127.0.0.1;port=3306;dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+        $dsn = "mysql:host=127.0.0.1;port=3306;dbname=" . DB_NAME . ";charset=utf8mb4";
         $pdo = new PDO($dsn, DB_USER, DB_PASS);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        
+        // Set character set explicitly
+        $pdo->exec("SET NAMES utf8mb4");
+        $pdo->exec("SET CHARACTER SET utf8mb4");
+        $pdo->exec("SET character_set_connection=utf8mb4");
         
         // Check if tables exist, if not create them
         $pdo->exec("CREATE TABLE IF NOT EXISTS `users` (
@@ -192,6 +197,11 @@ function validateCSRFToken($token) {
 // Sanitize input function
 function sanitizeInput($data) {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
+
+// Sanitize database input function (for database operations)
+function sanitizeDBInput($data) {
+    return trim($data);
 }
 
 // Generate unique order ID

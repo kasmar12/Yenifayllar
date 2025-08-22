@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
         $category_id = (int)($_POST['category_id'] ?? 0);
         $api_service_id = (int)($_POST['api_service_id'] ?? 0);
-        $name = sanitizeInput($_POST['name'] ?? '');
-        $description = sanitizeInput($_POST['description'] ?? '');
+        $name = sanitizeDBInput($_POST['name'] ?? '');
+        $description = sanitizeDBInput($_POST['description'] ?? '');
         $price = (float)($_POST['price'] ?? 0);
         $min_quantity = (int)($_POST['min_quantity'] ?? 1);
         $max_quantity = (int)($_POST['max_quantity'] ?? 10000);

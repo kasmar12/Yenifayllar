@@ -3,6 +3,11 @@
 CREATE DATABASE IF NOT EXISTS smm_panel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE smm_panel;
 
+-- Set character set for the session
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+SET character_set_connection=utf8mb4;
+
 -- Users table (for admin only)
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,

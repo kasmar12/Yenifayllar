@@ -26,8 +26,8 @@ $error = '';
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
-        $name = sanitizeInput($_POST['name'] ?? '');
-        $description = sanitizeInput($_POST['description'] ?? '');
+        $name = sanitizeDBInput($_POST['name'] ?? '');
+        $description = sanitizeDBInput($_POST['description'] ?? '');
         $status = $_POST['status'] ?? 'active';
         
         if (empty($name)) {
