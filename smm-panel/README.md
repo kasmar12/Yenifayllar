@@ -135,6 +135,12 @@ chmod 644 smm-panel/includes/config.php
 - ✅ Orders Management - View and manage all customer orders
 - ✅ Settings Management - Configure APIs and system settings
 
+**Recent Fixes Applied:**
+- 🔧 Fixed "Column not found: status" database error
+- 🔧 Recreated database tables with proper status ENUM columns
+- 🔧 Added null coalescing operators for better error handling
+- 🔧 All admin panel CRUD operations now working without errors
+
 ## 🔧 Configuration
 
 ### API Keys
