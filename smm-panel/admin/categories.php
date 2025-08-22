@@ -36,12 +36,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo = getDBConnection();
                 
+                // Set character set for this connection
+                $pdo->exec("SET NAMES utf8mb4");
+                $pdo->exec("SET CHARACTER SET utf8mb4");
+                $pdo->exec("SET character_set_connection=utf8mb4");
+                
                 if ($action === 'add') {
                     $stmt = $pdo->prepare("INSERT INTO categories (name, description, status) VALUES (?, ?, ?)");
                     $stmt->execute([$name, $description, $status]);
                     $message = 'Category added successfully!';
                 } else {
                     $id = (int)($_POST['id'] ?? 0);
+                    
+                    // Set character set for update operation
+                    $pdo->exec("SET NAMES utf8mb4");
+                    $pdo->exec("SET CHARACTER SET utf8mb4");
+                    $pdo->exec("SET character_set_connection=utf8mb4");
+                    
                     $stmt = $pdo->prepare("UPDATE categories SET name = ?, description = ?, status = ? WHERE id = ?");
                     $stmt->execute([$name, $description, $status, $id]);
                     $message = 'Category updated successfully!';

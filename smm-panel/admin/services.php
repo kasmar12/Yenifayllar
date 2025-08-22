@@ -41,12 +41,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo = getDBConnection();
                 
+                // Set character set for this connection
+                $pdo->exec("SET NAMES utf8mb4");
+                $pdo->exec("SET CHARACTER SET utf8mb4");
+                $pdo->exec("SET character_set_connection=utf8mb4");
+                
                 if ($action === 'add') {
                     $stmt = $pdo->prepare("INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([$category_id, $api_service_id, $name, $description, $price, $min_quantity, $max_quantity, $status]);
                     $message = 'Service added successfully!';
                 } else {
                     $id = (int)($_POST['id'] ?? 0);
+                    
+                    // Set character set for update operation
+                    $pdo->exec("SET NAMES utf8mb4");
+                    $pdo->exec("SET CHARACTER SET utf8mb4");
+                    $pdo->exec("SET character_set_connection=utf8mb4");
+                    
                     $stmt = $pdo->prepare("UPDATE services SET category_id = ?, api_service_id = ?, name = ?, description = ?, price = ?, min_quantity = ?, max_quantity = ?, status = ? WHERE id = ?");
                     $stmt->execute([$category_id, $api_service_id, $name, $description, $price, $min_quantity, $max_quantity, $status, $id]);
                     $message = 'Service updated successfully!';
