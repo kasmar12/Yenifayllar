@@ -55,21 +55,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id > 0) {
             try {
                 $pdo = getDBConnection();
-                // Check if category has services
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM services WHERE category_id = ?");
-                $stmt->execute([$id]);
-                $serviceCount = $stmt->fetchColumn();
                 
-                if ($serviceCount > 0) {
-                    $error = 'Cannot delete category with existing services.';
+                // First, delete all services in this category (due to CASCADE)
+                $stmt = $pdo->prepare("DELETE FROM services WHERE category_id = ?");
+                $stmt->execute([$id]);
+                $deletedServices = $stmt->rowCount();
+                
+                // Then delete the category
+                $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
+                $stmt->execute([$id]);
+                
+                if ($stmt->rowCount() > 0) {
+                    $message = "Category deleted successfully! {$deletedServices} services were also removed.";
                 } else {
-                    $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
-                    $stmt->execute([$id]);
-                    $message = 'Category deleted successfully!';
+                    $error = 'Category not found or already deleted.';
                 }
             } catch (Exception $e) {
                 $error = 'Database error: ' . $e->getMessage();
             }
+        } else {
+            $error = 'Invalid category ID.';
         }
     }
 }
@@ -262,20 +267,11 @@ if ($action === 'edit' && isset($_GET['id'])) {
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <?php if ($cat['service_count'] == 0): ?>
-                                                            <button type="button" 
-                                                                    class="btn btn-sm btn-outline-danger"
-                                                                    onclick="deleteCategory(<?php echo $cat['id']; ?>)">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        <?php else: ?>
-                                                            <button type="button" 
-                                                                    class="btn btn-sm btn-outline-secondary" 
-                                                                    disabled 
-                                                                    title="Cannot delete category with services">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        <?php endif; ?>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                onclick="deleteCategory(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars($cat['name']); ?>')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -342,8 +338,8 @@ if ($action === 'edit' && isset($_GET['id'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        function deleteCategory(id) {
-            if (confirm('Are you sure you want to delete this category?')) {
+        function deleteCategory(id, name) {
+            if (confirm(`Are you sure you want to delete the category "${name}"?\n\nThis will also delete all services in this category!`)) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.innerHTML = `

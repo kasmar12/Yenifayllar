@@ -60,12 +60,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id > 0) {
             try {
                 $pdo = getDBConnection();
-                $stmt = $pdo->prepare("DELETE FROM services WHERE id = ?");
+                
+                // Check if service has orders
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE service_id = ?");
                 $stmt->execute([$id]);
-                $message = 'Service deleted successfully!';
+                $orderCount = $stmt->fetchColumn();
+                
+                if ($orderCount > 0) {
+                    $error = "Cannot delete service - it has {$orderCount} orders.";
+                } else {
+                    $stmt = $pdo->prepare("DELETE FROM services WHERE id = ?");
+                    $stmt->execute([$id]);
+                    
+                    if ($stmt->rowCount() > 0) {
+                        $message = 'Service deleted successfully!';
+                    } else {
+                        $error = 'Service not found or already deleted.';
+                    }
+                }
             } catch (Exception $e) {
                 $error = 'Database error: ' . $e->getMessage();
             }
+        } else {
+            $error = 'Invalid service ID.';
         }
     }
 }
@@ -258,7 +275,7 @@ if ($action === 'edit' && isset($_GET['id'])) {
                                                         </a>
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-outline-danger"
-                                                                onclick="deleteService(<?php echo $srv['id']; ?>)">
+                                                                onclick="deleteService(<?php echo $srv['id']; ?>, '<?php echo htmlspecialchars($srv['name']); ?>')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </td>
@@ -382,8 +399,8 @@ if ($action === 'edit' && isset($_GET['id'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        function deleteService(id) {
-            if (confirm('Are you sure you want to delete this service?')) {
+        function deleteService(id, name) {
+            if (confirm(`Are you sure you want to delete the service "${name}"?`)) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.innerHTML = `
