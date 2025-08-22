@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             
                                                             <div class="d-flex justify-content-between align-items-center">
                                                                 <span class="service-price">
-                                                                    $<?php echo number_format($service['price'], 4); ?>/1000
+                                                                    AZN <?php echo rtrim(rtrim(number_format($service['price'], 4), '0'), '.'); ?>/1000
                                                                 </span>
                                                                 <small class="text-muted">
                                                                     Min: <?php echo number_format($service['min_quantity']); ?>
@@ -265,13 +265,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    class="form-control" 
                                    id="quantity" 
                                    name="quantity" 
-                                   placeholder="1000"
-                                   min="1" 
-                                   max="1000000"
+                                   placeholder="1000 (1 AZN)"
+                                   min="1000" 
+                                   max="100000"
+                                   value="1000"
                                    required>
                             <div class="form-text">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Enter the number of followers, likes, or views you want
+                                Enter the number of followers, likes, or views you want (1000 = 1 AZN)
                             </div>
                         </div>
 
@@ -357,18 +358,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const selectedCard = document.querySelector('.service-card.selected');
             if (selectedCard) {
                 const price = parseFloat(selectedCard.dataset.servicePrice);
-                const quantity = parseInt(document.getElementById('quantity').value) || 0;
+                const quantity = parseInt(document.getElementById('quantity').value) || 1000;
                 const totalPrice = price * quantity;
                 
                 // Format price without trailing zeros
                 const formattedPrice = totalPrice.toFixed(4).replace(/\.?0+$/, '');
                 document.getElementById('totalPrice').textContent = 'AZN ' + formattedPrice;
                 document.getElementById('priceDisplay').style.display = 'block';
+                
+                // Show price per 1000 units
+                const pricePer1000 = (price * 1000).toFixed(4).replace(/\.?0+$/, '');
+                console.log(`Price per 1000 units: AZN ${pricePer1000}`);
             }
         }
 
         // Update price when quantity changes
         document.getElementById('quantity').addEventListener('input', updatePriceDisplay);
+        
+        // Initialize price display with default quantity (1000)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default quantity to 1000
+            document.getElementById('quantity').value = 1000;
+            
+            // If a service is pre-selected, show its price
+            const selectedCard = document.querySelector('.service-card.selected');
+            if (selectedCard) {
+                updatePriceDisplay();
+            }
+        });
 
         // Form validation
         document.getElementById('orderForm').addEventListener('submit', function(e) {
