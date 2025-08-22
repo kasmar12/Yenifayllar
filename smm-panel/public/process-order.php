@@ -35,7 +35,7 @@ try {
         
         // Insert order into database
         $stmt = $pdo->prepare("
-            INSERT INTO orders (order_id, service_id, link, quantity, price, total_price, status, api_order_id, api_response, user_ip, user_agent) 
+            INSERT INTO orders (order_id, service_id, link, quantity, price, total_price, status, smm_order_id, api_response, user_ip, user_agent) 
             VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
         ");
         

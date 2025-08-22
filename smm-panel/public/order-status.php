@@ -35,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($order) {
                 // Update status from SMM API if order is pending/processing
-                if (in_array($order['status'], ['pending', 'processing']) && !empty($order['api_order_id'])) {
-                    $statusResult = getSMMOrderStatus($order['api_order_id']);
+                if (in_array($order['status'], ['pending', 'processing']) && !empty($order['smm_order_id'])) {
+                    $statusResult = getSMMOrderStatus($order['smm_order_id']);
                     
                     if ($statusResult['success']) {
                         $newStatus = $statusResult['status'];
