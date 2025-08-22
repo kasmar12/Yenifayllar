@@ -49,8 +49,12 @@ CREATE TABLE orders (
     link VARCHAR(500) NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10,4) NOT NULL,
+    total_price DECIMAL(10,4) NOT NULL DEFAULT 0.0000,
     status ENUM('pending', 'processing', 'completed', 'cancelled', 'error') DEFAULT 'pending',
     smm_order_id VARCHAR(100),
+    api_response TEXT,
+    user_ip VARCHAR(45),
+    user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
