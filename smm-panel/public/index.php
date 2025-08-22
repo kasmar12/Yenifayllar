@@ -362,8 +362,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const totalPrice = price * quantity;
                 
                 // Format price without trailing zeros
-                const formattedPrice = totalPrice.toFixed(4).replace(/\.?0+$/, '');
-                document.getElementById('totalPrice').textContent = 'AZN ' + formattedPrice;
+                let formattedPrice;
+                if (totalPrice === 1) {
+                    formattedPrice = '1 AZN';
+                } else {
+                    formattedPrice = 'AZN ' + totalPrice.toFixed(4).replace(/\.?0+$/, '');
+                }
+                
+                document.getElementById('totalPrice').textContent = formattedPrice;
                 document.getElementById('priceDisplay').style.display = 'block';
                 
                 // Show price per 1000 units
@@ -379,6 +385,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.addEventListener('DOMContentLoaded', function() {
             // Set default quantity to 1000
             document.getElementById('quantity').value = 1000;
+            
+            // Show default price for 1000 quantity
+            document.getElementById('totalPrice').textContent = '1 AZN';
+            document.getElementById('priceDisplay').style.display = 'block';
             
             // If a service is pre-selected, show its price
             const selectedCard = document.querySelector('.service-card.selected');
