@@ -243,8 +243,12 @@ if ($action === 'edit' && isset($_GET['id'])) {
                                                     </td>
                                                     <td><?php echo formatPrice($srv['price']); ?></td>
                                                     <td>
-                                                        <span class="badge bg-<?php echo $srv['status'] === 'active' ? 'success' : 'secondary'; ?>">
-                                                            <?php echo ucfirst($srv['status']); ?>
+                                                        <?php 
+                                                        $status = $srv['status'] ?? 'inactive';
+                                                        $statusClass = $status === 'active' ? 'success' : 'secondary';
+                                                        ?>
+                                                        <span class="badge bg-<?php echo $statusClass; ?>">
+                                                            <?php echo ucfirst($status); ?>
                                                         </span>
                                                     </td>
                                                     <td>

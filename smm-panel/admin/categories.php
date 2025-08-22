@@ -249,8 +249,12 @@ if ($action === 'edit' && isset($_GET['id'])) {
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <span class="badge bg-<?php echo $cat['status'] === 'active' ? 'success' : 'secondary'; ?>">
-                                                            <?php echo ucfirst($cat['status']); ?>
+                                                        <?php 
+                                                        $status = $cat['status'] ?? 'inactive';
+                                                        $statusClass = $status === 'active' ? 'success' : 'secondary';
+                                                        ?>
+                                                        <span class="badge bg-<?php echo $statusClass; ?>">
+                                                            <?php echo ucfirst($status); ?>
                                                         </span>
                                                     </td>
                                                     <td>

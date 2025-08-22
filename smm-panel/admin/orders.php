@@ -291,13 +291,15 @@ try {
                                                     <td><?php echo number_format($ord['quantity']); ?></td>
                                                     <td><?php echo formatPrice($ord['price']); ?></td>
                                                     <td>
-                                                        <span class="badge bg-<?php 
-                                                            echo $ord['status'] === 'pending' ? 'warning' : 
-                                                                ($ord['status'] === 'processing' ? 'info' : 
-                                                                ($ord['status'] === 'completed' ? 'success' : 
-                                                                ($ord['status'] === 'cancelled' ? 'secondary' : 'danger'))); 
-                                                        ?>">
-                                                            <?php echo ucfirst($ord['status']); ?>
+                                                        <?php 
+                                                        $status = $ord['status'] ?? 'pending';
+                                                        $statusClass = $status === 'pending' ? 'warning' : 
+                                                            ($status === 'processing' ? 'info' : 
+                                                            ($status === 'completed' ? 'success' : 
+                                                            ($status === 'cancelled' ? 'secondary' : 'danger')));
+                                                        ?>
+                                                        <span class="badge bg-<?php echo $statusClass; ?>">
+                                                            <?php echo ucfirst($status); ?>
                                                         </span>
                                                     </td>
                                                     <td>
@@ -340,13 +342,15 @@ try {
                                         <tr>
                                             <td><strong>Status:</strong></td>
                                             <td>
-                                                <span class="badge bg-<?php 
-                                                    echo $order['status'] === 'pending' ? 'warning' : 
-                                                        ($order['status'] === 'processing' ? 'info' : 
-                                                        ($order['status'] === 'completed' ? 'success' : 
-                                                        ($order['status'] === 'cancelled' ? 'secondary' : 'danger'))); 
-                                                ?>">
-                                                    <?php echo ucfirst($order['status']); ?>
+                                                <?php 
+                                                $status = $order['status'] ?? 'pending';
+                                                $statusClass = $status === 'pending' ? 'warning' : 
+                                                    ($status === 'processing' ? 'info' : 
+                                                    ($status === 'completed' ? 'success' : 
+                                                    ($status === 'cancelled' ? 'secondary' : 'danger')));
+                                                ?>
+                                                <span class="badge bg-<?php echo $statusClass; ?>">
+                                                    <?php echo ucfirst($status); ?>
                                                 </span>
                                             </td>
                                         </tr>
