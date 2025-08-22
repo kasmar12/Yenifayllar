@@ -6,6 +6,11 @@
 
 require_once '../includes/config.php';
 
+// Helper function to format price
+function formatPrice($price) {
+    return '$' . number_format($price, 4);
+}
+
 // Check admin authentication
 if (!isset($_SESSION['admin_id']) || !isset($_SESSION['admin_username'])) {
     header('Location: login.php');
@@ -19,7 +24,7 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-$action = $_GET['action'] ?? 'list';
+$action = $_POST['action'] ?? $_GET['action'] ?? 'list';
 $message = '';
 $error = '';
 

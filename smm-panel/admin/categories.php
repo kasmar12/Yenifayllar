@@ -19,7 +19,7 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-$action = $_GET['action'] ?? 'list';
+$action = $_POST['action'] ?? $_GET['action'] ?? 'list';
 $message = '';
 $error = '';
 
