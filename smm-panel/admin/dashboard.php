@@ -7,8 +7,15 @@
 require_once '../includes/config.php';
 require_once '../includes/api_functions.php';
 
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+
 // Check admin authentication
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if (!isset($_SESSION['admin_id']) || !isset($_SESSION['admin_username'])) {
     header('Location: login.php');
     exit;
 }
@@ -34,11 +41,11 @@ try {
     $completedOrders = $stmt->fetch()['total'];
     
     // Total services
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM services WHERE is_active = 1");
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM services WHERE status = 'active'");
     $totalServices = $stmt->fetch()['total'];
     
     // Total categories
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM categories WHERE is_active = 1");
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM categories WHERE status = 'active'");
     $totalCategories = $stmt->fetch()['total'];
     
     // Recent orders
