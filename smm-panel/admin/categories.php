@@ -56,25 +56,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo = getDBConnection();
                 
+                // Debug logging
+                error_log("Attempting to delete category ID: " . $id);
+                
                 // First, delete all services in this category (due to CASCADE)
                 $stmt = $pdo->prepare("DELETE FROM services WHERE category_id = ?");
                 $stmt->execute([$id]);
                 $deletedServices = $stmt->rowCount();
                 
+                error_log("Deleted {$deletedServices} services for category ID: " . $id);
+                
                 // Then delete the category
                 $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
                 $stmt->execute([$id]);
                 
+                error_log("Category delete result: " . $stmt->rowCount() . " rows affected");
+                
                 if ($stmt->rowCount() > 0) {
                     $message = "Category deleted successfully! {$deletedServices} services were also removed.";
+                    error_log("Category ID {$id} deleted successfully");
                 } else {
                     $error = 'Category not found or already deleted.';
+                    error_log("Category ID {$id} not found or already deleted");
                 }
             } catch (Exception $e) {
                 $error = 'Database error: ' . $e->getMessage();
+                error_log("Error deleting category ID {$id}: " . $e->getMessage());
             }
         } else {
             $error = 'Invalid category ID.';
+            error_log("Invalid category ID provided: " . var_export($_POST, true));
         }
     }
 }
@@ -339,15 +350,24 @@ if ($action === 'edit' && isset($_GET['id'])) {
     
     <script>
         function deleteCategory(id, name) {
+            console.log('deleteCategory called with ID:', id, 'Name:', name);
+            
             if (confirm(`Are you sure you want to delete the category "${name}"?\n\nThis will also delete all services in this category!`)) {
+                console.log('User confirmed deletion');
+                
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.innerHTML = `
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="id" value="${id}">
                 `;
+                
+                console.log('Form created:', form.outerHTML);
                 document.body.appendChild(form);
+                console.log('Form appended to body, submitting...');
                 form.submit();
+            } else {
+                console.log('User cancelled deletion');
             }
         }
     </script>

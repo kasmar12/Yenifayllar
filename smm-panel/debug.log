@@ -1,0 +1,4 @@
+# SMM Panel Debug Log
+# Date: <?php echo date('Y-m-d H:i:s'); ?>
+
+# This file will contain debug information about delete operations

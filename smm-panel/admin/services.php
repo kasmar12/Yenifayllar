@@ -61,28 +61,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo = getDBConnection();
                 
+                // Debug logging
+                error_log("Attempting to delete service ID: " . $id);
+                
                 // Check if service has orders
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE service_id = ?");
                 $stmt->execute([$id]);
                 $orderCount = $stmt->fetchColumn();
                 
+                error_log("Service ID {$id} has {$orderCount} orders");
+                
                 if ($orderCount > 0) {
                     $error = "Cannot delete service - it has {$orderCount} orders.";
+                    error_log("Cannot delete service ID {$id} - has {$orderCount} orders");
                 } else {
                     $stmt = $pdo->prepare("DELETE FROM services WHERE id = ?");
                     $stmt->execute([$id]);
                     
+                    error_log("Service delete result: " . $stmt->rowCount() . " rows affected");
+                    
                     if ($stmt->rowCount() > 0) {
                         $message = 'Service deleted successfully!';
+                        error_log("Service ID {$id} deleted successfully");
                     } else {
                         $error = 'Service not found or already deleted.';
+                        error_log("Service ID {$id} not found or already deleted");
                     }
                 }
             } catch (Exception $e) {
                 $error = 'Database error: ' . $e->getMessage();
+                error_log("Error deleting service ID {$id}: " . $e->getMessage());
             }
         } else {
             $error = 'Invalid service ID.';
+            error_log("Invalid service ID provided: " . var_export($_POST, true));
         }
     }
 }
@@ -400,15 +412,24 @@ if ($action === 'edit' && isset($_GET['id'])) {
     
     <script>
         function deleteService(id, name) {
+            console.log('deleteService called with ID:', id, 'Name:', name);
+            
             if (confirm(`Are you sure you want to delete the service "${name}"?`)) {
+                console.log('User confirmed deletion');
+                
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.innerHTML = `
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="id" value="${id}">
                 `;
+                
+                console.log('Form created:', form.outerHTML);
                 document.body.appendChild(form);
+                console.log('Form appended to body, submitting...');
                 form.submit();
+            } else {
+                console.log('User cancelled deletion');
             }
         }
     </script>

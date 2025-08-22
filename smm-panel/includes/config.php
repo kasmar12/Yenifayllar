@@ -41,6 +41,10 @@ if (session_status() === PHP_SESSION_NONE) {
 // Set timezone
 date_default_timezone_set('UTC');
 
+// Set error logging
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../debug.log');
+
 // Database connection function
 function getDBConnection() {
     try {
