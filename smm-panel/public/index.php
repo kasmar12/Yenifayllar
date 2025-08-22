@@ -12,17 +12,17 @@ try {
     $pdo = getDBConnection();
     
     // Get active categories
-    $stmt = $pdo->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order, name");
+    $stmt = $pdo->prepare("SELECT * FROM categories WHERE status = 'active' ORDER BY name");
     $stmt->execute();
     $categories = $stmt->fetchAll();
     
     // Get active services with category info
     $stmt = $pdo->prepare("
-        SELECT s.*, c.name as category_name, c.slug as category_slug 
+        SELECT s.*, c.name as category_name 
         FROM services s 
         JOIN categories c ON s.category_id = c.id 
-        WHERE s.is_active = 1 
-        ORDER BY c.sort_order, s.sort_order, s.name
+        WHERE s.status = 'active' AND c.status = 'active'
+        ORDER BY c.name, s.name
     ");
     $stmt->execute();
     $services = $stmt->fetchAll();
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Get service details
         try {
-            $stmt = $pdo->prepare("SELECT * FROM services WHERE id = ? AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT * FROM services WHERE id = ? AND status = 'active'");
             $stmt->execute([$serviceId]);
             $service = $stmt->fetch();
             
@@ -171,12 +171,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php foreach ($categories as $index => $category): ?>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link <?php echo $index === 0 ? 'active' : ''; ?>" 
-                                                    id="tab-<?php echo $category['slug']; ?>" 
+                                                    id="tab-<?php echo $category['id']; ?>" 
                                                     data-bs-toggle="tab" 
-                                                    data-bs-target="#content-<?php echo $category['slug']; ?>" 
+                                                    data-bs-target="#content-<?php echo $category['id']; ?>" 
                                                     type="button" 
                                                     role="tab">
-                                                <i class="fas fa-<?php echo getCategoryIcon($category['slug']); ?> me-2"></i>
+                                                <i class="fas fa-<?php echo getCategoryIcon($category['name']); ?> me-2"></i>
                                                 <?php echo htmlspecialchars($category['name']); ?>
                                             </button>
                                         </li>
@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="tab-content" id="categoryContent">
                                     <?php foreach ($categories as $index => $category): ?>
                                         <div class="tab-pane fade <?php echo $index === 0 ? 'show active' : ''; ?>" 
-                                             id="content-<?php echo $category['slug']; ?>" 
+                                             id="content-<?php echo $category['id']; ?>" 
                                              role="tabpanel">
                                             
                                             <div class="row">
@@ -390,7 +390,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
 // Helper function to get category icon
-function getCategoryIcon($slug) {
+function getCategoryIcon($name) {
+    $name = strtolower($name);
     $icons = [
         'instagram' => 'camera',
         'tiktok' => 'music',
@@ -400,6 +401,6 @@ function getCategoryIcon($slug) {
         'default' => 'tag'
     ];
     
-    return $icons[$slug] ?? $icons['default'];
+    return $icons[$name] ?? $icons['default'];
 }
 ?>
