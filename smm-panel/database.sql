@@ -61,34 +61,77 @@ CREATE TABLE settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Insert default admin user (password: admin123)
-INSERT INTO users (username, password, role) VALUES 
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+-- Insert default admin user (password: admin123) - Only if not exists
+INSERT INTO users (username, password, role) 
+SELECT 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
 
--- Insert default categories
-INSERT INTO categories (name, description) VALUES 
-('Instagram', 'Instagram services including followers, likes, and views'),
-('TikTok', 'TikTok services including followers, likes, and views'),
-('YouTube', 'YouTube services including subscribers and views');
+-- Insert default categories - Only if not exists
+INSERT INTO categories (name, description) 
+SELECT 'Instagram', 'Instagram services including followers, likes, and views'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'Instagram');
 
--- Insert default services
-INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) VALUES 
-(1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000),
-(1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000),
-(1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000),
-(2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000),
-(2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000),
-(3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000);
+INSERT INTO categories (name, description) 
+SELECT 'TikTok', 'TikTok services including followers, likes, and views'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'TikTok');
 
--- Insert default settings
-INSERT INTO settings (setting_key, setting_value, description) VALUES 
-('smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Provider API URL'),
-('smm_api_key', 'YOUR_SMM_API_KEY', 'SMM Provider API Key'),
-('aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'),
-('site_name', 'SMM Panel', 'Website name'),
-('site_description', 'Professional SMM Services', 'Website description'),
-('currency', 'USD', 'Default currency'),
-('timezone', 'UTC', 'Default timezone');
+INSERT INTO categories (name, description) 
+SELECT 'YouTube', 'YouTube services including subscribers and views'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'YouTube');
+
+-- Insert default services - Only if not exists
+INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
+SELECT 1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000
+WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'Instagram Followers');
+
+INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
+SELECT 1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000
+WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'Instagram Likes');
+
+INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
+SELECT 1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000
+WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'Instagram Views');
+
+INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
+SELECT 2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000
+WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'TikTok Followers');
+
+INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
+SELECT 2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000
+WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'TikTok Likes');
+
+INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) 
+SELECT 3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000
+WHERE NOT EXISTS (SELECT 1 FROM services WHERE name = 'YouTube Subscribers');
+
+-- Insert default settings - Only if not exists
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Provider API URL'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'smm_api_url');
+
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'smm_api_key', 'YOUR_SMM_API_KEY', 'SMM Provider API Key'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'smm_api_key');
+
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'aylive_api_key');
+
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'site_name', 'SMM Panel', 'Website name'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'site_name');
+
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'site_description', 'Professional SMM Services', 'Website description'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'site_description');
+
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'currency', 'USD', 'Default currency'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'currency');
+
+INSERT INTO settings (setting_key, setting_value, description) 
+SELECT 'timezone', 'UTC', 'Default timezone'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'timezone');
 
 -- Create indexes for better performance
 CREATE INDEX idx_orders_order_id ON orders(order_id);

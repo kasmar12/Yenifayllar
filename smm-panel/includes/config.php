@@ -306,47 +306,56 @@ function initializeDatabase() {
             $stmt->execute(['admin', $adminPassword]);
         }
         
-        // Insert default categories if not exists
-        $defaultCategories = [
-            ['Instagram', 'Instagram services including followers, likes, and views'],
-            ['TikTok', 'TikTok services including followers, likes, and views'],
-            ['YouTube', 'YouTube services including subscribers and views']
-        ];
-        
-        foreach ($defaultCategories as $category) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO categories (name, description) VALUES (?, ?)");
-            $stmt->execute($category);
+        // Insert default categories only if table is completely empty
+        $stmt = $pdo->query("SELECT COUNT(*) FROM categories");
+        if ($stmt->fetchColumn() == 0) {
+            $defaultCategories = [
+                ['Instagram', 'Instagram services including followers, likes, and views'],
+                ['TikTok', 'TikTok services including followers, likes, and views'],
+                ['YouTube', 'YouTube services including subscribers and views']
+            ];
+            
+            foreach ($defaultCategories as $category) {
+                $stmt = $pdo->prepare("INSERT INTO categories (name, description) VALUES (?, ?)");
+                $stmt->execute($category);
+            }
         }
         
-        // Insert default services if not exists
-        $defaultServices = [
-            [1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000],
-            [1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000],
-            [1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000],
-            [2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000],
-            [2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000],
-            [3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000]
-        ];
-        
-        foreach ($defaultServices as $service) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute($service);
+        // Insert default services only if table is completely empty
+        $stmt = $pdo->query("SELECT COUNT(*) FROM services");
+        if ($stmt->fetchColumn() == 0) {
+            $defaultServices = [
+                [1, 1, 'Instagram Followers', 'High quality Instagram followers', 2.0000, 100, 10000],
+                [1, 2, 'Instagram Likes', 'Real Instagram likes for posts', 1.0000, 50, 5000],
+                [1, 3, 'Instagram Views', 'Instagram video views', 0.5000, 100, 10000],
+                [2, 4, 'TikTok Followers', 'Real TikTok followers', 1.5000, 100, 10000],
+                [2, 5, 'TikTok Likes', 'TikTok video likes', 0.8000, 100, 10000],
+                [3, 6, 'YouTube Subscribers', 'Real YouTube subscribers', 5.0000, 100, 1000]
+            ];
+            
+            foreach ($defaultServices as $service) {
+                $stmt = $pdo->prepare("INSERT INTO services (category_id, api_service_id, name, description, price, min_quantity, max_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute($service);
+            }
         }
         
-        // Insert default settings if not exists
-        $defaultSettings = [
-            ['smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Provider API URL'],
-            ['smm_api_key', 'YOUR_SMM_API_KEY', 'SMM Provider API Key'],
-            ['aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'],
-            ['site_name', 'SMM Panel', 'Website name'],
-            ['site_description', 'Professional SMM Services', 'Website description'],
-            ['currency', 'USD', 'Default currency'],
-            ['timezone', 'UTC', 'Default timezone']
-        ];
-        
-        foreach ($defaultSettings as $setting) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO settings (setting_key, setting_value, description) VALUES (?, ?, ?)");
-            $stmt->execute($setting);
+        // Insert default settings only if table is completely empty
+        $stmt = $pdo->query("SELECT COUNT(*) FROM settings");
+        if ($stmt->fetchColumn() == 0) {
+            $defaultSettings = [
+                ['smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Provider API URL'],
+                ['smm_api_key', 'YOUR_SMM_API_KEY', 'SMM Provider API Key'],
+                ['aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'],
+                ['site_name', 'SMM Panel', 'Website name'],
+                ['site_description', 'Professional SMM Services', 'Website description'],
+                ['currency', 'USD', 'Default currency'],
+                ['timezone', 'UTC', 'Default timezone']
+            ];
+            
+            foreach ($defaultSettings as $setting) {
+                $stmt = $pdo->prepare("INSERT INTO settings (setting_key, setting_value, description) VALUES (?, ?, ?)");
+                $stmt->execute($setting);
+            }
         }
         
         return true;
@@ -356,6 +365,9 @@ function initializeDatabase() {
     }
 }
 
-// Initialize database on first run
-initializeDatabase();
+// Initialize database only once per session
+if (!isset($_SESSION['db_initialized'])) {
+    initializeDatabase();
+    $_SESSION['db_initialized'] = true;
+}
 ?>
