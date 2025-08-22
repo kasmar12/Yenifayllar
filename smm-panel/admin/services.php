@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $max_quantity = (int)($_POST['max_quantity'] ?? 10000);
         $status = $_POST['status'] ?? 'active';
         
-        if (empty($name) || $price <= 0) {
+        if (empty($name) || $price < 0) {
             $error = 'Please fill all required fields correctly.';
         } else {
             try {
@@ -368,7 +368,7 @@ if ($action === 'edit' && isset($_GET['id'])) {
                                         <div class="mb-3">
                                             <label for="price" class="form-label">Price *</label>
                                             <div class="input-group">
-                                                <span class="input-group-text">$</span>
+                                                <span class="input-group-text">AZN</span>
                                                 <input type="number" class="form-control" id="price" name="price" 
                                                        value="<?php echo $service ? $service['price'] : ''; ?>" 
                                                        step="0.0001" min="0" placeholder="0.0000" required>
@@ -380,7 +380,7 @@ if ($action === 'edit' && isset($_GET['id'])) {
                                             <label for="min_quantity" class="form-label">Min Quantity</label>
                                             <input type="number" class="form-control" id="min_quantity" name="min_quantity" 
                                                    value="<?php echo $service ? $service['min_quantity'] : 1; ?>" 
-                                                   min="1" placeholder="1">
+                                                   min="0" placeholder="1">
                                         </div>
                                     </div>
                                     <div class="col-md-4">

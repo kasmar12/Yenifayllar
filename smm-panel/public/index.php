@@ -363,7 +363,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Format price without trailing zeros
                 let formattedPrice;
-                if (totalPrice === 1) {
+                if (totalPrice === 0) {
+                    formattedPrice = 'Pulsuz (Free)';
+                } else if (totalPrice === 1) {
                     formattedPrice = '1 AZN';
                 } else {
                     formattedPrice = 'AZN ' + totalPrice.toFixed(4).replace(/\.?0+$/, '');
