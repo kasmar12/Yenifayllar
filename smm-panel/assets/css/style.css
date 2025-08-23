@@ -682,6 +682,86 @@ body {
     background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
 }
 
+/* ===== SIMPLE SERVICE CARDS ===== */
+.simple-service-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    height: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.simple-service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.simple-service-card.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+}
+
+.service-icon {
+    margin-bottom: 1rem;
+}
+
+.service-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+}
+
+.service-desc {
+    color: #6c757d;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    min-height: 2.5rem;
+}
+
+.service-badge {
+    margin-top: auto;
+}
+
+.service-badge .badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+}
+
+/* Responsive Design for Simple Service Cards */
+@media (max-width: 768px) {
+    .simple-service-card {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .service-icon i {
+        font-size: 1.5rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .simple-service-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .service-name {
+        font-size: 0.95rem;
+    }
+    
+    .service-desc {
+        font-size: 0.8rem;
+        min-height: 2rem;
+    }
+}
+
 /* ===== MODERN SERVICE SELECTION STYLES ===== */
 
 /* Service Selection Header */
