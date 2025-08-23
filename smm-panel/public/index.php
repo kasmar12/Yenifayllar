@@ -11,10 +11,18 @@ require_once '../includes/api_functions.php';
 try {
     $pdo = getDBConnection();
     
+    // Debug: Check database connection
+    if (!$pdo) {
+        throw new Exception("Database connection failed");
+    }
+    
     // Get active categories
     $stmt = $pdo->prepare("SELECT * FROM categories WHERE status = 'active' ORDER BY name");
     $stmt->execute();
     $categories = $stmt->fetchAll();
+    
+    // Debug: Log categories count
+    error_log("Found " . count($categories) . " active categories");
     
     // Get active services with category info
     $stmt = $pdo->prepare("
@@ -27,8 +35,12 @@ try {
     $stmt->execute();
     $services = $stmt->fetchAll();
     
+    // Debug: Log services count
+    error_log("Found " . count($services) . " active services");
+    
 } catch (Exception $e) {
     $error = "Database error: " . $e->getMessage();
+    error_log("SMM Panel Error: " . $e->getMessage());
     $categories = [];
     $services = [];
 }
@@ -143,6 +155,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
+            
+            <!-- Debug Information -->
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Error:</strong> <?php echo htmlspecialchars($error); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+            
+            <!-- Debug Info (remove in production) -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Debug Info:</strong><br>
+                Categories: <?php echo count($categories); ?><br>
+                Services: <?php echo count($services); ?><br>
+                Database Status: <?php echo isset($pdo) ? 'Connected' : 'Not Connected'; ?>
+            </div>
 
             <!-- Order Form -->
             <div class="card">
