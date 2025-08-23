@@ -11,18 +11,10 @@ require_once '../includes/api_functions.php';
 try {
     $pdo = getDBConnection();
     
-    // Debug: Check database connection
-    if (!$pdo) {
-        throw new Exception("Database connection failed");
-    }
-    
     // Get active categories
     $stmt = $pdo->prepare("SELECT * FROM categories WHERE status = 'active' ORDER BY name");
     $stmt->execute();
     $categories = $stmt->fetchAll();
-    
-    // Debug: Log categories count
-    error_log("Found " . count($categories) . " active categories");
     
     // Get active services with category info
     $stmt = $pdo->prepare("
@@ -35,12 +27,8 @@ try {
     $stmt->execute();
     $services = $stmt->fetchAll();
     
-    // Debug: Log services count
-    error_log("Found " . count($services) . " active services");
-    
 } catch (Exception $e) {
     $error = "Database error: " . $e->getMessage();
-    error_log("SMM Panel Error: " . $e->getMessage());
     $categories = [];
     $services = [];
 }
@@ -156,23 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
             
-            <!-- Debug Information -->
-            <?php if (isset($error)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Error:</strong> <?php echo htmlspecialchars($error); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            
-            <!-- Debug Info (remove in production) -->
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Debug Info:</strong><br>
-                Categories: <?php echo count($categories); ?><br>
-                Services: <?php echo count($services); ?><br>
-                Database Status: <?php echo isset($pdo) ? 'Connected' : 'Not Connected'; ?>
-            </div>
+
 
             <!-- Order Form -->
             <div class="card">
@@ -186,40 +158,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" id="orderForm">
                         <!-- Service Selection -->
                         <div class="mb-4">
-                            <div class="service-selection-header text-center mb-4">
-                                <h5 class="text-primary mb-2">
-                                    <i class="fas fa-star me-2"></i>Choose Your Service
-                                </h5>
-                                <p class="text-muted">Select from our premium social media services</p>
-                            </div>
+                            <label for="service_id" class="form-label">
+                                <strong><i class="fas fa-cogs me-2"></i>Select Service</strong>
+                            </label>
                             
                             <?php if (empty($categories)): ?>
-                                <div class="alert alert-warning text-center">
+                                <div class="alert alert-warning">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
                                     No services available at the moment.
                                 </div>
                             <?php else: ?>
-                                <!-- Modern Category Pills -->
-                                <div class="category-pills mb-4">
-                                    <div class="d-flex flex-wrap justify-content-center gap-2">
-                                        <?php foreach ($categories as $index => $category): ?>
-                                            <button class="category-pill <?php echo $index === 0 ? 'active' : ''; ?>" 
-                                                    data-category="<?php echo $category['id']; ?>"
-                                                    onclick="showCategory(<?php echo $category['id']; ?>)">
+                                <!-- Category Tabs -->
+                                <ul class="nav nav-tabs mb-3" id="categoryTabs" role="tablist">
+                                    <?php foreach ($categories as $index => $category): ?>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link <?php echo $index === 0 ? 'active' : ''; ?>" 
+                                                    id="tab-<?php echo $category['id']; ?>" 
+                                                    data-bs-toggle="tab" 
+                                                    data-bs-target="#content-<?php echo $category['id']; ?>" 
+                                                    type="button" 
+                                                    role="tab">
                                                 <i class="fas fa-<?php echo getCategoryIcon($category['name']); ?> me-2"></i>
                                                 <?php echo htmlspecialchars($category['name']); ?>
                                             </button>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
 
-                                <!-- Services Grid -->
-                                <div class="services-container">
+                                <!-- Category Content -->
+                                <div class="tab-content" id="categoryContent">
                                     <?php foreach ($categories as $index => $category): ?>
-                                        <div class="category-services <?php echo $index === 0 ? 'active' : ''; ?>" 
-                                             id="category-<?php echo $category['id']; ?>">
+                                        <div class="tab-pane fade <?php echo $index === 0 ? 'show active' : ''; ?>" 
+                                             id="content-<?php echo $category['id']; ?>" 
+                                             role="tabpanel">
                                             
-                                            <div class="row g-3">
+                                            <div class="row">
                                                 <?php 
                                                 $categoryServices = array_filter($services, function($service) use ($category) {
                                                     return $service['category_id'] == $category['id'];
@@ -227,58 +200,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 ?>
                                                 
                                                 <?php foreach ($categoryServices as $service): ?>
-                                                    <div class="col-lg-4 col-md-6">
-                                                        <div class="modern-service-card" 
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="service-card" 
                                                              data-service-id="<?php echo $service['id']; ?>"
                                                              data-service-price="<?php echo $service['price']; ?>"
                                                              data-service-min="<?php echo $service['min_quantity']; ?>"
-                                                             data-service-max="<?php echo $service['max_quantity']; ?>"
-                                                             onclick="selectService(this)">
+                                                             data-service-max="<?php echo $service['max_quantity']; ?>">
                                                             
-                                                            <div class="service-card-header">
-                                                                <div class="service-icon">
-                                                                    <i class="fas fa-<?php echo getServiceIcon($service['name']); ?>"></i>
-                                                                </div>
-                                                                <div class="service-status">
-                                                                    <span class="status-dot active"></span>
-                                                                    <small>Active</small>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div class="service-card-body">
-                                                                <h6 class="service-title">
+                                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                <h6 class="mb-0 fw-bold">
                                                                     <?php echo htmlspecialchars($service['name']); ?>
                                                                 </h6>
-                                                                
-                                                                <p class="service-description">
-                                                                    <?php echo htmlspecialchars($service['description']); ?>
-                                                                </p>
-                                                                
-                                                                <div class="service-meta">
-                                                                    <div class="price-info">
-                                                                        <span class="price-label">Price per 1000:</span>
-                                                                        <span class="price-value">
-                                                                            <?php if ($service['price'] == 0): ?>
-                                                                                <span class="text-success">Free</span>
-                                                                            <?php else: ?>
-                                                                                AZN <?php echo rtrim(rtrim(number_format($service['price'], 4), '0'), '.'); ?>
-                                                                            <?php endif; ?>
-                                                                        </span>
-                                                                    </div>
-                                                                    
-                                                                    <div class="quantity-info">
-                                                                        <span class="quantity-label">Quantity Range:</span>
-                                                                        <span class="quantity-value">
-                                                                            <?php echo number_format($service['min_quantity']); ?> - <?php echo number_format($service['max_quantity']); ?>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
+                                                                <span class="category-badge">
+                                                                    <?php echo htmlspecialchars($category['name']); ?>
+                                                                </span>
                                                             </div>
                                                             
-                                                            <div class="service-card-footer">
-                                                                <div class="selection-indicator">
-                                                                    <i class="fas fa-check-circle"></i>
-                                                                </div>
+                                                            <p class="text-muted small mb-2">
+                                                                <?php echo htmlspecialchars($service['description']); ?>
+                                                            </p>
+                                                            
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="service-price">
+                                                                    AZN <?php echo rtrim(rtrim(number_format($service['price'], 4), '0'), '.'); ?>/1000
+                                                                </span>
+                                                                <small class="text-muted">
+                                                                    Min: <?php echo number_format($service['min_quantity']); ?>
+                                                                </small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -386,47 +334,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Category switching
-        function showCategory(categoryId) {
-            // Hide all category services
-            document.querySelectorAll('.category-services').forEach(cat => {
-                cat.classList.remove('active');
+        // Service selection functionality
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove previous selection
+                document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select current card
+                this.classList.add('selected');
+                
+                // Update hidden input
+                const serviceId = this.dataset.serviceId;
+                document.getElementById('selectedServiceId').value = serviceId;
+                
+                // Update price display
+                updatePriceDisplay();
+                
+                // Enable submit button
+                document.getElementById('submitBtn').disabled = false;
             });
-            
-            // Show selected category
-            document.getElementById('category-' + categoryId).classList.add('active');
-            
-            // Update category pills
-            document.querySelectorAll('.category-pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-
-        // Service selection
-        function selectService(serviceCard) {
-            // Remove previous selection
-            document.querySelectorAll('.modern-service-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Select current card
-            serviceCard.classList.add('selected');
-            
-            // Update hidden input
-            const serviceId = serviceCard.dataset.serviceId;
-            document.getElementById('selectedServiceId').value = serviceId;
-            
-            // Update price display
-            updatePriceDisplay();
-            
-            // Enable submit button
-            document.getElementById('submitBtn').disabled = false;
-        }
+        });
 
         // Update price display
         function updatePriceDisplay() {
-            const selectedCard = document.querySelector('.modern-service-card.selected');
+            const selectedCard = document.querySelector('.service-card.selected');
             if (selectedCard) {
                 const price = parseFloat(selectedCard.dataset.servicePrice);
                 const quantity = parseInt(document.getElementById('quantity').value) || 1000;
@@ -464,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('priceDisplay').style.display = 'block';
             
             // If a service is pre-selected, show its price
-            const selectedCard = document.querySelector('.modern-service-card.selected');
+            const selectedCard = document.querySelector('.service-card.selected');
             if (selectedCard) {
                 updatePriceDisplay();
             }
