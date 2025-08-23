@@ -1,6 +1,9 @@
 <?php
-require_once 'config.php';
-require_once 'bot.php';
+// Bot token
+$bot_token = "6006598727:AAG8f3xW8FAIDF21lZUMI_Ajd5paYK8nAWE";
+
+// Telegram API URL
+$api_url = "https://api.telegram.org/bot{$bot_token}";
 
 echo "🔄 Bot Polling rejimində işləyir...\n";
 echo "Bot: @" . BOT_USERNAME . "\n";

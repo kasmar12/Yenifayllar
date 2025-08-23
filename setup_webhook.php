@@ -2,7 +2,7 @@
 // Webhook quraşdırma faylı
 // Bu faylı bir dəfə işə salın
 
-$bot_token = "YOUR_BOT_TOKEN_HERE";
+$bot_token = "6006598727:AAG8f3xW8FAIDF21lZUMI_Ajd5paYK8nAWE";
 $webhook_url = "http://localhost/webhook.php"; // Local test üçün
 
 echo "🤖 Telegram Bot Webhook Quraşdırılır...\n\n";

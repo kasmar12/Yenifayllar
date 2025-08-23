@@ -2,7 +2,7 @@
 // Telegram Bot Webhook - Sadə versiya
 
 // Bot token - öz token-inizi yazın
-$bot_token = "YOUR_BOT_TOKEN_HERE";
+$bot_token = "6006598727:AAG8f3xW8FAIDF21lZUMI_Ajd5paYK8nAWE";
 
 // Telegram-dan gələn məlumatları al
 $update = json_decode(file_get_contents('php://input'), true);
