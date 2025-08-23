@@ -108,12 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <nav class="navbar navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-rocket me-2"></i>
+                <i class="fas fa-shopping-cart me-2"></i>
                 <?php echo SITE_NAME; ?>
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link text-white" href="order-status.php">
-                    <i class="fas fa-search me-1"></i>Order Status
+                    <i class="fas fa-search me-1"></i>Check Status
                 </a>
             </div>
         </div>
@@ -124,11 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Header -->
             <div class="text-center mb-5">
                 <h1 class="display-5 fw-bold text-primary mb-3">
-                    <i class="fas fa-rocket me-2"></i>
-                    SMM Services
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Place Your Order
                 </h1>
                 <p class="text-muted">
-                    Enter your details and place your order
+                    Fill in the details below to place your order
                 </p>
             </div>
 
@@ -146,59 +146,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Order Form -->
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <form method="POST" id="orderForm">
-                        <!-- Auto-selected Service (Hidden) -->
-                        <?php if (!empty($categories)): ?>
+                    <form method="POST" id="orderForm" class="needs-validation" novalidate>
+                        <!-- Hidden Auto-selected Service -->
+                        <?php if (!empty($services)): ?>
                             <?php 
-                            // Automatically select the first available service
+                            // Automatically select the first available service in background
                             $autoSelectedService = $services[0];
-                            $autoSelectedCategory = '';
-                            foreach ($categories as $cat) {
-                                if ($cat['id'] == $autoSelectedService['category_id']) {
-                                    $autoSelectedCategory = $cat['name'];
-                                    break;
-                                }
-                            }
                             ?>
                             <input type="hidden" name="service_id" value="<?php echo $autoSelectedService['id']; ?>">
-                            
-                            <div class="row justify-content-center">
-                                <div class="col-md-6">
-                                    <div class="card border-primary">
-                                        <div class="card-body text-center p-4">
-                                            <div class="service-icon mb-3">
-                                                <i class="fas fa-<?php echo getServiceIcon($autoSelectedService['name']); ?> fa-3x text-primary"></i>
-                                            </div>
-                                            
-                                            <h6 class="service-name mb-2 fw-bold">
-                                                <?php echo htmlspecialchars($autoSelectedService['name']); ?>
-                                            </h6>
-                                            
-                                            <p class="service-desc text-muted mb-3">
-                                                <?php echo htmlspecialchars($autoSelectedService['description']); ?>
-                                            </p>
-                                            
-                                            <div class="service-badge">
-                                                <span class="badge bg-primary fs-6 px-3 py-2">
-                                                    <?php echo htmlspecialchars($autoSelectedCategory); ?>
-                                                </span>
-                                            </div>
-                                            
-                                            <div class="mt-3">
-                                                <small class="text-success">
-                                                    <i class="fas fa-check-circle me-1"></i>
-                                                    Service automatically selected
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <div class="alert alert-warning text-center">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                No services available at the moment.
-                            </div>
                         <?php endif; ?>
 
                         <!-- Link/Username Input -->
@@ -264,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (!link || !quantity) {
                 e.preventDefault();
-                alert('Please fill in all fields.');
+                alert('Please fill in all required fields.');
                 return false;
             }
             
@@ -272,6 +227,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
             document.getElementById('submitBtn').disabled = true;
         });
+        
+        // Bootstrap form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
     </script>
 </body>
 </html>
