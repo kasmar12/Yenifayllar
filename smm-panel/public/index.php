@@ -147,66 +147,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card shadow-sm">
                 <div class="card-body p-4">
                     <form method="POST" id="orderForm">
-                        <!-- Service Selection (Auto-selected) -->
-                        <div class="mb-4">
-                            <h5 class="text-center mb-3">
-                                <i class="fas fa-cogs me-2"></i>Select Service
-                            </h5>
-                            
-                            <?php if (empty($categories)): ?>
-                                <div class="alert alert-warning text-center">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    No services available at the moment.
-                                </div>
-                            <?php else: ?>
-                                <!-- Auto-selected Service Display -->
-                                <?php 
-                                // Automatically select the first available service
-                                $autoSelectedService = $services[0];
-                                $autoSelectedCategory = '';
-                                foreach ($categories as $cat) {
-                                    if ($cat['id'] == $autoSelectedService['category_id']) {
-                                        $autoSelectedCategory = $cat['name'];
-                                        break;
-                                    }
+                        <!-- Auto-selected Service (Hidden) -->
+                        <?php if (!empty($categories)): ?>
+                            <?php 
+                            // Automatically select the first available service
+                            $autoSelectedService = $services[0];
+                            $autoSelectedCategory = '';
+                            foreach ($categories as $cat) {
+                                if ($cat['id'] == $autoSelectedService['category_id']) {
+                                    $autoSelectedCategory = $cat['name'];
+                                    break;
                                 }
-                                ?>
-                                <input type="hidden" name="service_id" value="<?php echo $autoSelectedService['id']; ?>">
-                                
-                                <div class="row justify-content-center">
-                                    <div class="col-md-6">
-                                        <div class="card border-primary">
-                                            <div class="card-body text-center p-4">
-                                                <div class="service-icon mb-3">
-                                                    <i class="fas fa-<?php echo getServiceIcon($autoSelectedService['name']); ?> fa-3x text-primary"></i>
-                                                </div>
-                                                
-                                                <h6 class="service-name mb-2 fw-bold">
-                                                    <?php echo htmlspecialchars($autoSelectedService['name']); ?>
-                                                </h6>
-                                                
-                                                <p class="service-desc text-muted mb-3">
-                                                    <?php echo htmlspecialchars($autoSelectedService['description']); ?>
-                                                </p>
-                                                
-                                                <div class="service-badge">
-                                                    <span class="badge bg-primary fs-6 px-3 py-2">
-                                                        <?php echo htmlspecialchars($autoSelectedCategory); ?>
-                                                    </span>
-                                                </div>
-                                                
-                                                <div class="mt-3">
-                                                    <small class="text-success">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Service automatically selected
-                                                    </small>
-                                                </div>
+                            }
+                            ?>
+                            <input type="hidden" name="service_id" value="<?php echo $autoSelectedService['id']; ?>">
+                            
+                            <div class="row justify-content-center">
+                                <div class="col-md-6">
+                                    <div class="card border-primary">
+                                        <div class="card-body text-center p-4">
+                                            <div class="service-icon mb-3">
+                                                <i class="fas fa-<?php echo getServiceIcon($autoSelectedService['name']); ?> fa-3x text-primary"></i>
+                                            </div>
+                                            
+                                            <h6 class="service-name mb-2 fw-bold">
+                                                <?php echo htmlspecialchars($autoSelectedService['name']); ?>
+                                            </h6>
+                                            
+                                            <p class="service-desc text-muted mb-3">
+                                                <?php echo htmlspecialchars($autoSelectedService['description']); ?>
+                                            </p>
+                                            
+                                            <div class="service-badge">
+                                                <span class="badge bg-primary fs-6 px-3 py-2">
+                                                    <?php echo htmlspecialchars($autoSelectedCategory); ?>
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="mt-3">
+                                                <small class="text-success">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    Service automatically selected
+                                                </small>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            <?php endif; ?>
-                        </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="alert alert-warning text-center">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No services available at the moment.
+                            </div>
+                        <?php endif; ?>
 
                         <!-- Link/Username Input -->
                         <div class="mb-3">
