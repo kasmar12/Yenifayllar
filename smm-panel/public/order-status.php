@@ -41,11 +41,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($statusResult['success']) {
                         $newStatus = $statusResult['status'];
                         
+                        // Map SMM API status to database status
+                        $statusMapping = [
+                            'pending' => 'pending',
+                            'processing' => 'processing',
+                            'completed' => 'completed',
+                            'cancelled' => 'cancelled',
+                            'canceled' => 'cancelled', // Handle both spellings
+                            'error' => 'error'
+                        ];
+                        
+                        $mappedStatus = $statusMapping[$newStatus] ?? 'pending';
+                        
                         // Update database if status changed
-                        if ($newStatus !== $order['status']) {
+                        if ($mappedStatus !== $order['status']) {
                             $updateStmt = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
-                            $updateStmt->execute([$newStatus, $order['id']]);
-                            $order['status'] = $newStatus;
+                            $updateStmt->execute([$mappedStatus, $order['id']]);
+                            $order['status'] = $mappedStatus;
                         }
                     }
                 }
@@ -245,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             $statusClass = match($order['status']) {
                                                 'completed' => 'status-completed',
                                                 'processing' => 'status-processing',
-                                                'canceled' => 'status-canceled',
+                                                'cancelled' => 'status-canceled',
                                                 default => 'status-pending'
                                             };
                                             ?>
@@ -254,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 $statusText = match($order['status']) {
                                                     'completed' => 'Tamamlandı',
                                                     'processing' => 'İşleniyor',
-                                                    'canceled' => 'İptal Edildi',
+                                                    'cancelled' => 'İptal Edildi',
                                                     'pending' => 'Beklemede',
                                                     default => ucfirst($order['status'])
                                                 };
@@ -339,7 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li><span class="badge status-pending me-2"><span data-tr="Beklemede" data-az="Gözləyir" data-en="Pending">Beklemede</span></span> - <span data-tr="Sipariş işlenmeyi bekliyor" data-az="Sifariş işlənməyi gözləyir" data-en="Order is waiting to be processed">Sipariş işlenmeyi bekliyor</span></li>
                                 <li><span class="badge status-processing me-2"><span data-tr="İşleniyor" data-az="İşlənir" data-en="Processing">İşleniyor</span></span> - <span data-tr="Sipariş üzerinde çalışılıyor" data-az="Sifariş üzərində işlənir" data-en="Order is being worked on">Sipariş üzerinde çalışılıyor</span></li>
                                 <li><span class="badge status-completed me-2"><span data-tr="Tamamlandı" data-az="Tamamlandı" data-en="Completed">Tamamlandı</span></span> - <span data-tr="Sipariş başarıyla tamamlandı" data-az="Sifariş uğurla tamamlandı" data-en="Order finished successfully">Sipariş başarıyla tamamlandı</span></li>
-                                <li><span class="badge status-canceled me-2"><span data-tr="İptal Edildi" data-az="Ləğv Edildi" data-en="Canceled">İptal Edildi</span></span> - <span data-tr="Sipariş iptal edildi" data-az="Sifariş ləğv edildi" data-en="Order was canceled">Sipariş iptal edildi</span></li>
+                                <li><span class="badge status-canceled me-2"><span data-tr="İptal Edildi" data-az="Ləğv Edildi" data-en="Cancelled">İptal Edildi</span></span> - <span data-tr="Sipariş iptal edildi" data-az="Sifariş ləğv edildi" data-en="Order was cancelled">Sipariş iptal edildi</span></li>
                             </ul>
                         </div>
                         <div class="col-md-6">
