@@ -37,36 +37,35 @@ while (true) {
                                 [
                                     [
                                         'text' => '🌐 Vebsaytı Aç',
-                                        'callback_data' => 'open_website'
+                                        'web_app' => [
+                                            'url' => 'https://gogole.cok'
+                                        ]
                                     ]
                                 ]
                             ]
                         ];
                         
                         $message_text = "👋 Salam! Mən sizin Telegram botunuzam.\n\n";
-                        $message_text .= "Aşağıdakı button-a basaraq vebsaytı aça bilərsiniz:";
+                        $message_text .= "Aşağıdakı button-a basaraq vebsaytı Telegram daxilində aça bilərsiniz:";
                         
                         sendMessage($chat_id, $message_text, $keyboard);
                         echo "✅ /start mesajı göndərildi\n";
                     }
                 }
                 
-                // Button click varsa
-                if (isset($update['callback_query'])) {
-                    $callback_query = $update['callback_query'];
-                    $chat_id = $callback_query['message']['chat']['id'];
-                    $data = $callback_query['data'];
+                // Web App açıldığında
+                if (isset($update['web_app_data'])) {
+                    $web_app_data = $update['web_app_data'];
+                    $chat_id = $web_app_data['message']['chat']['id'];
+                    $data = $web_app_data['data'];
                     
-                    echo "🔘 Button click: {$data}\n";
+                    echo "🌐 Web App açıldı: {$data}\n";
                     
-                    if ($data === 'open_website') {
-                        $message_text = "🔗 Vebsayt linki:\n\n";
-                        $message_text .= "https://gogole.cok\n\n";
-                        $message_text .= "Bu linkə daxil olaraq vebsaytı görə bilərsiniz.";
-                        
-                        sendMessage($chat_id, $message_text);
-                        echo "✅ Vebsayt linki göndərildi\n";
-                    }
+                    $message_text = "✅ Vebsayt Telegram daxilində açıldı!\n\n";
+                    $message_text .= "İndi vebsaytı istifadə edə bilərsiniz.";
+                    
+                    sendMessage($chat_id, $message_text);
+                    echo "✅ Web App açıldı mesajı göndərildi\n";
                 }
             }
         }
