@@ -105,16 +105,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-shopping-cart me-2"></i>
-                <?php echo SITE_NAME; ?>
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <div class="brand-icon me-3">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name"><?php echo SITE_NAME; ?></span>
+                    <small class="brand-tagline d-block">Professional SMM Services</small>
+                </div>
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link text-white" href="order-status.php">
-                    <i class="fas fa-search me-1"></i>Durum Kontrolü
-                </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Items -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.php">
+                            <i class="fas fa-home me-2"></i>
+                            <span>Ana Sayfa</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="order-status.php">
+                            <i class="fas fa-search me-2"></i>
+                            <span>Sipariş Durumu</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">
+                            <i class="fas fa-cogs me-2"></i>
+                            <span>Hizmetler</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span>İletişim</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
