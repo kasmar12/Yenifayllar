@@ -95,8 +95,6 @@ try {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../assets/css/style.css" rel="stylesheet">
-    <!-- Theme Switcher -->
-    <script src="../assets/js/theme-switcher.js"></script>
 </head>
 <body>
     <!-- Navigation -->
