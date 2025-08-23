@@ -353,4 +353,70 @@ function calculateServicePrice($serviceId, $quantity) {
         return 0;
     }
 }
+
+/**
+ * Get icon for service based on name
+ * @param string $serviceName Service name
+ * @return string FontAwesome icon class
+ */
+function getServiceIcon($serviceName) {
+    $serviceName = strtolower($serviceName);
+    
+    // Instagram services
+    if (strpos($serviceName, 'instagram') !== false) {
+        if (strpos($serviceName, 'followers') !== false) return 'users';
+        if (strpos($serviceName, 'likes') !== false) return 'heart';
+        if (strpos($serviceName, 'views') !== false) return 'eye';
+        if (strpos($serviceName, 'comments') !== false) return 'comment';
+        if (strpos($serviceName, 'video') !== false) return 'video';
+        if (strpos($serviceName, 'photo') !== false) return 'image';
+        return 'instagram';
+    }
+    
+    // TikTok services
+    if (strpos($serviceName, 'tiktok') !== false) {
+        if (strpos($serviceName, 'followers') !== false) return 'users';
+        if (strpos($serviceName, 'likes') !== false) return 'heart';
+        if (strpos($serviceName, 'views') !== false) return 'eye';
+        if (strpos($serviceName, 'comments') !== false) return 'comment';
+        if (strpos($serviceName, 'video') !== false) return 'video';
+        return 'music';
+    }
+    
+    // YouTube services
+    if (strpos($serviceName, 'youtube') !== false) {
+        if (strpos($serviceName, 'subscribers') !== false) return 'users';
+        if (strpos($serviceName, 'likes') !== false) return 'thumbs-up';
+        if (strpos($serviceName, 'views') !== false) return 'eye';
+        if (strpos($serviceName, 'comments') !== false) return 'comment';
+        if (strpos($serviceName, 'video') !== false) return 'video';
+        return 'youtube';
+    }
+    
+    // Twitter services
+    if (strpos($serviceName, 'twitter') !== false) {
+        if (strpos($serviceName, 'followers') !== false) return 'users';
+        if (strpos($serviceName, 'likes') !== false) return 'heart';
+        if (strpos($serviceName, 'retweets') !== false) return 'retweet';
+        return 'twitter';
+    }
+    
+    // Facebook services
+    if (strpos($serviceName, 'facebook') !== false) {
+        if (strpos($serviceName, 'followers') !== false) return 'users';
+        if (strpos($serviceName, 'likes') !== false) return 'thumbs-up';
+        if (strpos($serviceName, 'views') !== false) return 'eye';
+        return 'facebook';
+    }
+    
+    // Default icons based on service type
+    if (strpos($serviceName, 'followers') !== false) return 'users';
+    if (strpos($serviceName, 'likes') !== false) return 'heart';
+    if (strpos($serviceName, 'views') !== false) return 'eye';
+    if (strpos($serviceName, 'comments') !== false) return 'comment';
+    if (strpos($serviceName, 'video') !== false) return 'video';
+    if (strpos($serviceName, 'photo') !== false) return 'image';
+    
+    return 'star'; // Default icon
+}
 ?>

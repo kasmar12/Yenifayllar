@@ -681,3 +681,342 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
 }
+
+/* ===== MODERN SERVICE SELECTION STYLES ===== */
+
+/* Service Selection Header */
+.service-selection-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.service-selection-header h5 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.service-selection-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Category Pills */
+.category-pills {
+    margin-bottom: 2rem;
+}
+
+.category-pill {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    color: #6c757d;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    margin: 0 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.category-pill:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.category-pill.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Services Container */
+.services-container {
+    position: relative;
+}
+
+.category-services {
+    display: none;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.category-services.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modern Service Cards */
+.modern-service-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 20px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+
+.modern-service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.modern-service-card:hover::before {
+    transform: scaleX(1);
+}
+
+.modern-service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+    border-color: #667eea;
+}
+
+.modern-service-card.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+}
+
+.modern-service-card.selected::before {
+    transform: scaleX(1);
+}
+
+/* Service Card Header */
+.service-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.service-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.service-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #28a745;
+}
+
+.status-dot.active {
+    background: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.service-status small {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Service Card Body */
+.service-card-body {
+    flex: 1;
+}
+
+.service-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.service-description {
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    min-height: 2.7rem;
+}
+
+.service-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.price-info, .quantity-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.price-label, .quantity-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.price-value, .quantity-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.price-value .text-success {
+    color: #28a745 !important;
+    font-weight: 700;
+}
+
+/* Service Card Footer */
+.service-card-footer {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.selection-indicator {
+    opacity: 0;
+    transition: all 0.3s ease;
+    color: #667eea;
+    font-size: 1.5rem;
+}
+
+.modern-service-card.selected .selection-indicator {
+    opacity: 1;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive Design for Modern Service Cards */
+@media (max-width: 768px) {
+    .service-selection-header {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .service-selection-header h5 {
+        font-size: 1.3rem;
+    }
+    
+    .service-selection-header p {
+        font-size: 1rem;
+    }
+    
+    .category-pill {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        margin: 3px;
+    }
+    
+    .modern-service-card {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .service-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .service-selection-header {
+        padding: 1rem;
+        border-radius: 15px;
+    }
+    
+    .service-selection-header h5 {
+        font-size: 1.2rem;
+    }
+    
+    .category-pills {
+        margin-bottom: 1.5rem;
+    }
+    
+    .category-pill {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        margin: 2px;
+    }
+    
+    .modern-service-card {
+        padding: 1rem;
+        border-radius: 15px;
+    }
+    
+    .service-card-header {
+        margin-bottom: 0.75rem;
+    }
+    
+    .service-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .service-title {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .service-description {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .price-info, .quantity-info {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
