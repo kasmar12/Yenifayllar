@@ -55,19 +55,19 @@ try {
         // Clear pending order from session
         unset($_SESSION['pending_order']);
         
-        $message = 'Order placed successfully!';
+        $message = 'Sipariş başarıyla verildi!';
         $messageType = 'success';
         
         // Log activity
-        logActivity('Order Placed', "Order ID: {$orderId}, Service: {$pendingOrder['service_name']}, Quantity: {$pendingOrder['quantity']}");
+        logActivity('Sipariş Verildi', "Sipariş ID: {$orderId}, Hizmet: {$pendingOrder['service_name']}, Miktar: {$pendingOrder['quantity']}");
         
     } else {
-        $message = 'Failed to place order: ' . $orderResult['error'];
+        $message = 'Sipariş verilemedi: ' . $orderResult['error'];
         $messageType = 'danger';
     }
     
 } catch (Exception $e) {
-    $message = 'Error processing order: ' . $e->getMessage();
+    $message = 'Sipariş işlenirken hata: ' . $e->getMessage();
     $messageType = 'danger';
 }
 ?>
@@ -77,7 +77,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo SITE_NAME; ?> - Order Processing</title>
+    <title><?php echo SITE_NAME; ?> - Sipariş İşleniyor</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -91,7 +91,7 @@ try {
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-rocket me-2"></i>
+                <i class="fas fa-shopping-cart me-2"></i>
                 <?php echo SITE_NAME; ?>
             </a>
         </div>
@@ -102,28 +102,28 @@ try {
             <?php if ($messageType === 'success'): ?>
                 <!-- Success State -->
                 <div class="text-center">
-                    <div class="alert alert-success" role="alert">
-                        <i class="fas fa-check-circle fa-3x mb-3"></i>
-                        <h4 class="alert-heading">Order Placed Successfully!</h4>
-                        <p class="mb-0">Your order has been submitted and is now being processed.</p>
-                    </div>
+                                    <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h4 class="alert-heading">Sipariş Başarıyla Verildi!</h4>
+                    <p class="mb-0">Siparişiniz gönderildi ve şimdi işleniyor.</p>
+                </div>
                     
                     <!-- Order Details -->
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0">
-                                <i class="fas fa-receipt me-2"></i>Order Details
+                                <i class="fas fa-receipt me-2"></i>Sipariş Detayları
                             </h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Order ID:</strong></p>
+                                    <p><strong>Sipariş ID:</strong></p>
                                     <h4 class="text-primary"><?php echo htmlspecialchars($orderId); ?></h4>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Status:</strong></p>
-                                    <span class="badge bg-warning fs-6">Pending</span>
+                                    <p><strong>Durum:</strong></p>
+                                    <span class="badge bg-warning fs-6">Beklemede</span>
                                 </div>
                             </div>
                             
@@ -131,22 +131,22 @@ try {
                             
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Service:</strong></p>
+                                    <p><strong>Hizmet:</strong></p>
                                     <p class="text-muted"><?php echo htmlspecialchars($pendingOrder['service_name']); ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Target:</strong></p>
+                                    <p><strong>Hedef:</strong></p>
                                     <p class="text-muted"><?php echo htmlspecialchars($pendingOrder['link']); ?></p>
                                 </div>
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Quantity:</strong></p>
+                                    <p><strong>Miktar:</strong></p>
                                     <p class="text-muted"><?php echo number_format($pendingOrder['quantity']); ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Total Price:</strong></p>
+                                    <p><strong>Toplam Fiyat:</strong></p>
                                     <p class="text-success fw-bold">AZN <?php echo rtrim(rtrim(number_format($pendingOrder['total_price'], 4), '0'), '.'); ?></p>
                                 </div>
                             </div>
@@ -155,16 +155,16 @@ try {
                     
                     <div class="alert alert-info" role="alert">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Next Steps:</strong> Your order will be processed within 24-48 hours. 
-                        You can track your order status using the Order ID above.
+                        <strong>Sonraki Adımlar:</strong> Siparişiniz 24-48 saat içinde işlenecek. 
+                        Yukarıdaki Sipariş ID'sini kullanarak sipariş durumunuzu takip edebilirsiniz.
                     </div>
                     
                     <div class="d-grid gap-2 d-md-block">
                         <a href="order-status.php" class="btn btn-primary">
-                            <i class="fas fa-search me-2"></i>Check Order Status
+                            <i class="fas fa-search me-2"></i>Sipariş Durumunu Kontrol Et
                         </a>
                         <a href="index.php" class="btn btn-outline-secondary">
-                            <i class="fas fa-plus me-2"></i>Place Another Order
+                            <i class="fas fa-plus me-2"></i>Başka Sipariş Ver
                         </a>
                     </div>
                 </div>
@@ -172,37 +172,37 @@ try {
             <?php else: ?>
                 <!-- Error State -->
                 <div class="text-center">
-                    <div class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                        <h4 class="alert-heading">Order Failed</h4>
-                        <p><?php echo htmlspecialchars($message); ?></p>
-                    </div>
+                                    <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h4 class="alert-heading">Sipariş Başarısız</h4>
+                    <p><?php echo htmlspecialchars($message); ?></p>
+                </div>
                     
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0">
-                                <i class="fas fa-exclamation-triangle me-2"></i>Attempted Order Details
+                                <i class="fas fa-exclamation-triangle me-2"></i>Denenen Sipariş Detayları
                             </h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Service:</strong></p>
+                                    <p><strong>Hizmet:</strong></p>
                                     <p class="text-muted"><?php echo htmlspecialchars($pendingOrder['service_name']); ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Target:</strong></p>
+                                    <p><strong>Hedef:</strong></p>
                                     <p class="text-muted"><?php echo htmlspecialchars($pendingOrder['link']); ?></p>
                                 </div>
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Quantity:</strong></p>
+                                    <p><strong>Miktar:</strong></p>
                                     <p class="text-muted"><?php echo number_format($pendingOrder['quantity']); ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Total Price:</strong></p>
+                                    <p><strong>Toplam Fiyat:</strong></p>
                                     <p class="text-muted">AZN <?php echo rtrim(rtrim(number_format($pendingOrder['total_price'], 4), '0'), '.'); ?></p>
                                 </div>
                             </div>
@@ -211,10 +211,10 @@ try {
                     
                     <div class="d-grid gap-2 d-md-block">
                         <a href="index.php" class="btn btn-primary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Order Form
+                            <i class="fas fa-arrow-left me-2"></i>Sipariş Formuna Dön
                         </a>
                         <button onclick="location.reload()" class="btn btn-outline-secondary">
-                            <i class="fas fa-redo me-2"></i>Try Again
+                            <i class="fas fa-redo me-2"></i>Tekrar Dene
                         </button>
                     </div>
                 </div>
@@ -230,7 +230,7 @@ try {
         function copyOrderId() {
             const orderId = '<?php echo $orderId; ?>';
             navigator.clipboard.writeText(orderId).then(function() {
-                alert('Order ID copied to clipboard!');
+                alert('Sipariş ID panoya kopyalandı!');
             });
         }
         
