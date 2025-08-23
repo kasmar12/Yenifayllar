@@ -1,0 +1,24 @@
+{
+    "name": "telegram-bot/website-link-bot",
+    "description": "Telegram bot that shows website link with button",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "TelegramBot\\": "src/"
+        }
+    },
+    "scripts": {
+        "setup": "php setup.php",
+        "test": "php test.php"
+    },
+    "keywords": [
+        "telegram",
+        "bot",
+        "php",
+        "webhook"
+    ],
+    "license": "MIT"
+}
