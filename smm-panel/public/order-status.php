@@ -273,31 +273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </tr>
                                 </table>
                             </div>
-                            <div class="col-md-6">
-                                <h6 class="text-primary"><span data-tr="Hizmet Detayları" data-az="Xidmət Təfərrüatları" data-en="Service Details">Hizmet Detayları</span></h6>
-                                <table class="table table-borderless">
-                                    <tr>
-                                        <td><strong><span data-tr="Hizmet:" data-az="Xidmət:" data-en="Service:">Hizmet:</span></strong></td>
-                                        <td><?php echo htmlspecialchars($order['service_name']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong><span data-tr="Kategori:" data-az="Kateqoriya:" data-en="Category:">Kategori:</span></strong></td>
-                                        <td><?php echo htmlspecialchars($order['category_name']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong><span data-tr="Hedef:" data-az="Hədəf:" data-en="Target:">Hedef:</span></strong></td>
-                                        <td><code><?php echo htmlspecialchars($order['link']); ?></code></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong><span data-tr="Miktar:" data-az="Miqdar:" data-en="Quantity:">Miktar:</span></strong></td>
-                                        <td><?php echo number_format($order['quantity']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong><span data-tr="Toplam Fiyat:" data-az="Ümumi Qiymət:" data-en="Total Price:">Toplam Fiyat:</span></strong></td>
-                                        <td class="text-success fw-bold">AZN <?php echo rtrim(rtrim(number_format($order['total_price'], 4), '0'), '.'); ?></td>
-                                    </tr>
-                                </table>
-                            </div>
+
                         </div>
 
                         <!-- Status Timeline -->
