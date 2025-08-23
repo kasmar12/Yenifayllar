@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     SMM Services
                 </h1>
                 <p class="text-muted">
-                    Choose your service and place your order
+                    Enter your details and place your order
                 </p>
             </div>
 
@@ -147,68 +147,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card shadow-sm">
                 <div class="card-body p-4">
                     <form method="POST" id="orderForm">
-                        <!-- Service Selection -->
-                        <div class="mb-4">
-                            <h5 class="text-center mb-3">
-                                <i class="fas fa-cogs me-2"></i>Select Service
-                            </h5>
+                        <!-- Auto-selected Service (Hidden) -->
+                        <?php if (!empty($services)): ?>
+                            <?php 
+                            // Automatically select the first available service
+                            $autoSelectedService = $services[0];
+                            $autoSelectedCategory = '';
+                            foreach ($categories as $cat) {
+                                if ($cat['id'] == $autoSelectedService['category_id']) {
+                                    $autoSelectedCategory = $cat['name'];
+                                    break;
+                                }
+                            }
+                            ?>
+                            <input type="hidden" name="service_id" value="<?php echo $autoSelectedService['id']; ?>">
                             
-                            <?php if (empty($categories)): ?>
-                                <div class="alert alert-warning text-center">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    No services available at the moment.
+                            <!-- Service Info Display -->
+                            <div class="alert alert-info text-center mb-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-<?php echo getServiceIcon($autoSelectedService['name']); ?> me-2"></i>
+                                            <?php echo htmlspecialchars($autoSelectedService['name']); ?>
+                                        </h6>
+                                        <small class="text-muted">
+                                            <?php echo htmlspecialchars($autoSelectedService['description']); ?>
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="badge bg-primary fs-6">
+                                            <?php echo htmlspecialchars($autoSelectedCategory); ?>
+                                        </span>
+                                    </div>
                                 </div>
-                            <?php else: ?>
-                                <!-- Simple Service Grid -->
-                                <div class="row">
-                                    <?php 
-                                    // Get first 6 services for simple display
-                                    $displayServices = array_slice($services, 0, 6);
-                                    ?>
-                                    
-                                    <?php foreach ($displayServices as $service): ?>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="simple-service-card" 
-                                                 data-service-id="<?php echo $service['id']; ?>"
-                                                 data-service-price="<?php echo $service['price']; ?>"
-                                                 data-service-min="<?php echo $service['min_quantity']; ?>"
-                                                 data-service-max="<?php echo $service['max_quantity']; ?>">
-                                                
-                                                <div class="service-icon mb-2">
-                                                    <i class="fas fa-<?php echo getServiceIcon($service['name']); ?> fa-2x text-primary"></i>
-                                                </div>
-                                                
-                                                <h6 class="service-name mb-2">
-                                                    <?php echo htmlspecialchars($service['name']); ?>
-                                                </h6>
-                                                
-                                                <p class="service-desc small text-muted mb-2">
-                                                    <?php echo htmlspecialchars($service['description']); ?>
-                                                </p>
-                                                
-                                                <div class="service-badge">
-                                                    <span class="badge bg-primary">
-                                                        <?php 
-                                                        $categoryName = '';
-                                                        foreach ($categories as $cat) {
-                                                            if ($cat['id'] == $service['category_id']) {
-                                                                $categoryName = $cat['name'];
-                                                                break;
-                                                            }
-                                                        }
-                                                        echo htmlspecialchars($categoryName);
-                                                        ?>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-
-                                <input type="hidden" name="service_id" id="selectedServiceId" required>
-                                <div class="invalid-feedback">Please select a service.</div>
-                            <?php endif; ?>
-                        </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="alert alert-warning text-center">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No services available at the moment.
+                            </div>
+                        <?php endif; ?>
 
                         <!-- Link/Username Input -->
                         <div class="mb-3">
@@ -249,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <!-- Submit Button -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="fas fa-paper-plane me-2"></i>
                                 Place Order
                             </button>
@@ -266,33 +244,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Service selection functionality
-        document.querySelectorAll('.simple-service-card').forEach(card => {
-            card.addEventListener('click', function() {
-                // Remove previous selection
-                document.querySelectorAll('.simple-service-card').forEach(c => c.classList.remove('selected'));
-                
-                // Select current card
-                this.classList.add('selected');
-                
-                // Update hidden input
-                const serviceId = this.dataset.serviceId;
-                document.getElementById('selectedServiceId').value = serviceId;
-                
-                // Enable submit button
-                document.getElementById('submitBtn').disabled = false;
-            });
-        });
-
         // Form validation
         document.getElementById('orderForm').addEventListener('submit', function(e) {
-            const serviceId = document.getElementById('selectedServiceId').value;
             const link = document.getElementById('link').value.trim();
             const quantity = document.getElementById('quantity').value;
             
-            if (!serviceId || !link || !quantity) {
+            if (!link || !quantity) {
                 e.preventDefault();
-                alert('Please fill in all fields and select a service.');
+                alert('Please fill in all fields.');
                 return false;
             }
             
