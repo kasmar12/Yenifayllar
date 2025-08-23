@@ -105,33 +105,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-rocket me-2"></i>
                 <?php echo SITE_NAME; ?>
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="order-status.php">
-                    <i class="fas fa-search me-1"></i>Check Order Status
-                </a>
-                <a class="nav-link" href="../admin/login.php">
-                    <i class="fas fa-user-shield me-1"></i>Admin
+                <a class="nav-link text-white" href="order-status.php">
+                    <i class="fas fa-search me-1"></i>Order Status
                 </a>
             </div>
         </div>
     </nav>
 
     <div class="container">
-        <div class="main-container fade-in">
+        <div class="main-container">
             <!-- Header -->
-            <div class="text-center mb-4">
-                <h1 class="display-4 fw-bold text-primary mb-3">
-                    <i class="fas fa-chart-line me-3"></i>
-                    Professional SMM Services
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-primary mb-3">
+                    <i class="fas fa-rocket me-2"></i>
+                    SMM Services
                 </h1>
-                <p class="lead text-muted">
-                    Boost your social media presence with our high-quality services
+                <p class="text-muted">
+                    Choose your service and place your order
                 </p>
             </div>
 
@@ -147,23 +144,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
             <!-- Order Form -->
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        Place Your Order
-                    </h4>
-                </div>
-                <div class="card-body">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
                     <form method="POST" id="orderForm">
                         <!-- Service Selection -->
                         <div class="mb-4">
-                            <div class="text-center mb-3">
-                                <h5 class="text-primary">
-                                    <i class="fas fa-star me-2"></i>Available Services
-                                </h5>
-                                <p class="text-muted">Choose your preferred service</p>
-                            </div>
+                            <h5 class="text-center mb-3">
+                                <i class="fas fa-cogs me-2"></i>Select Service
+                            </h5>
                             
                             <?php if (empty($categories)): ?>
                                 <div class="alert alert-warning text-center">
@@ -261,45 +249,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <!-- Submit Button -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                                 <i class="fas fa-paper-plane me-2"></i>
-                                Continue to Order
+                                Place Order
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Features Section -->
-            <div class="row mt-5">
-                <div class="col-md-4 text-center mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <i class="fas fa-bolt fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">Fast Delivery</h5>
-                            <p class="card-text">Get your orders completed quickly with our efficient service.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">Secure & Safe</h5>
-                            <p class="card-text">Your account safety is our top priority.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <i class="fas fa-headset fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">24/7 Support</h5>
-                            <p class="card-text">Our support team is always here to help you.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 
