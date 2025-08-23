@@ -31,7 +31,12 @@ define('WEBSITE_URL', 'https://gogole.cok');
 php setup.php
 ```
 
-### 4. Test Edin
+### 4. Local Test (Polling)
+```bash
+php polling.php
+```
+
+### 5. Test Edin
 ```bash
 php test.php
 ```
@@ -46,10 +51,17 @@ php test.php
 
 ## 🔧 İstifadə
 
-1. Telegram-da botunuzu tapın
-2. `/start` yazın
-3. "🌐 Vebsaytı Aç" buttonuna basın
-4. Vebsayt linkini alın
+### Local Test (Polling)
+1. Terminal-da `php polling.php` işə salın
+2. Telegram-da botunuzu tapın: @azesmm_bot
+3. `/start` yazın
+4. "🌐 Vebsaytı Aç" buttonuna basın
+5. Vebsayt linkini alın
+
+### Webhook (Production)
+1. Public HTTPS domain quraşdırın
+2. `config.php`-də `TEST_MODE = false` edin
+3. `php setup.php` işə salın
 
 ## 🌐 Webhook Tələbləri
 

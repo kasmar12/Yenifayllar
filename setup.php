@@ -18,13 +18,19 @@ try {
         exit;
     }
     
-    // Webhook quraşdır
-    $webhook = $bot->setWebhook(WEBHOOK_URL);
-    if ($webhook['ok']) {
-        echo "✅ Webhook uğurla quraşdırıldı!\n";
-        echo "Webhook URL: " . WEBHOOK_URL . "\n\n";
+    // Webhook quraşdır (əgər public domain varsa)
+    if (defined('TEST_MODE') && TEST_MODE) {
+        echo "🔄 Test rejimində webhook quraşdırılmayacaq\n";
+        echo "Local test üçün polling istifadə edin: php polling.php\n\n";
     } else {
-        echo "❌ Webhook quraşdırıla bilmədi: " . $webhook['description'] . "\n";
+        $webhook = $bot->setWebhook(WEBHOOK_URL);
+        if ($webhook['ok']) {
+            echo "✅ Webhook uğurla quraşdırıldı!\n";
+            echo "Webhook URL: " . WEBHOOK_URL . "\n\n";
+        } else {
+            echo "❌ Webhook quraşdırıla bilmədi: " . $webhook['description'] . "\n";
+            echo "Local test üçün polling istifadə edin: php polling.php\n\n";
+        }
     }
     
     echo "🎉 Bot hazırdır! İndi Telegram-da /start yazaraq test edə bilərsiniz.\n";
