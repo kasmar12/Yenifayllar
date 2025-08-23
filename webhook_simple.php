@@ -20,9 +20,9 @@ if ($update) {
                 'inline_keyboard' => [
                     [
                         [
-                            'text' => '🌐 Vebsaytı Aç',
+                            'text' => '🌐 Google Aç',
                             'web_app' => [
-                                'url' => 'https://gogole.cok'
+                                'url' => 'https://google.com'
                             ]
                         ]
                     ]
@@ -30,7 +30,7 @@ if ($update) {
             ];
             
             $message_text = "👋 Salam! Mən sizin Telegram botunuzam.\n\n";
-            $message_text .= "Aşağıdakı button-a basaraq vebsaytı Telegram daxilində aça bilərsiniz:";
+            $message_text .= "Aşağıdakı button-a basaraq Google-ı Telegram daxilində aça bilərsiniz:";
             
             sendMessage($chat_id, $message_text, $keyboard);
         }
