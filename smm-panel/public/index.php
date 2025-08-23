@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link text-white" href="order-status.php">
-                    <i class="fas fa-search me-1"></i>Check Status
+                    <i class="fas fa-search me-1"></i>Durum Kontrolü
                 </a>
             </div>
         </div>
@@ -125,10 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="text-center mb-5">
                 <h1 class="display-5 fw-bold text-primary mb-3">
                     <i class="fas fa-shopping-cart me-2"></i>
-                    Place Your Order
+                    Sipariş Verin
                 </h1>
                 <p class="text-muted">
-                    Fill in the details below to place your order
+                    Sipariş vermek için aşağıdaki bilgileri doldurun
                 </p>
             </div>
 
@@ -159,24 +159,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <!-- Link/Username Input -->
                         <div class="mb-3">
                             <label for="link" class="form-label">
-                                <strong><i class="fas fa-link me-2"></i>Instagram/TikTok Link or Username</strong>
+                                <strong><i class="fas fa-link me-2"></i>Instagram/TikTok Link veya Kullanıcı Adı</strong>
                             </label>
                             <input type="text" 
                                    class="form-control" 
                                    id="link" 
                                    name="link" 
-                                   placeholder="Enter Instagram username, TikTok link, or YouTube URL"
+                                   placeholder="Instagram kullanıcı adı, TikTok linki veya YouTube URL'si girin"
                                    required>
                             <div class="form-text">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Enter the link or username you want to boost
+                                Artırmak istediğiniz link veya kullanıcı adını girin
                             </div>
                         </div>
 
                         <!-- Quantity Input -->
                         <div class="mb-4">
                             <label for="quantity" class="form-label">
-                                <strong><i class="fas fa-sort-numeric-up me-2"></i>Quantity</strong>
+                                <strong><i class="fas fa-sort-numeric-up me-2"></i>Miktar</strong>
                             </label>
                             <input type="number" 
                                    class="form-control" 
@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    required>
                             <div class="form-text">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Enter the number of followers, likes, or views you want
+                                İstediğiniz takipçi, beğeni veya görüntüleme sayısını girin
                             </div>
                         </div>
 
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="fas fa-paper-plane me-2"></i>
-                                Place Order
+                                Sipariş Ver
                             </button>
                         </div>
                     </form>
@@ -219,12 +219,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (!link || !quantity) {
                 e.preventDefault();
-                alert('Please fill in all required fields.');
+                alert('Lütfen tüm gerekli alanları doldurun.');
                 return false;
             }
             
             // Show loading state
-            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>İşleniyor...';
             document.getElementById('submitBtn').disabled = true;
         });
         

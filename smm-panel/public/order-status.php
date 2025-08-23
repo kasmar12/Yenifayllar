@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orderId = sanitizeInput($_POST['order_id'] ?? '');
     
     if (empty($orderId)) {
-        $message = 'Please enter an order ID.';
+        $message = 'Lütfen bir sipariş ID girin.';
         $messageType = 'warning';
     } else {
         try {
@@ -50,15 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
                 
-                $message = 'Order found successfully!';
+                $message = 'Sipariş başarıyla bulundu!';
                 $messageType = 'success';
             } else {
-                $message = 'Order not found. Please check your order ID.';
+                $message = 'Sipariş bulunamadı. Lütfen sipariş ID\'nizi kontrol edin.';
                 $messageType = 'danger';
             }
             
         } catch (Exception $e) {
-            $message = 'Error checking order: ' . $e->getMessage();
+            $message = 'Sipariş kontrol edilirken hata: ' . $e->getMessage();
             $messageType = 'danger';
         }
     }
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo SITE_NAME; ?> - Check Order Status</title>
+    <title><?php echo SITE_NAME; ?> - Sipariş Durumu Kontrolü</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="index.php">
-                    <i class="fas fa-home me-1"></i>Home
+                    <i class="fas fa-home me-1"></i>Ana Sayfa
                 </a>
             </div>
         </div>
@@ -101,10 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="text-center mb-4">
                 <h1 class="display-5 fw-bold text-primary mb-3">
                     <i class="fas fa-search me-3"></i>
-                    Check Order Status
+                    Sipariş Durumu Kontrolü
                 </h1>
                 <p class="lead text-muted">
-                    Enter your order ID to track the status of your order
+                    Siparişinizin durumunu takip etmek için sipariş ID'nizi girin
                 </p>
             </div>
 
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="fas fa-search me-2"></i>
-                        Order Status Checker
+                        Sipariş Durumu Kontrolörü
                     </h5>
                 </div>
                 <div class="card-body">
@@ -130,25 +130,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="row">
                             <div class="col-md-8">
                                 <label for="order_id" class="form-label">
-                                    <strong><i class="fas fa-hashtag me-2"></i>Order ID</strong>
+                                    <strong><i class="fas fa-hashtag me-2"></i>Sipariş ID</strong>
                                 </label>
                                 <input type="text" 
                                        class="form-control form-control-lg" 
                                        id="order_id" 
                                        name="order_id" 
-                                       placeholder="Enter your order ID (e.g., ORD20241201ABC12345)"
+                                       placeholder="Sipariş ID'nizi girin (örn: ORD20241201ABC12345)"
                                        value="<?php echo htmlspecialchars($_POST['order_id'] ?? ''); ?>"
                                        required>
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-search me-2"></i>Check Status
+                                    <i class="fas fa-search me-2"></i>Durumu Kontrol Et
                                 </button>
                             </div>
                         </div>
                         <div class="form-text mt-2">
                             <i class="fas fa-info-circle me-1"></i>
-                            You can find your order ID in the confirmation email or on the order success page.
+                            Sipariş ID'nizi onay e-postasında veya sipariş başarı sayfasında bulabilirsiniz.
                         </div>
                     </form>
                 </div>
@@ -157,23 +157,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Order Details -->
             <?php if ($order): ?>
                 <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-receipt me-2"></i>
-                            Order Details
-                        </h5>
-                    </div>
+                                    <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>
+                        Sipariş Detayları
+                    </h5>
+                </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <h6 class="text-primary">Order Information</h6>
+                                <h6 class="text-primary">Sipariş Bilgileri</h6>
                                 <table class="table table-borderless">
                                     <tr>
-                                        <td><strong>Order ID:</strong></td>
+                                        <td><strong>Sipariş ID:</strong></td>
                                         <td><code class="fs-6"><?php echo htmlspecialchars($order['order_id']); ?></code></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Status:</strong></td>
+                                        <td><strong>Durum:</strong></td>
                                         <td>
                                             <?php 
                                             $statusClass = match($order['status']) {
@@ -184,41 +184,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             };
                                             ?>
                                             <span class="badge <?php echo $statusClass; ?>">
-                                                <?php echo ucfirst($order['status']); ?>
+                                                <?php 
+                                                $statusText = match($order['status']) {
+                                                    'completed' => 'Tamamlandı',
+                                                    'processing' => 'İşleniyor',
+                                                    'canceled' => 'İptal Edildi',
+                                                    'pending' => 'Beklemede',
+                                                    default => ucfirst($order['status'])
+                                                };
+                                                echo $statusText;
+                                                ?>
                                             </span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Created:</strong></td>
+                                        <td><strong>Oluşturuldu:</strong></td>
                                         <td><?php echo date('M j, Y H:i', strtotime($order['created_at'])); ?></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Last Updated:</strong></td>
+                                        <td><strong>Son Güncelleme:</strong></td>
                                         <td><?php echo date('M j, Y H:i', strtotime($order['updated_at'])); ?></td>
                                     </tr>
                                 </table>
                             </div>
                             <div class="col-md-6">
-                                <h6 class="text-primary">Service Details</h6>
+                                <h6 class="text-primary">Hizmet Detayları</h6>
                                 <table class="table table-borderless">
                                     <tr>
-                                        <td><strong>Service:</strong></td>
+                                        <td><strong>Hizmet:</strong></td>
                                         <td><?php echo htmlspecialchars($order['service_name']); ?></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Category:</strong></td>
+                                        <td><strong>Kategori:</strong></td>
                                         <td><?php echo htmlspecialchars($order['category_name']); ?></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Target:</strong></td>
+                                        <td><strong>Hedef:</strong></td>
                                         <td><code><?php echo htmlspecialchars($order['link']); ?></code></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Quantity:</strong></td>
+                                        <td><strong>Miktar:</strong></td>
                                         <td><?php echo number_format($order['quantity']); ?></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Total Price:</strong></td>
+                                        <td><strong>Toplam Fiyat:</strong></td>
                                         <td class="text-success fw-bold">AZN <?php echo rtrim(rtrim(number_format($order['total_price'], 4), '0'), '.'); ?></td>
                                     </tr>
                                 </table>
@@ -227,12 +236,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <!-- Status Timeline -->
                         <div class="mt-4">
-                            <h6 class="text-primary">Order Timeline</h6>
+                            <h6 class="text-primary">Sipariş Zaman Çizelgesi</h6>
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-marker bg-primary"></div>
                                     <div class="timeline-content">
-                                        <h6 class="mb-1">Order Placed</h6>
+                                        <h6 class="mb-1">Sipariş Verildi</h6>
                                         <p class="text-muted mb-0"><?php echo date('M j, Y H:i', strtotime($order['created_at'])); ?></p>
                                     </div>
                                 </div>
@@ -241,8 +250,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="timeline-item">
                                     <div class="timeline-marker bg-info"></div>
                                     <div class="timeline-content">
-                                        <h6 class="mb-1">Processing Started</h6>
-                                        <p class="text-muted mb-0">Order is being processed by our team</p>
+                                        <h6 class="mb-1">İşlem Başladı</h6>
+                                        <p class="text-muted mb-0">Sipariş ekibimiz tarafından işleniyor</p>
                                     </div>
                                 </div>
                                 <?php endif; ?>
@@ -251,8 +260,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="timeline-item">
                                     <div class="timeline-marker bg-success"></div>
                                     <div class="timeline-content">
-                                        <h6 class="mb-1">Completed</h6>
-                                        <p class="text-muted mb-0">Order has been completed successfully</p>
+                                        <h6 class="mb-1">Tamamlandı</h6>
+                                        <p class="text-muted mb-0">Sipariş başarıyla tamamlandı</p>
                                     </div>
                                 </div>
                                 <?php endif; ?>
@@ -262,10 +271,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <!-- Action Buttons -->
                         <div class="d-grid gap-2 d-md-block mt-4">
                             <a href="index.php" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Place New Order
+                                <i class="fas fa-plus me-2"></i>Yeni Sipariş Ver
                             </a>
                             <button onclick="window.print()" class="btn btn-outline-secondary">
-                                <i class="fas fa-print me-2"></i>Print Details
+                                <i class="fas fa-print me-2"></i>Detayları Yazdır
                             </button>
                         </div>
                     </div>
@@ -277,29 +286,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="fas fa-question-circle me-2"></i>
-                        Need Help?
+                        Yardıma mı ihtiyacınız var?
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Order Status Meanings:</h6>
+                            <h6>Sipariş Durumu Anlamları:</h6>
                             <ul class="list-unstyled">
-                                <li><span class="badge status-pending me-2">Pending</span> - Order is waiting to be processed</li>
-                                <li><span class="badge status-processing me-2">Processing</span> - Order is being worked on</li>
-                                <li><span class="badge status-completed me-2">Completed</span> - Order finished successfully</li>
-                                <li><span class="badge status-canceled me-2">Canceled</span> - Order was canceled</li>
+                                <li><span class="badge status-pending me-2">Beklemede</span> - Sipariş işlenmeyi bekliyor</li>
+                                <li><span class="badge status-processing me-2">İşleniyor</span> - Sipariş üzerinde çalışılıyor</li>
+                                <li><span class="badge status-completed me-2">Tamamlandı</span> - Sipariş başarıyla tamamlandı</li>
+                                <li><span class="badge status-canceled me-2">İptal Edildi</span> - Sipariş iptal edildi</li>
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <h6>Contact Support:</h6>
+                            <h6>Destek İletişimi:</h6>
                             <p class="mb-2">
                                 <i class="fas fa-envelope me-2"></i>
-                                Email: support@smmpanel.com
+                                E-posta: support@smmpanel.com
                             </p>
                             <p class="mb-0">
                                 <i class="fas fa-clock me-2"></i>
-                                Response time: Within 24 hours
+                                Yanıt süresi: 24 saat içinde
                             </p>
                         </div>
                     </div>
@@ -356,13 +365,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (!orderId) {
                 e.preventDefault();
-                alert('Please enter an order ID.');
+                alert('Lütfen bir sipariş ID girin.');
                 return false;
             }
             
             // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Checking...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Kontrol Ediliyor...';
             submitBtn.disabled = true;
         });
         
