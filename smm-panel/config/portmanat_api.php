@@ -60,8 +60,20 @@ class PortmanatAPI {
             error_log("Portmanat Token Request Data: " . json_encode($token_data));
         }
         
-        // Get token from Portmanat
-        $token_response = $this->makeRequest('/operation/token', $token_data);
+        // Get token from Portmanat - try different endpoints
+        $token_response = $this->makeRequest('/api/operation/token', $token_data);
+        
+        // If first endpoint fails, try alternative
+        if (!$token_response || (isset($token_response['success']) && !$token_response['success'])) {
+            error_log("First token endpoint failed, trying alternative");
+            $token_response = $this->makeRequest('/operation/token', $token_data);
+        }
+        
+        // If both fail, try the most common endpoint
+        if (!$token_response || (isset($token_response['success']) && !$token_response['success'])) {
+            error_log("Both token endpoints failed, trying common endpoint");
+            $token_response = $this->makeRequest('/api/token', $token_data);
+        }
         
         if ($this->debug_mode) {
             error_log("Portmanat Token Response: " . json_encode($token_response));
@@ -447,40 +459,54 @@ class PortmanatAPI {
      */
     public function testConnection() {
         try {
-            // Test with a simple balance request
-            $balance = $this->getBalance();
+            // Test with multiple endpoints to find the correct one
+            $endpoints = [
+                '/api/balance',
+                '/balance', 
+                '/account/balance',
+                '/api/account/balance',
+                '/merchant/balance'
+            ];
             
-            if ($balance && isset($balance['success']) && $balance['success']) {
-                return [
-                    'success' => true,
-                    'message' => 'API connection successful',
-                    'balance' => $balance
-                ];
-            } else {
-                // Try alternative endpoint
-                error_log("First balance endpoint failed, trying alternative");
-                $balance = $this->makeRequest('/balance', ['merchant_id' => $this->merchant_id]);
+            foreach ($endpoints as $endpoint) {
+                error_log("Testing Portmanat endpoint: " . $endpoint);
                 
-                if ($balance && isset($balance['success']) && $balance['success']) {
+                $data = [
+                    'merchant_id' => $this->merchant_id
+                ];
+                $data['sign'] = $this->generateSignature($data);
+                
+                $response = $this->makeRequest($endpoint, $data);
+                
+                if ($response && isset($response['success']) && $response['success']) {
+                    error_log("Successful connection with endpoint: " . $endpoint);
                     return [
                         'success' => true,
-                        'message' => 'API connection successful (alternative endpoint)',
-                        'balance' => $balance
+                        'message' => 'API connection successful with endpoint: ' . $endpoint,
+                        'balance' => $response,
+                        'working_endpoint' => $endpoint
                     ];
                 } else {
-                    return [
-                        'success' => false,
-                        'message' => 'API connection failed - both endpoints failed',
-                        'balance' => $balance
-                    ];
+                    error_log("Failed connection with endpoint: " . $endpoint . " - " . json_encode($response));
                 }
             }
+            
+            // If all endpoints fail, return detailed error
+            return [
+                'success' => false,
+                'message' => 'API connection failed - all endpoints failed',
+                'tested_endpoints' => $endpoints,
+                'last_response' => $response ?? 'No response'
+            ];
+            
         } catch (Exception $e) {
+            error_log("Portmanat testConnection Exception: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'API connection failed: ' . $e->getMessage()
             ];
         } catch (Error $e) {
+            error_log("Portmanat testConnection Fatal Error: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'API connection failed (fatal): ' . $e->getMessage()
