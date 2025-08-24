@@ -69,12 +69,27 @@ if (!$settings) {
 
 // Handle API test requests
 $test_result = null;
+$smm_test_result = null;
+
 if (isset($_POST['test_portmanat'])) {
     try {
         $portmanat = new PortmanatAPI();
         $test_result = $portmanat->testConnection();
     } catch (Exception $e) {
         $test_result = [
+            'success' => false,
+            'message' => 'Test failed: ' . $e->getMessage()
+        ];
+    }
+}
+
+if (isset($_POST['test_smm_api'])) {
+    try {
+        require_once '../config/smm_api.php';
+        $smm_api = new SMMAPI();
+        $smm_test_result = $smm_api->testConnection();
+    } catch (Exception $e) {
+        $smm_test_result = [
             'success' => false,
             'message' => 'Test failed: ' . $e->getMessage()
         ];
