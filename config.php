@@ -1,13 +1,13 @@
 <?php
-// SMM Service Configuration
-// Change these values to target different services
+// Portmanat.az API Configuration
+// Based on official API documentation: https://partners.portmanat.az/page/api
 
 // API Configuration
 $API_KEY = "your_api_key_here"; // Replace with your actual API key
-$API_ENDPOINT = "https://api.portmanat.az/order"; // Replace with actual endpoint
+$API_ENDPOINT = "https://partners.portmanat.az/api"; // Base API endpoint
 
 // Payment Configuration
-$PAYMENT_ENDPOINT = "https://payment.portmanat.az/pay"; // Portmanat.az payment endpoint
+$PAYMENT_ENDPOINT = "https://partners.portmanat.az/api/payment"; // Payment endpoint
 $CURRENCY = "AZN"; // Currency for payments
 $PRICE_PER_UNIT = 0.01; // Price per unit in AZN
 
@@ -40,10 +40,17 @@ $CURRENT_SERVICE_NAME = $SERVICE_NAMES[$SERVICE_ID] ?? "Bilinməyən Xidmət";
 // 129 - TikTok Followers
 // 130 - Facebook Likes
 
+// API Endpoints based on documentation:
+// - POST /api/order - Create new order
+// - GET /api/order/{id} - Get order status
+// - POST /api/payment - Create payment
+// - GET /api/services - Get available services
+// - GET /api/balance - Get account balance
+
 // Payment flow:
 // 1. User fills form and submits
-// 2. System calculates price and stores order in session
-// 3. User is redirected to Portmanat.az payment page
+// 2. System creates payment via /api/payment
+// 3. User is redirected to payment page
 // 4. After successful payment, user returns with payment_status=success
-// 5. System completes the SMM order using stored session data
+// 5. System completes the SMM order using /api/order
 ?>

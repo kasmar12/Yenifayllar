@@ -1,25 +1,27 @@
-# SMM Sifariş və Ödəniş Sistemi
+# SMM Sifariş və Ödəniş Sistemi - Portmanat.az API
 
-Bu layihə, SMM (Social Media Marketing) sifarişləri vermək üçün Portmanat.az ödəniş sistemi ilə inteqrasiya edilmiş sadə və mobil uyğun PHP veb səhifəsidir.
+Bu layihə, SMM (Social Media Marketing) sifarişləri vermək üçün **Portmanat.az Partners API** ilə tam inteqrasiya edilmiş sadə və mobil uyğun PHP veb səhifəsidir.
 
 ## ✨ Əsas Xüsusiyyətlər
 
 - ✅ Mobil uyğun dizayn
 - ✅ Form validasiyası
-- ✅ Portmanat.az ödəniş sistemi inteqrasiyası
+- ✅ **Portmanat.az Partners API** tam inteqrasiyası
 - ✅ Azərbaycan dilində interfeys
 - ✅ Asan xidmət dəyişdirmə
 - ✅ Təhlükəsiz input sanitizasiyası
 - ✅ Real-time qiymət hesablaması
 - ✅ Ödəniş uğurlu olduqdan sonra SMM sifarişi tamamlama
+- ✅ SSL təhlükəsizliyi
 
 ## 🔄 İş Axışı
 
 1. **İstifadəçi formu doldurur** və təsdiq edir
 2. **Sistem qiyməti hesablayır** və sifarişi sessiyada saxlayır
-3. **İstifadəçi Portmanat.az ödəniş səhifəsinə yönləndirilir**
-4. **Ödəniş uğurlu olduqdan sonra** istifadəçi geri qayıdır
-5. **Sistem SMM sifarişini tamamlayır** və nəticəni göstərir
+3. **Portmanat.az API-yə ödəniş sorğusu** göndərilir (`/api/payment`)
+4. **İstifadəçi ödəniş səhifəsinə yönləndirilir**
+5. **Ödəniş uğurlu olduqdan sonra** istifadəçi geri qayıdır
+6. **Sistem SMM sifarişini tamamlayır** (`/api/order`) və nəticəni göstərir
 
 ## 🚀 Quraşdırma
 
@@ -33,8 +35,8 @@ Bu layihə, SMM (Social Media Marketing) sifarişləri vermək üçün Portmanat
 
 ```php
 $API_KEY = "your_actual_api_key"; // Gerçək API açarınızı buraya yazın
-$API_ENDPOINT = "https://api.portmanat.az/order"; // Gerçək API endpoint-inizi yazın
-$PAYMENT_ENDPOINT = "https://payment.portmanat.az/pay"; // Ödəniş endpoint-i
+$API_ENDPOINT = "https://partners.portmanat.az/api"; // Base API endpoint
+$PAYMENT_ENDPOINT = "https://partners.portmanat.az/api/payment"; // Ödəniş endpoint
 ```
 
 ### Ödəniş Parametrləri
@@ -65,6 +67,18 @@ $SERVICE_ID = 124; // Instagram İzləyiciləri üçün
 | 129 | TikTok İzləyiciləri |
 | 130 | Facebook Bəyənmələri |
 
+## 🔗 Portmanat.az API Endpoint-ləri
+
+Sistem aşağıdakı API endpoint-lərindən istifadə edir:
+
+| Endpoint | Metod | Təsvir |
+|----------|-------|---------|
+| `/api/services` | GET | Mövcud xidmətləri almaq |
+| `/api/balance` | GET | Hesab balansını almaq |
+| `/api/payment` | POST | Ödəniş yaratmaq |
+| `/api/order` | POST | Yeni sifariş yaratmaq |
+| `/api/order/{id}` | GET | Sifariş statusunu almaq |
+
 ## 💰 Qiymət Hesablaması
 
 Sistem avtomatik olaraq qiyməti hesablayır:
@@ -86,6 +100,8 @@ Sistem avtomatik olaraq qiyməti hesablayır:
 - Form validasiyası
 - Sessiya idarəetməsi
 - API response handling
+- SSL təhlükəsizliyi
+- Bearer token autentifikasiyası
 
 ## 📋 Form Sahələri
 
@@ -95,16 +111,36 @@ Sistem avtomatik olaraq qiyməti hesablayır:
 
 ## 🔗 API İnteqrasiyası
 
-### Ödəniş Sonrası SMM Sifarişi
+### Ödəniş Yaradılması
 
-Sistem ödəniş uğurlu olduqdan sonra aşağıdakı məlumatları Portmanat.az API-sinə POST sorğusu kimi göndərir:
+Sistem ödəniş yaratmaq üçün aşağıdakı məlumatları `/api/payment` endpoint-inə göndərir:
+
+```json
+{
+    "amount": 1.00,
+    "currency": "AZN",
+    "description": "Instagram Bəyənmələri - 100 ədəd",
+    "return_url": "https://yoursite.com/?payment_status=success",
+    "cancel_url": "https://yoursite.com/",
+    "order_id": "smm_64f8a1b2c3d4e",
+    "service_id": 123,
+    "username": "istifadəçi_adı",
+    "link": "https://instagram.com/p/...",
+    "quantity": 100
+}
+```
+
+### SMM Sifarişi Tamamlama
+
+Ödəniş uğurlu olduqdan sonra sistem aşağıdakı məlumatları `/api/order` endpoint-inə göndərir:
 
 ```json
 {
     "service_id": 123,
     "username": "istifadəçi_adı",
     "link": "https://instagram.com/p/...",
-    "quantity": 100
+    "quantity": 100,
+    "total_price": 1.00
 }
 ```
 
@@ -116,8 +152,10 @@ Sistem aşağıdakı xəta vəziyyətlərini idarə edir:
 - Yanlış URL formatı
 - Yanlış miqdar dəyəri
 - API bağlantı xətaları
+- cURL xətaları
 - API response xətaları
 - Ödəniş xətaları
+- SSL xətaları
 
 ## 🎨 Fərdiləşdirmə
 
@@ -139,6 +177,7 @@ Qiymət hesablamasını `config.php` faylında `$PRICE_PER_UNIT` dəyərini dəy
 - cURL extension
 - Veb server (Apache, Nginx, və s.)
 - Session dəstəyi
+- SSL dəstəyi (tövsiyə olunur)
 
 ## 🧪 Test
 
@@ -147,24 +186,28 @@ Sistemin düzgün işləməsini yoxlamaq üçün `test.php` faylından istifadə
 1. `test.php` səhifəsini açın
 2. Konfiqurasiya məlumatlarını yoxlayın
 3. Sistem yoxlamalarını görün
-4. API bağlantısını test edin
+4. Portmanat.az API bağlantısını test edin
+5. Müxtəlif endpoint-ləri yoxlayın
 
 ## 🔧 Sorun Həlli
 
 ### API Bağlantı Xətası
 - API açarınızın düzgün olduğundan əmin olun
-- API endpoint URL-ni yoxlayın
+- API endpoint URL-lərini yoxlayın
 - Serverinizin xarici API-lərə giriş icazəsi olduğundan əmin olun
+- SSL sertifikatlarını yoxlayın
 
 ### Ödəniş Xətası
-- Portmanat.az ödəniş parametrlərini yoxlayın
+- Portmanat.az API parametrlərini yoxlayın
 - Return və cancel URL-lərini yoxlayın
 - API açarının ödəniş sistemi üçün də düzgün olduğundan əmin olun
+- cURL xətalarını yoxlayın
 
 ### Form Göndərilmə Xətası
 - PHP xəta loglarını yoxlayın
 - Form validasiya mesajlarını oxuyun
 - Server parametrlərini yoxlayın
+- Session dəstəyini yoxlayın
 
 ## 📄 Lisenziya
 
@@ -176,9 +219,22 @@ Hər hansı problem yaşasanız, kod şərhlərini yoxlayın və ya developer il
 
 ## 🔄 Yeniləmələr
 
+### v2.1 - Portmanat.az API Tam İnteqrasiyası
+- Portmanat.az Partners API tam dəstəyi
+- Müxtəlif API endpoint-ləri
+- Təkmilləşdirilmiş xəta idarəetməsi
+- SSL təhlükəsizliyi
+- Bearer token autentifikasiyası
+
 ### v2.0 - Ödəniş Sistemi Əlavə Edildi
 - Portmanat.az ödəniş sistemi inteqrasiyası
 - Real-time qiymət hesablaması
 - Sessiya idarəetməsi
 - Azərbaycan dili dəstəyi
 - Təkmilləşdirilmiş təhlükəsizlik
+
+## 📚 Əlavə Məlumat
+
+- **Portmanat.az API Sənədləri**: https://partners.portmanat.az/page/api
+- **API Base URL**: https://partners.portmanat.az/api
+- **Dəstək**: Portmanat.az dəstək komandası ilə əlaqə saxlayın

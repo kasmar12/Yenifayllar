@@ -13,26 +13,32 @@ if (isset($_GET['payment_status']) && $_GET['payment_status'] === 'success') {
     if (isset($_SESSION['pending_order'])) {
         $order_data = $_SESSION['pending_order'];
         
-        // Now complete the SMM order
+        // Now complete the SMM order using Portmanat.az API
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT);
+        curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT . '/order');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($order_data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $API_KEY
+            'Authorization: Bearer ' . $API_KEY,
+            'Accept: application/json'
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
         curl_close($ch);
         
-        if ($httpCode === 200) {
+        if ($error) {
+            $message = "cURL xətası: " . $error;
+            $message_type = 'error';
+        } elseif ($httpCode === 200 || $httpCode === 201) {
             $result = json_decode($response, true);
             if ($result && isset($result['success']) && $result['success']) {
-                $message = "Ödəniş uğurlu! SMM sifarişi tamamlandı. Sifariş ID: " . ($result['order_id'] ?? 'N/A');
+                $message = "Ödəniş uğurlu! SMM sifarişi tamamlandı. Sifariş ID: " . ($result['order_id'] ?? $result['id'] ?? 'N/A');
                 $message_type = 'success';
                 unset($_SESSION['pending_order']); // Clear pending order
             } else {
@@ -41,6 +47,12 @@ if (isset($_GET['payment_status']) && $_GET['payment_status'] === 'success') {
             }
         } else {
             $message = "Ödəniş uğurlu amma SMM API xətası. HTTP Kodu: " . $httpCode;
+            if ($response) {
+                $result = json_decode($response, true);
+                if ($result && isset($result['message'])) {
+                    $message .= " - " . $result['message'];
+                }
+            }
             $message_type = 'error';
         }
     } else {
@@ -85,19 +97,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'total_price' => $total_price
         ];
         
-        // Redirect to payment page
-        $payment_url = $PAYMENT_ENDPOINT . "?" . http_build_query([
+        // Create payment via Portmanat.az API
+        $payment_data = [
             'amount' => $total_price,
             'currency' => $CURRENCY,
             'description' => $CURRENT_SERVICE_NAME . ' - ' . $quantity . ' ədəd',
             'return_url' => $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?payment_status=success',
             'cancel_url' => $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
             'order_id' => uniqid('smm_'),
-            'api_key' => $API_KEY
-        ]);
+            'service_id' => $SERVICE_ID,
+            'username' => $username,
+            'link' => $link,
+            'quantity' => $quantity
+        ];
         
-        header('Location: ' . $payment_url);
-        exit;
+        // Send payment request to Portmanat.az API
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $PAYMENT_ENDPOINT);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payment_data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $API_KEY,
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($error) {
+            $message = "Ödəniş yaradılarkən xəta: " . $error;
+            $message_type = 'error';
+        } elseif ($httpCode === 200 || $httpCode === 201) {
+            $result = json_decode($response, true);
+            if ($result && isset($result['payment_url'])) {
+                // Redirect to payment page
+                header('Location: ' . $result['payment_url']);
+                exit;
+            } elseif ($result && isset($result['redirect_url'])) {
+                // Alternative redirect field
+                header('Location: ' . $result['redirect_url']);
+                exit;
+            } else {
+                $message = "Ödəniş yaradıldı amma yönləndirmə URL-i tapılmadı";
+                $message_type = 'error';
+            }
+        } else {
+            $message = "Ödəniş yaradılarkən API xətası. HTTP Kodu: " . $httpCode;
+            if ($response) {
+                $result = json_decode($response, true);
+                if ($result && isset($result['message'])) {
+                    $message .= " - " . $result['message'];
+                }
+            }
+            $message_type = 'error';
+        }
     } else {
         $message = implode(', ', $errors);
         $message_type = 'error';
@@ -110,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMM Sifariş və Ödəniş Sistemi</title>
+    <title>SMM Sifariş və Ödəniş Sistemi - Portmanat.az</title>
     <style>
         * {
             margin: 0;
@@ -288,6 +347,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 14px;
         }
         
+        .api-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            color: #1976d2;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
         @media (max-width: 480px) {
             body {
                 padding: 10px;
@@ -321,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <div class="header">
             <h1>SMM Sifariş və Ödəniş</h1>
-            <p>Təhlükəsiz ödəniş ilə sifariş verin</p>
+            <p>Portmanat.az API ilə təhlükəsiz ödəniş</p>
         </div>
         
         <div class="form-container">
@@ -334,6 +404,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="service-info">
                 <strong>Mövcud Xidmət:</strong> <?php echo $CURRENT_SERVICE_NAME; ?>
                 <div class="service-id">Xidmət ID: <?php echo $SERVICE_ID; ?></div>
+            </div>
+            
+            <div class="api-info">
+                <strong>🔗 API:</strong> Portmanat.az Partners API istifadə edilir
             </div>
             
             <div class="payment-notice">
@@ -370,7 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="price-calculator">
                         <span>Ümumi qiymət:</span>
-                        <span class="total-price" id="totalPrice">1.00 AZN</span>
+                        <span class="total-price" id="totalPrice">1.00 <?php echo $CURRENCY; ?></span>
                     </div>
                 </div>
                 

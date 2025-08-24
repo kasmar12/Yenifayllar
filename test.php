@@ -1,23 +1,26 @@
 <?php
-// Test file to verify system configuration
+// Test file to verify Portmanat.az API configuration
 require_once 'config.php';
 
-echo "<h1>SMM Sipariş Sistemi - Test Sayfası</h1>";
-echo "<h2>Konfigürasyon Bilgileri</h2>";
+echo "<h1>SMM Sifariş və Ödəniş Sistemi - Test Səhifəsi</h1>";
+echo "<h2>Portmanat.az API Konfiqurasiyası</h2>";
 
-echo "<p><strong>API Endpoint:</strong> " . $API_ENDPOINT . "</p>";
+echo "<p><strong>API Base URL:</strong> " . $API_ENDPOINT . "</p>";
+echo "<p><strong>Ödəniş Endpoint:</strong> " . $PAYMENT_ENDPOINT . "</p>";
 echo "<p><strong>API Key:</strong> " . (empty($API_KEY) ? "AYARLANMAMIŞ" : "AYARLANDI") . "</p>";
-echo "<p><strong>Servis ID:</strong> " . $SERVICE_ID . "</p>";
-echo "<p><strong>Servis Adı:</strong> " . $CURRENT_SERVICE_NAME . "</p>";
+echo "<p><strong>Valyuta:</strong> " . $CURRENCY . "</p>";
+echo "<p><strong>Vahid Qiyməti:</strong> " . $PRICE_PER_UNIT . " " . $CURRENCY . "</p>";
+echo "<p><strong>Xidmət ID:</strong> " . $SERVICE_ID . "</p>";
+echo "<p><strong>Xidmət Adı:</strong> " . $CURRENT_SERVICE_NAME . "</p>";
 
-echo "<h2>Sistem Kontrolleri</h2>";
+echo "<h2>Sistem Yoxlamaları</h2>";
 
 // Check PHP version
-echo "<p><strong>PHP Sürümü:</strong> " . PHP_VERSION . " ";
+echo "<p><strong>PHP Versiyası:</strong> " . PHP_VERSION . " ";
 if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
-    echo "✅ Uygun";
+    echo "✅ Uyğun";
 } else {
-    echo "❌ PHP 7.0+ gerekli";
+    echo "❌ PHP 7.0+ tələb olunur";
 }
 echo "</p>";
 
@@ -26,40 +29,43 @@ echo "<p><strong>cURL Extension:</strong> ";
 if (extension_loaded('curl')) {
     echo "✅ Yüklü";
 } else {
-    echo "❌ Yüklü değil";
+    echo "❌ Yüklü deyil";
 }
 echo "</p>";
 
 // Check if config file is readable
-echo "<p><strong>Config Dosyası:</strong> ";
+echo "<p><strong>Config Faylı:</strong> ";
 if (is_readable('config.php')) {
-    echo "✅ Okunabilir";
+    echo "✅ Oxuna bilər";
 } else {
-    echo "❌ Okunamıyor";
+    echo "❌ Oxuna bilmir";
+}
+echo "</p>";
+
+// Check session support
+echo "<p><strong>Session Dəstəyi:</strong> ";
+if (function_exists('session_start')) {
+    echo "✅ Mövcud";
+} else {
+    echo "❌ Mövcud deyil";
 }
 echo "</p>";
 
 // Test API connectivity (if API key is set)
 if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
-    echo "<h2>API Bağlantı Testi</h2>";
+    echo "<h2>Portmanat.az API Bağlantı Testi</h2>";
     
-    $testData = [
-        'service_id' => $SERVICE_ID,
-        'username' => 'test_user',
-        'link' => 'https://example.com/test',
-        'quantity' => 1
-    ];
-    
+    // Test services endpoint
+    echo "<h3>1. Xidmətlər Endpoint Testi</h3>";
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($testData));
+    curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT . '/services');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $API_KEY
+        'Authorization: Bearer ' . $API_KEY,
+        'Accept: application/json'
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -67,24 +73,82 @@ if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
     curl_close($ch);
     
     if ($error) {
-        echo "<p><strong>cURL Hatası:</strong> " . $error . "</p>";
+        echo "<p><strong>cURL Xətası:</strong> " . $error . "</p>";
     } else {
         echo "<p><strong>HTTP Kodu:</strong> " . $httpCode . "</p>";
-        echo "<p><strong>API Yanıtı:</strong> " . htmlspecialchars($response) . "</p>";
+        echo "<p><strong>API Cavabı:</strong> " . htmlspecialchars($response) . "</p>";
     }
+    
+    // Test balance endpoint
+    echo "<h3>2. Balans Endpoint Testi</h3>";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT . '/balance');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $API_KEY,
+        'Accept: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($error) {
+        echo "<p><strong>cURL Xətası:</strong> " . $error . "</p>";
+    } else {
+        echo "<p><strong>HTTP Kodu:</strong> " . $httpCode . "</p>";
+        echo "<p><strong>API Cavabı:</strong> " . htmlspecialchars($response) . "</p>";
+    }
+    
+    // Test payment endpoint (without creating actual payment)
+    echo "<h3>3. Ödəniş Endpoint Testi (Bağlantı)</h3>";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $PAYMENT_ENDPOINT);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $API_KEY,
+        'Accept: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($error) {
+        echo "<p><strong>cURL Xətası:</strong> " . $error . "</p>";
+    } else {
+        echo "<p><strong>HTTP Kodu:</strong> " . $httpCode . "</p>";
+        echo "<p><strong>Endpoint Cavabı:</strong> " . htmlspecialchars($response) . "</p>";
+    }
+    
 } else {
     echo "<h2>API Testi</h2>";
-    echo "<p>⚠️ API anahtarı ayarlanmadığı için test yapılamıyor.</p>";
-    echo "<p>Test yapmak için <code>config.php</code> dosyasında API anahtarınızı ayarlayın.</p>";
+    echo "<p>⚠️ API açarı ayarlanmadığı üçün test edilə bilmir.</p>";
+    echo "<p>Test etmək üçün <code>config.php</code> faylında API açarınızı təyin edin.</p>";
 }
 
-echo "<h2>Sonraki Adımlar</h2>";
+echo "<h2>Portmanat.az API Endpoint-ləri</h2>";
+echo "<ul>";
+echo "<li><strong>POST /api/order</strong> - Yeni sifariş yaratmaq</li>";
+echo "<li><strong>GET /api/order/{id}</strong> - Sifariş statusunu almaq</li>";
+echo "<li><strong>POST /api/payment</strong> - Ödəniş yaratmaq</li>";
+echo "<li><strong>GET /api/services</strong> - Mövcud xidmətləri almaq</li>";
+echo "<li><strong>GET /api/balance</strong> - Hesab balansını almaq</li>";
+echo "</ul>";
+
+echo "<h2>Sonrakı Addımlar</h2>";
 echo "<ol>";
-echo "<li>Ana sayfayı açmak için <a href='index.php'>buraya tıklayın</a></li>";
-echo "<li>API anahtarınızı <code>config.php</code> dosyasında ayarlayın</li>";
-echo "<li>Farklı servisler için <code>SERVICE_ID</code> değerini değiştirin</li>";
+echo "<li>Ana səhifəni açmaq üçün <a href='index.php'>buraya klikləyin</a></li>";
+echo "<li>API açarınızı <code>config.php</code> faylında təyin edin</li>";
+echo "<li>Fərqli xidmətlər üçün <code>SERVICE_ID</code> dəyərini dəyişdirin</li>";
 echo "<li>Formu test edin</li>";
 echo "</ol>";
 
-echo "<p><em>Bu test dosyası sadece geliştirme amaçlıdır. Canlı ortamda kaldırın.</em></p>";
+echo "<p><em>Bu test faylı yalnız inkişaf məqsədləri üçündür. Canlı mühitdə silin.</em></p>";
 ?>
