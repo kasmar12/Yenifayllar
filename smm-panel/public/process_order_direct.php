@@ -71,57 +71,29 @@ try {
         throw new Exception("Sifariş ID alına bilmədi!");
     }
     
+    // Store order data in session for ad completion
+    $_SESSION['pending_order'] = [
+        'service_id' => $service_id,
+        'service_name' => $service['name'],
+        'link' => $link,
+        'amount' => $amount,
+        'price' => $price
+    ];
+    
     // Generate AY.Live ad link
     $link_shortener = new LinkShortener();
-    $short_link_result = $link_shortener->generateShortLink($link, $order_id);
+    $short_link_result = $link_shortener->generateShortLink($link, 'temp_' . time());
     
     if (!$short_link_result['success']) {
         throw new Exception("Reklam linki yaradıla bilmədi: " . $short_link_result['error']);
     }
     
-    // Store order data in session for later use
-    $_SESSION['current_order'] = [
-        'id' => $order_id,
-        'service_name' => $service['name'],
-        'link' => $link,
-        'amount' => $amount,
-        'price' => $price,
-        'short_link' => $short_link_result['short_url'],
-        'shortener_service' => $short_link_result['service']
-    ];
-    
-    // Log the order creation
+    // Log the pending order
     try {
-        $log_entry = date('Y-m-d H:i:s') . " - Order #$order_id created and redirecting to ad page\n";
+        $log_entry = date('Y-m-d H:i:s') . " - Pending order created, redirecting to AY.Live ad page\n";
         file_put_contents('../logs/orders_log.txt', $log_entry, FILE_APPEND);
     } catch (Exception $e) {
         error_log("Failed to write order log: " . $e->getMessage());
-    }
-    
-    // Store callback URL for AY.Live
-    $callback_data = [
-        'order_id' => $order_id,
-        'callback_url' => SHORTENER_CALLBACK_URL,
-        'timestamp' => time()
-    ];
-    
-    $callback_file = "../logs/shortener_callbacks.json";
-    $callbacks = [];
-    
-    if (file_exists($callback_file)) {
-        $callbacks = json_decode(file_get_contents($callback_file), true) ?: [];
-    }
-    
-    $callbacks[$order_id] = [
-        'status' => 'pending',
-        'timestamp' => time(),
-        'data' => $callback_data
-    ];
-    
-    try {
-        file_put_contents($callback_file, json_encode($callbacks, JSON_PRETTY_PRINT));
-    } catch (Exception $e) {
-        error_log("Failed to write callback file: " . $e->getMessage());
     }
     
     // Redirect to AY.Live ad page

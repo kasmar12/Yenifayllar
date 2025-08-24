@@ -80,15 +80,13 @@ class LinkShortener {
      * Generate AY.Live short link
      */
     private function generateAYLiveLink($target_url, $order_id, $custom_alias) {
-        // AY.Live format: https://ay.live/st/?api=KEY&url=TARGET_URL&callback=CALLBACK_URL&order_id=ORDER_ID
-        $callback_url = urlencode($this->callback_url . '?order_id=' . $order_id);
-        $short_url = $this->api_url . "?api=" . $this->api_key . "&url=" . urlencode($target_url) . "&callback=" . $callback_url . "&order_id=" . $order_id;
+        // AY.Live format: https://ay.live/st/?api=KEY&url=TARGET_URL
+        $short_url = $this->api_url . "?api=" . $this->api_key . "&url=" . urlencode($target_url);
         
         $this->log("AY.Live short link generated", [
             'order_id' => $order_id,
             'short_url' => $short_url,
-            'target_url' => $target_url,
-            'callback_url' => $this->callback_url . '?order_id=' . $order_id
+            'target_url' => $target_url
         ]);
         
         return [

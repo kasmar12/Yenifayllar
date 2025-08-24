@@ -18,11 +18,13 @@ switch (LINK_SHORTENER_SERVICE) {
         // AY.Live API Configuration
         define('SHORTENER_API_URL', 'https://ay.live/st/');
         define('SHORTENER_API_KEY', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab');
-        define('SHORTENER_CALLBACK_URL', 'http://192.168.100.184:8080/public/shortener_callback.php');
         
-        // AY.Live specific settings
-        define('AYLIVE_CALLBACK_PARAM', 'callback');
-        define('AYLIVE_ORDER_ID_PARAM', 'order_id');
+        // AY.Live API Response Format
+        define('AYLIVE_SUCCESS_STATUS', 'success');
+        define('AYLIVE_URL_PARAM', 'shortenedUrl');
+        
+        // No callback needed - direct API response
+        define('AYLIVE_NO_CALLBACK', true);
         break;
         
     case 'linkvertise':
