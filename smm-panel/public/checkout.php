@@ -48,7 +48,13 @@ $order_id = $db->lastInsertId();
 
 // Create Portmanat payment
 $portmanat = new PortmanatAPI();
-$callback_url = 'https://' . $_SERVER['HTTP_HOST'] . '/callback_portmanat.php';
+
+// Fix callback URL generation
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+$callback_url = $protocol . '://' . $host . '/callback_portmanat.php';
+$return_url = $protocol . '://' . $host . '/payment_success.php';
+
 $description = $service['name'] . ' - ' . number_format($amount) . ' ədəd';
 
 // Log order creation

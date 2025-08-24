@@ -38,7 +38,13 @@ try {
     echo "<h4>2. Create Payment Test</h4>";
     $test_amount = 10.00;
     $test_order_id = 'TEST_' . time();
-    $test_callback = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/callback_portmanat.php';
+    
+    // Fix callback URL generation (same as in checkout.php)
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+    $test_callback = $protocol . '://' . $host . '/callback_portmanat.php';
+    $test_return = $protocol . '://' . $host . '/payment_success.php';
+    
     $test_description = 'Test Payment - SMM Panel';
     
     echo "<p><strong>Test Parameters:</strong></p>";
@@ -46,6 +52,7 @@ try {
     echo "<li><strong>Amount:</strong> $test_amount AZN</li>";
     echo "<li><strong>Order ID:</strong> $test_order_id</li>";
     echo "<li><strong>Callback URL:</strong> $test_callback</li>";
+    echo "<li><strong>Return URL:</strong> $test_return</li>";
     echo "<li><strong>Description:</strong> $test_description</li>";
     echo "</ul>";
     
@@ -78,6 +85,20 @@ try {
         echo "</div>";
     }
     
+    echo "<hr>";
+    
+    // Test 3: Check current configuration
+    echo "<h4>3. Current Configuration</h4>";
+    echo "<div style='background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 20px; border-radius: 5px;'>";
+    echo "<h5>Portmanat API Configuration:</h5>";
+    echo "<ul>";
+    echo "<li><strong>API URL:</strong> https://partners.portmanat.az/api</li>";
+    echo "<li><strong>Merchant ID:</strong> " . (defined('PORTMANAT_MERCHANT_ID') ? PORTMANAT_MERCHANT_ID : 'Not defined') . "</li>";
+    echo "<li><strong>Secret Key:</strong> " . (defined('PORTMANAT_SECRET_KEY') ? '***' . substr(PORTMANAT_SECRET_KEY, -4) : 'Not defined') . "</li>";
+    echo "<li><strong>Debug Mode:</strong> Enabled</li>";
+    echo "</ul>";
+    echo "</div>";
+    
 } catch (Exception $e) {
     echo "<div style='background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 20px; border-radius: 5px;'>";
     echo "<h4>❌ Exception Occurred</h4>";
@@ -98,6 +119,8 @@ echo "<li><strong>cURL Extension:</strong> " . (extension_loaded('curl') ? '✅ 
 echo "<li><strong>JSON Extension:</strong> " . (extension_loaded('json') ? '✅ Loaded' : '❌ Not Loaded') . "</li>";
 echo "<li><strong>Current Time:</strong> " . date('Y-m-d H:i:s') . "</li>";
 echo "<li><strong>Server:</strong> " . ($_SERVER['HTTP_HOST'] ?? 'Unknown') . "</li>";
+echo "<li><strong>Protocol:</strong> " . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'HTTPS' : 'HTTP') . "</li>";
+echo "<li><strong>Document Root:</strong> " . ($_SERVER['DOCUMENT_ROOT'] ?? 'Unknown') . "</li>";
 echo "</ul>";
 echo "</div>";
 

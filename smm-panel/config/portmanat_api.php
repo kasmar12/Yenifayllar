@@ -23,11 +23,11 @@ class PortmanatAPI {
             'merchant_id' => $this->merchant_id,
             'amount' => number_format($amount, 2, '.', ''), // Format amount properly
             'order_id' => $orderId,
-            'callback_url' => $callback_url,
+            'callback_url' => $callbackUrl,
             'currency' => 'AZN',
             'description' => $description ?: 'SMM Panel Order #' . $orderId,
             'language' => 'az', // Azerbaijani language
-            'return_url' => $callback_url // Return URL after payment
+            'return_url' => $callbackUrl // Return URL after payment
         ];
 
         // Generate signature
