@@ -2,7 +2,7 @@
 class PortmanatAPI {
     private $merchant_id;
     private $secret_key;
-    private $api_url = 'https://partners.portmanat.az';
+    private $api_url = 'https://portmanat.az/api';
     private $debug_mode = true; // Debug mode aktiv edin
 
     public function __construct() {
@@ -61,18 +61,27 @@ class PortmanatAPI {
         }
         
         // Get token from Portmanat - try different endpoints
-        $token_response = $this->makeRequest('/api/operation/token', $token_data);
+        $token_endpoints = [
+            '/operation/token',
+            '/token',
+            '/merchant/token',
+            '/api/token',
+            '/v1/token',
+            '/payment/token',
+            '/merchant/' . $this->merchant_id . '/token'
+        ];
         
-        // If first endpoint fails, try alternative
-        if (!$token_response || (isset($token_response['success']) && !$token_response['success'])) {
-            error_log("First token endpoint failed, trying alternative");
-            $token_response = $this->makeRequest('/operation/token', $token_data);
-        }
-        
-        // If both fail, try the most common endpoint
-        if (!$token_response || (isset($token_response['success']) && !$token_response['success'])) {
-            error_log("Both token endpoints failed, trying common endpoint");
-            $token_response = $this->makeRequest('/api/token', $token_data);
+        $token_response = null;
+        foreach ($token_endpoints as $endpoint) {
+            error_log("Trying token endpoint: " . $endpoint);
+            $token_response = $this->makeRequest($endpoint, $token_data);
+            
+            if ($token_response && isset($token_response['token'])) {
+                error_log("Token endpoint successful: " . $endpoint);
+                break;
+            } else {
+                error_log("Token endpoint failed: " . $endpoint . " - " . json_encode($token_response));
+            }
         }
         
         if ($this->debug_mode) {
@@ -459,35 +468,51 @@ class PortmanatAPI {
      */
     public function testConnection() {
         try {
-            // Test with multiple endpoints to find the correct one
-            $endpoints = [
-                '/api/balance',
-                '/balance', 
-                '/account/balance',
-                '/api/account/balance',
-                '/merchant/balance'
+            // Test with multiple API URLs and endpoints
+            $api_urls = [
+                'https://portmanat.az/api',
+                'https://portmanat.az',
+                'https://api.portmanat.az',
+                'https://partners.portmanat.az'
             ];
             
-            foreach ($endpoints as $endpoint) {
-                error_log("Testing Portmanat endpoint: " . $endpoint);
+            $endpoints = [
+                '/balance',
+                '/merchant/balance',
+                '/account/balance',
+                '/merchant/account/balance',
+                '/api/merchant/balance',
+                '/v1/balance',
+                '/v1/merchant/balance',
+                '/merchant/' . $this->merchant_id . '/balance'
+            ];
+            
+            foreach ($api_urls as $api_url) {
+                error_log("Testing API URL: " . $api_url);
+                $this->api_url = $api_url;
                 
-                $data = [
-                    'merchant_id' => $this->merchant_id
-                ];
-                $data['sign'] = $this->generateSignature($data);
-                
-                $response = $this->makeRequest($endpoint, $data);
-                
-                if ($response && isset($response['success']) && $response['success']) {
-                    error_log("Successful connection with endpoint: " . $endpoint);
-                    return [
-                        'success' => true,
-                        'message' => 'API connection successful with endpoint: ' . $endpoint,
-                        'balance' => $response,
-                        'working_endpoint' => $endpoint
+                foreach ($endpoints as $endpoint) {
+                    error_log("Testing endpoint: " . $api_url . $endpoint);
+                    
+                    $data = [
+                        'merchant_id' => $this->merchant_id
                     ];
-                } else {
-                    error_log("Failed connection with endpoint: " . $endpoint . " - " . json_encode($response));
+                    $data['sign'] = $this->generateSignature($data);
+                    
+                    $response = $this->makeRequest($endpoint, $data);
+                    
+                    if ($response && isset($response['success']) && $response['success']) {
+                        error_log("Successful connection with API URL: " . $api_url . " and endpoint: " . $endpoint);
+                        return [
+                            'success' => true,
+                            'message' => 'API connection successful',
+                            'balance' => $response,
+                            'working_api_url' => $api_url,
+                            'working_endpoint' => $endpoint
+                        ];
+                    } else {
+                        error_log("Failed connection with API URL: " . $api_url . " and endpoint: " . $endpoint . " - " . json_encode($response));
+                    }
                 }
             }
             

@@ -12,7 +12,12 @@ define('PORTMANAT_MERCHANT_ID', '195');
 define('PORTMANAT_SECRET_KEY', '7708346a');
 
 // Portmanat API URL (dəyişməyin)
-define('PORTMANAT_API_URL', 'https://portmanat.az');
+define('PORTMANAT_API_URL', 'https://portmanat.az/api');
+
+// Alternative API URLs for testing
+define('PORTMANAT_ALT_API_URL_1', 'https://portmanat.az');
+define('PORTMANAT_ALT_API_URL_2', 'https://api.portmanat.az');
+define('PORTMANAT_ALT_API_URL_3', 'https://partners.portmanat.az');
 
 // Callback URL (sizin domain-iniz)
 define('PORTMANAT_CALLBACK_URL', 'http://192.168.100.184:8080/public/callback_portmanat.php');
