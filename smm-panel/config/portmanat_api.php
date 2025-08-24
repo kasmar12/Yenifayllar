@@ -251,11 +251,17 @@ class PortmanatAPI {
                 'data' => $data,
                 'http_code' => $http_code,
                 'curl_error' => $curl_error,
-                'curl_info' => $curl_info
+                'curl_info' => $curl_info,
+                'endpoint' => $endpoint,
+                'api_url' => $this->api_url
             ]));
             
             // Log complete raw response
             error_log("Portmanat API Raw Response: " . $response);
+            
+            // Log response length and first 500 characters
+            error_log("Portmanat API Response Length: " . strlen($response));
+            error_log("Portmanat API Response Preview: " . substr($response, 0, 500));
         }
         
         // Check for cURL errors

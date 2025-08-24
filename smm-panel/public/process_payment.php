@@ -73,6 +73,11 @@ function processPortmanatPayment($order, $db) {
 
         // Log payment creation
         error_log("Creating Portmanat payment for order #{$order['id']}: Amount={$order['price']}, Callback=$callback_url");
+        error_log("Portmanat API instance created: " . get_class($portmanat));
+
+        // Test Portmanat connection first
+        $connection_test = $portmanat->testConnection();
+        error_log("Portmanat connection test result: " . json_encode($connection_test));
 
         $payment = $portmanat->createPayment($order['price'], $order['id'], $callback_url, $description, '1');
         

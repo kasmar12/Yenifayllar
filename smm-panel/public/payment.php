@@ -279,8 +279,11 @@ if (isset($_SESSION['current_order'])) {
 
         <!-- Back Button -->
         <div class="text-center mt-4">
-            <a href="index.php" class="btn btn-outline-secondary">
+            <a href="index.php" class="btn btn-outline-secondary me-2">
                 <i class="fas fa-arrow-left"></i> Ana Səhifəyə Qayıt
+            </a>
+            <a href="../test_portmanat_debug.php" class="btn btn-outline-warning" target="_blank">
+                <i class="fas fa-bug"></i> Portmanat Debug Test
             </a>
         </div>
     </div>
