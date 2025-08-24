@@ -127,6 +127,17 @@ if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
         echo "<p><strong>Endpoint Cavabı:</strong> " . htmlspecialchars($response) . "</p>";
     }
     
+    // Test order endpoint structure
+    echo "<h3>4. Sifariş Endpoint Strukturu Testi</h3>";
+    $testOrderData = [
+        'service_id' => $SERVICE_ID,
+        'link' => 'https://instagram.com/p/test',
+        'quantity' => 100,
+        'total_price' => 1.00
+    ];
+    echo "<p><strong>Test Sifariş Məlumatları:</strong></p>";
+    echo "<pre>" . json_encode($testOrderData, JSON_PRETTY_PRINT) . "</pre>";
+    
 } else {
     echo "<h2>API Testi</h2>";
     echo "<p>⚠️ API açarı ayarlanmadığı üçün test edilə bilmir.</p>";

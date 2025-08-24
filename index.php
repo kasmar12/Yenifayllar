@@ -63,17 +63,12 @@ if (isset($_GET['payment_status']) && $_GET['payment_status'] === 'success') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate and sanitize inputs
-    $username = trim($_POST['username'] ?? '');
     $link = trim($_POST['link'] ?? '');
     $quantity = intval($_POST['quantity'] ?? 0);
     
     $errors = [];
     
     // Validation
-    if (empty($username)) {
-        $errors[] = "İstifadəçi adı tələb olunur";
-    }
-    
     if (empty($link)) {
         $errors[] = "Link tələb olunur";
     } elseif (!filter_var($link, FILTER_VALIDATE_URL)) {
@@ -91,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Store order data in session for later use
         $_SESSION['pending_order'] = [
             'service_id' => $SERVICE_ID,
-            'username' => $username,
             'link' => $link,
             'quantity' => $quantity,
             'total_price' => $total_price
@@ -106,7 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'cancel_url' => $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
             'order_id' => uniqid('smm_'),
             'service_id' => $SERVICE_ID,
-            'username' => $username,
             'link' => $link,
             'quantity' => $quantity
         ];
@@ -415,13 +408,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <form method="POST" action="" id="orderForm">
-                <div class="form-group">
-                    <label for="username">İstifadəçi Adı:</label>
-                    <input type="text" id="username" name="username" 
-                           value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>"
-                           placeholder="İstifadəçi adınızı daxil edin" required>
-                </div>
-                
                 <div class="form-group">
                     <label for="link">Link:</label>
                     <input type="text" id="link" name="link" 

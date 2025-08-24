@@ -16,7 +16,7 @@ Bu layihə, SMM (Social Media Marketing) sifarişləri vermək üçün **Portman
 
 ## 🔄 İş Axışı
 
-1. **İstifadəçi formu doldurur** və təsdiq edir
+1. **İstifadəçi link və miqdarı daxil edir** və təsdiq edir
 2. **Sistem qiyməti hesablayır** və sifarişi sessiyada saxlayır
 3. **Portmanat.az API-yə ödəniş sorğusu** göndərilir (`/api/payment`)
 4. **İstifadəçi ödəniş səhifəsinə yönləndirilir**
@@ -105,7 +105,6 @@ Sistem avtomatik olaraq qiyməti hesablayır:
 
 ## 📋 Form Sahələri
 
-- **İstifadəçi Adı**: Mətn daxiletməsi (məcburi)
 - **Link**: URL daxiletməsi (məcburi, düzgün URL formatında olmalıdır)
 - **Miqdar**: Rəqəm daxiletməsi (məcburi, 0-dan böyük olmalıdır)
 
@@ -124,7 +123,6 @@ Sistem ödəniş yaratmaq üçün aşağıdakı məlumatları `/api/payment` end
     "cancel_url": "https://yoursite.com/",
     "order_id": "smm_64f8a1b2c3d4e",
     "service_id": 123,
-    "username": "istifadəçi_adı",
     "link": "https://instagram.com/p/...",
     "quantity": 100
 }
@@ -137,7 +135,6 @@ Sistem ödəniş yaratmaq üçün aşağıdakı məlumatları `/api/payment` end
 ```json
 {
     "service_id": 123,
-    "username": "istifadəçi_adı",
     "link": "https://instagram.com/p/...",
     "quantity": 100,
     "total_price": 1.00

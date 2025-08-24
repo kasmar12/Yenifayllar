@@ -48,7 +48,7 @@ $CURRENT_SERVICE_NAME = $SERVICE_NAMES[$SERVICE_ID] ?? "Bilinməyən Xidmət";
 // - GET /api/balance - Get account balance
 
 // Payment flow:
-// 1. User fills form and submits
+// 1. User fills form with link and quantity
 // 2. System creates payment via /api/payment
 // 3. User is redirected to payment page
 // 4. After successful payment, user returns with payment_status=success
