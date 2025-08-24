@@ -181,6 +181,9 @@ if (isset($_GET['error'])) {
                 <a href="../test_checkout_step_by_step.php" class="btn btn-outline-warning btn-sm">
                     <i class="fas fa-search"></i> Step-by-Step Test
                 </a>
+                <a href="../test_checkout_debug.php" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-bug"></i> Debug Test
+                </a>
             </p>
         </div>
         <?php endif; ?>

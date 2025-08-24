@@ -14,19 +14,27 @@ function handleError($error_type, $error_message, $file, $line) {
 
 set_error_handler('handleError');
 
+// Log the start of checkout process
+error_log("Checkout process started for IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+
 try {
     // Start session
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
     
-    // Include required files
+    // Include required files one by one to identify which one causes the error
+    error_log("Loading database.php...");
     require_once '../config/database.php';
-    require_once '../config/portmanat_config.php';
-    require_once '../config/portmanat_api.php';
+    error_log("Database.php loaded successfully");
     
-    // Log the start of checkout process
-    error_log("Checkout process started for IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    error_log("Loading portmanat_config.php...");
+    require_once '../config/portmanat_config.php';
+    error_log("Portmanat_config.php loaded successfully");
+    
+    error_log("Loading portmanat_api.php...");
+    require_once '../config/portmanat_api.php';
+    error_log("Portmanat_api.php loaded successfully");
     
 } catch (Exception $e) {
     error_log("Critical error in checkout.php: " . $e->getMessage());
@@ -66,14 +74,18 @@ if (empty($service_id) || empty($link) || empty($amount)) {
     exit;
 }
 
+error_log("Input validation passed: service_id=$service_id, link=$link, amount=$amount");
+
 // Validate amount
 try {
+    error_log("Creating database connection...");
     $database = new Database();
     $db = $database->getConnection();
     
     if (!$db) {
         throw new Exception("Database connection failed");
     }
+    error_log("Database connection successful");
     
     $query = "SELECT * FROM services WHERE id = ?";
     $stmt = $db->prepare($query);
@@ -90,6 +102,8 @@ try {
         exit;
     }
     
+    error_log("Service validation passed: " . $service['name']);
+    
 } catch (Exception $e) {
     error_log("Database error in checkout.php: " . $e->getMessage());
     header('Location: index.php?error=database_error&msg=' . urlencode('Database error occurred. Please try again.'));
@@ -98,9 +112,11 @@ try {
 
 // Calculate price
 $price = ($amount / 1000) * $service['price_per_1k'];
+error_log("Price calculated: $price");
 
 // Create order in database
 try {
+    error_log("Creating order in database...");
     $query = "INSERT INTO orders (service_id, link, amount, price, status) VALUES (?, ?, ?, ?, 'pending')";
     $stmt = $db->prepare($query);
     $result = $stmt->execute([$service_id, $link, $amount, $price]);
@@ -125,7 +141,9 @@ try {
 
 // Create Portmanat payment
 try {
+    error_log("Creating Portmanat API instance...");
     $portmanat = new PortmanatAPI();
+    error_log("Portmanat API instance created successfully");
     
     // Use predefined callback URLs from config
     $callback_url = PORTMANAT_CALLBACK_URL;
