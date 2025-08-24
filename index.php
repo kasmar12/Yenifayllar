@@ -17,17 +17,17 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $link = trim($_POST['link'] ?? '');
     $quantity = intval($_POST['quantity'] ?? 0);
-    $amount = floatval($_POST['amount'] ?? 0);
     
     // Basic validation
     if (empty($link)) {
         $error = 'Link/Username is required';
     } elseif ($quantity <= 0) {
         $error = 'Quantity must be greater than 0';
-    } elseif ($amount <= 0) {
-        $error = 'Amount must be greater than 0';
     } else {
         try {
+            // Calculate amount automatically based on quantity
+            $amount = ($quantity / 1000) * PRICE_PER_1000;
+            
             // Generate unique order ID
             $order_id = 'ORD_' . time() . '_' . rand(1000, 9999);
             
@@ -44,6 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Calculate preview amount for display
+$preview_quantity = 1000;
+$preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,6 +100,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 10px;
             border: none;
         }
+        .price-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: white;
+        }
+        .price-calculator {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -125,7 +143,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         <?php endif; ?>
                         
-                        <form method="POST" action="">
+                        <div class="price-info text-center">
+                            <h5 class="mb-2">
+                                <i class="fas fa-tags me-2"></i>
+                                Pricing Information
+                            </h5>
+                            <p class="mb-0">
+                                <strong><?php echo PRICE_PER_1000 . ' ' . CURRENCY; ?></strong> per 1000 followers/likes/views
+                            </p>
+                        </div>
+                        
+                        <form method="POST" action="" id="orderForm">
                             <div class="mb-3">
                                 <label for="link" class="form-label">
                                     <i class="fas fa-link me-2"></i>
@@ -151,27 +179,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                        id="quantity" 
                                        name="quantity" 
                                        placeholder="1000"
-                                       value="<?php echo htmlspecialchars($_POST['quantity'] ?? ''); ?>"
-                                       min="1" 
+                                       value="<?php echo htmlspecialchars($_POST['quantity'] ?? '1000'); ?>"
+                                       min="100" 
+                                       step="100"
                                        required>
-                                <div class="form-text">Number of followers, likes, or views to order</div>
+                                <div class="form-text">Number of followers, likes, or views to order (minimum 100)</div>
                             </div>
                             
-                            <div class="mb-4">
-                                <label for="amount" class="form-label">
-                                    <i class="fas fa-money-bill-wave me-2"></i>
-                                    Amount (<?php echo CURRENCY; ?>)
-                                </label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="amount" 
-                                       name="amount" 
-                                       placeholder="25.00"
-                                       value="<?php echo htmlspecialchars($_POST['amount'] ?? ''); ?>"
-                                       min="0.01" 
-                                       step="0.01" 
-                                       required>
-                                <div class="form-text">Total amount to pay for the service</div>
+                            <div class="price-calculator text-center">
+                                <h6 class="text-white mb-2">
+                                    <i class="fas fa-calculator me-2"></i>
+                                    Price Calculation
+                                </h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-white-50 d-block">Quantity:</small>
+                                        <strong class="text-white" id="calcQuantity">1000</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-white-50 d-block">Total Price:</small>
+                                        <strong class="text-white" id="calcPrice"><?php echo number_format($preview_amount, 2); ?> <?php echo CURRENCY; ?></strong>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="d-grid">
@@ -196,5 +225,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Real-time price calculation
+        document.getElementById('quantity').addEventListener('input', function() {
+            const quantity = parseInt(this.value) || 0;
+            const pricePer1000 = <?php echo PRICE_PER_1000; ?>;
+            const totalPrice = (quantity / 1000) * pricePer1000;
+            
+            document.getElementById('calcQuantity').textContent = quantity.toLocaleString();
+            document.getElementById('calcPrice').textContent = totalPrice.toFixed(2) + ' <?php echo CURRENCY; ?>';
+        });
+        
+        // Form validation
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            if (quantity < 100) {
+                e.preventDefault();
+                alert('Minimum quantity is 100');
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>

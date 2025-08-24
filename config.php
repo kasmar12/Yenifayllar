@@ -20,6 +20,10 @@ define('SMM_API_URL', 'https://your-smm-provider.com/api/v2'); // Replace with y
 define('SMM_API_KEY', 'YOUR_SMM_API_KEY');                    // Replace with your SMM provider API key
 define('SMM_SERVICE_ID', '123');                              // Replace with your actual service ID
 
+// Pricing Configuration
+// Price per 1000 followers/likes/views (in AZN)
+define('PRICE_PER_1000', 25.00); // 25 AZN per 1000 units
+
 // Application Configuration
 define('SITE_URL', 'http://localhost/smm-panel'); // Replace with your actual site URL
 define('CURRENCY', 'AZN');
