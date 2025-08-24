@@ -2,6 +2,9 @@
 // Development mode aktiv edin
 define('DEVELOPMENT_MODE', true);
 
+// Portmanat konfiqurasiyasını daxil edin
+require_once 'config/portmanat_config.php';
+
 echo "<h1>Portmanat API Test</h1>";
 echo "<hr>";
 
@@ -76,13 +79,71 @@ try {
         
         if (isset($payment_result['debug_info'])) {
             echo "<details>";
-            echo "<summary><strong>Debug Information</strong></summary>";
-            echo "<div style='background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px;'>";
-            echo "<pre>" . json_encode($payment_result['debug_info'], JSON_PRETTY_PRINT) . "</pre>";
+            echo "<summary><strong>🔍 Detailed Debug Information</strong></summary>";
+            echo "<div style='background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px;'>";
+            
+            $debug = $payment_result['debug_info'];
+            
+            if (isset($debug['headers'])) {
+                echo "<h6>📋 Response Headers:</h6>";
+                echo "<pre style='background: #e9ecef; padding: 10px; border-radius: 3px; font-size: 11px;'>" . htmlspecialchars($debug['headers']) . "</pre>";
+            }
+            
+            if (isset($debug['body'])) {
+                echo "<h6>📄 Response Body:</h6>";
+                echo "<pre style='background: #e9ecef; padding: 10px; border-radius: 3px; font-size: 11px;'>" . htmlspecialchars($debug['body']) . "</pre>";
+                
+                // Try to detect if it's HTML
+                if (strpos($debug['body'], '<!DOCTYPE') !== false || strpos($debug['body'], '<html') !== false) {
+                    echo "<div style='background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; margin: 10px 0; border-radius: 3px;'>";
+                    echo "<strong>⚠️ HTML Response Detected!</strong> The API is returning HTML instead of JSON.";
+                    echo "</div>";
+                }
+            }
+            
+            if (isset($debug['raw_response'])) {
+                echo "<h6>🔍 Complete Raw Response:</h6>";
+                echo "<pre style='background: #e9ecef; padding: 10px; border-radius: 3px; font-size: 11px; max-height: 200px; overflow-y: auto;'>" . htmlspecialchars($debug['raw_response']) . "</pre>";
+            }
+            
+            if (isset($debug['http_code'])) {
+                echo "<h6>📊 HTTP Status:</h6>";
+                echo "<p><strong>Code:</strong> " . $debug['http_code'] . "</p>";
+            }
+            
+            if (isset($debug['json_error'])) {
+                echo "<h6>❌ JSON Error:</h6>";
+                echo "<p><strong>Error:</strong> " . $debug['json_error'] . "</p>";
+            }
+            
             echo "</div>";
             echo "</details>";
         }
+        
+        // Show recent error logs
+        echo "<details>";
+        echo "<summary><strong>📝 Recent Error Logs</strong></summary>";
+        echo "<div style='background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px;'>";
+        
+        $log_file = 'logs/orders_log.txt';
+        if (file_exists($log_file)) {
+            $logs = file_get_contents($log_file);
+            $recent_logs = array_slice(explode("\n", $logs), -10); // Son 10 sətir
+            
+            echo "<h6>Son 10 error log:</h6>";
+            echo "<div style='max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 11px;'>";
+            foreach ($recent_logs as $log) {
+                if (trim($log) && (strpos($log, 'ERROR') !== false || strpos($log, 'Portmanat') !== false)) {
+                    echo htmlspecialchars($log) . "<br>";
+                }
+            }
+            echo "</div>";
+        } else {
+            echo "<p>Log faylı tapılmadı: $log_file</p>";
+        }
+        
         echo "</div>";
+        echo "</details>";
     }
     
     echo "<hr>";

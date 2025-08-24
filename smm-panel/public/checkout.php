@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/portmanat_config.php'; // Portmanat konfiqurasiyası
 require_once '../config/portmanat_api.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
