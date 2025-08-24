@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/link_shortener_config.php';
+require_once '../config/link_shortener.php';
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -59,16 +61,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Sifariş ID alına bilmədi!");
             }
             
+            // Generate short link for the order
+            $link_shortener = new LinkShortener();
+            $short_link_result = $link_shortener->generateShortLink($link, $order_id);
+            
+            if (!$short_link_result['success']) {
+                throw new Exception("Link qısaltma xətası: " . $short_link_result['error']);
+            }
+            
             // Store order data in session for processing
             $_SESSION['current_order'] = [
                 'id' => $order_id,
                 'service_name' => $service['name'],
                 'link' => $link,
                 'amount' => $amount,
-                'price' => $price
+                'price' => $price,
+                'short_link' => $short_link_result['short_url'],
+                'shortener_service' => $short_link_result['service']
             ];
             
-            $message = 'Sifariş uğurla yaradıldı! İndi link qısaltma servisi ilə işləyə bilərsiniz.';
+            $message = 'Sifariş uğurla yaradıldı! İndi reklam keçərək sifarişinizi aktivləşdirin.';
             
         } catch (Exception $e) {
             $error = $e->getMessage();
@@ -206,14 +218,14 @@ if (isset($_SESSION['current_order'])) {
 
         <!-- Link Shortening Service -->
         <div class="link-shortening">
-            <h3><i class="fas fa-link"></i> Link Qısaltma Servisi</h3>
-            <p class="mb-3">Sifarişinizi aktivləşdirmək üçün link qısaltma servisindən keçin</p>
+            <h3><i class="fas fa-link"></i> Reklam Keçmə Sistemi</h3>
+            <p class="mb-3">Sifarişinizi aktivləşdirmək üçün reklamı keçin</p>
             
             <div class="shortened-link">
-                <h5>Qısaldılmış Link:</h5>
+                <h5>Reklam Linki:</h5>
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" id="shortenedLink" 
-                           value="https://ay.live/api/?api=9556ddb32a7c865f06acf4f8950f64c5045ef2ab&url=<?php echo urlencode($order_data['link']); ?>&alias=order_<?php echo $order_data['id']; ?>" 
+                           value="<?php echo htmlspecialchars($order_data['short_link']); ?>" 
                            readonly>
                     <button class="btn btn-light" type="button" onclick="copyLink()">
                         <i class="fas fa-copy"></i> Kopyala
@@ -221,14 +233,14 @@ if (isset($_SESSION['current_order'])) {
                 </div>
                 <small class="text-light">
                     <i class="fas fa-info-circle"></i> 
-                    Bu linki kopyalayın və brauzerinizdə açın
+                    Bu linki açın və reklamı keçin
                 </small>
             </div>
             
             <div class="mt-4">
-                <a href="https://ay.live/api/?api=9556ddb32a7c865f06acf4f8950f64c5045ef2ab&url=<?php echo urlencode($order_data['link']); ?>&alias=order_<?php echo $order_data['id']; ?>" 
+                <a href="<?php echo htmlspecialchars($order_data['short_link']); ?>" 
                    class="btn btn-light btn-lg" target="_blank">
-                    <i class="fas fa-external-link-alt"></i> Link Qısaltma Servisinə Get
+                    <i class="fas fa-external-link-alt"></i> Reklamı Keç
                 </a>
             </div>
         </div>
@@ -241,31 +253,31 @@ if (isset($_SESSION['current_order'])) {
                 <div class="step-number">1</div>
                 <div class="step-content">
                     <strong>Sifariş Yaradıldı</strong>
-                    <p class="mb-0 text-muted">Sifarişiniz sistemə qəbul edildi</p>
+                    <p class="mb-0 text-muted">Sifarişiniz sistemə qəbul edildi və "pending" statusunda</p>
                 </div>
             </div>
             
             <div class="step-item">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <strong>Link Qısaltma</strong>
-                    <p class="mb-0 text-muted">Yuxarıdakı linki açın və reklamı keçin</p>
+                    <strong>Reklam Keçmə</strong>
+                    <p class="mb-0 text-muted">Yuxarıdakı reklam linkini açın və reklamı tamamlayın</p>
                 </div>
             </div>
             
             <div class="step-item">
                 <div class="step-number">3</div>
                 <div class="step-content">
-                    <strong>Sifariş Aktivləşir</strong>
-                    <p class="mb-0 text-muted">Reklam keçildikdən sonra sifariş avtomatik başlayır</p>
+                    <strong>Avtomatik Aktivləşmə</strong>
+                    <p class="mb-0 text-muted">Reklam keçildikdən sonra sifariş avtomatik olaraq SMM API-yə göndərilir</p>
                 </div>
             </div>
             
             <div class="step-item">
                 <div class="step-number">4</div>
                 <div class="step-content">
-                    <strong>Tamamlanır</strong>
-                    <p class="mb-0 text-muted">Xidmət tamamlandıqda bildiriş alacaqsınız</p>
+                    <strong>Xidmət Tamamlanır</strong>
+                    <p class="mb-0 text-muted">SMM API xidməti tamamlandıqda bildiriş alacaqsınız</p>
                 </div>
             </div>
         </div>
