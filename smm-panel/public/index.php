@@ -22,6 +22,47 @@ if ($db) {
 } else {
     $services = [];
 }
+
+// Handle error messages
+$error_message = '';
+$debug_info = '';
+
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'missing_data':
+            $error_message = 'Bütün məlumatları doldurun!';
+            break;
+        case 'invalid_service':
+            $error_message = 'Yanlış xidmət seçildi!';
+            break;
+        case 'invalid_amount':
+            $error_message = 'Yanlış miqdar daxil edildi!';
+            break;
+        case 'payment_failed':
+            $error_message = 'Ödəniş yaradılarkən xəta baş verdi!';
+            if (isset($_GET['msg'])) {
+                $error_message .= ' ' . htmlspecialchars($_GET['msg']);
+            }
+            if (isset($_GET['debug'])) {
+                $debug_info = htmlspecialchars($_GET['debug']);
+            }
+            break;
+        case 'payment_id_missing':
+            $error_message = 'Ödəniş ID-si alınmadı!';
+            if (isset($_GET['debug'])) {
+                $debug_info = htmlspecialchars($_GET['debug']);
+            }
+            break;
+        case 'payment_exception':
+            $error_message = 'Ödəniş zamanı xəta baş verdi!';
+            if (isset($_GET['msg'])) {
+                $error_message .= ' ' . htmlspecialchars($_GET['msg']);
+            }
+            break;
+        default:
+            $error_message = 'Naməlum xəta baş verdi!';
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -60,6 +101,17 @@ if ($db) {
             margin: 20px 0;
             border-radius: 5px;
         }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +126,35 @@ if ($db) {
     </div>
 
     <div class="container my-5">
+        <!-- Error Messages -->
+        <?php if ($error_message): ?>
+        <div class="error-banner">
+            <h4><i class="fas fa-exclamation-triangle"></i> Xəta!</h4>
+            <p><?php echo $error_message; ?></p>
+            
+            <?php if ($debug_info): ?>
+            <details>
+                <summary><strong>Debug Məlumatı (Texniki personal üçün)</strong></summary>
+                <div class="debug-info">
+                    <pre><?php echo $debug_info; ?></pre>
+                </div>
+            </details>
+            <?php endif; ?>
+            
+            <p class="mt-3">
+                <a href="index.php" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-refresh"></i> Səhifəni Yenilə
+                </a>
+                <a href="../admin/settings.php" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-cog"></i> Admin Tənzimləmələri
+                </a>
+                <a href="../test_portmanat.php" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-bug"></i> Portmanat API Test
+                </a>
+            </p>
+        </div>
+        <?php endif; ?>
+
         <!-- Database Error Banner -->
         <?php if (!$db): ?>
         <div class="error-banner">

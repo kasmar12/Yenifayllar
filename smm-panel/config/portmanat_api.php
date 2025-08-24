@@ -3,6 +3,7 @@ class PortmanatAPI {
     private $merchant_id;
     private $secret_key;
     private $api_url = 'https://partners.portmanat.az/api';
+    private $debug_mode = true; // Debug mode aktiv edin
 
     public function __construct() {
         $this->merchant_id = 'YOUR_MERCHANT_ID'; // Portmanat-dan aldığınız merchant ID
@@ -22,18 +23,26 @@ class PortmanatAPI {
             'merchant_id' => $this->merchant_id,
             'amount' => number_format($amount, 2, '.', ''), // Format amount properly
             'order_id' => $orderId,
-            'callback_url' => $callbackUrl,
+            'callback_url' => $callback_url,
             'currency' => 'AZN',
             'description' => $description ?: 'SMM Panel Order #' . $orderId,
             'language' => 'az', // Azerbaijani language
-            'return_url' => $callbackUrl // Return URL after payment
+            'return_url' => $callback_url // Return URL after payment
         ];
 
         // Generate signature
         $data['sign'] = $this->generateSignature($data);
         
+        if ($this->debug_mode) {
+            error_log("Portmanat API Request Data: " . json_encode($data));
+        }
+        
         // Make API request
         $response = $this->makeRequest('/create-payment', $data);
+        
+        if ($this->debug_mode) {
+            error_log("Portmanat API Response: " . json_encode($response));
+        }
         
         return $response;
     }
@@ -62,7 +71,7 @@ class PortmanatAPI {
      */
     public function getPaymentHistory($startDate, $endDate) {
         $data = [
-            'merchant_id' => $this->merchant_id,
+            'merchant_id' => 'YOUR_MERCHANT_ID',
             'start_date' => $startDate,
             'end_date' => $endDate
         ];
@@ -107,6 +116,10 @@ class PortmanatAPI {
         // Remove last '&' and add secret key
         $sign_string = rtrim($sign_string, '&') . $this->secret_key;
         
+        if ($this->debug_mode) {
+            error_log("Portmanat Signature String: " . $sign_string);
+        }
+        
         // Generate MD5 hash
         return md5($sign_string);
     }
@@ -118,10 +131,17 @@ class PortmanatAPI {
      * @return array Response data
      */
     private function makeRequest($endpoint, $data) {
+        $full_url = $this->api_url . $endpoint;
+        
+        if ($this->debug_mode) {
+            error_log("Portmanat API URL: " . $full_url);
+            error_log("Portmanat API Request: " . http_build_query($data));
+        }
+        
         $ch = curl_init();
         
         curl_setopt_array($ch, [
-            CURLOPT_URL => $this->api_url . $endpoint,
+            CURLOPT_URL => $full_url,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($data),
             CURLOPT_RETURNTRANSFER => true,
@@ -132,14 +152,23 @@ class PortmanatAPI {
             CURLOPT_TIMEOUT => 30,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_VERBOSE => $this->debug_mode,
+            CURLOPT_HEADER => true
         ]);
         
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
+        $info = curl_getinfo($ch);
         
         curl_close($ch);
+        
+        if ($this->debug_mode) {
+            error_log("Portmanat API HTTP Code: " . $http_code);
+            error_log("Portmanat API CURL Info: " . json_encode($info));
+            error_log("Portmanat API Raw Response: " . $response);
+        }
         
         if ($error) {
             return [
@@ -152,8 +181,20 @@ class PortmanatAPI {
             return [
                 'success' => false,
                 'error' => 'HTTP Error: ' . $http_code,
-                'response' => $response
+                'response' => $response,
+                'debug_info' => [
+                    'url' => $full_url,
+                    'request_data' => $data,
+                    'http_code' => $http_code,
+                    'raw_response' => $response
+                ]
             ];
+        }
+        
+        // Extract body from response (remove headers)
+        $body_start = strpos($response, "\r\n\r\n");
+        if ($body_start !== false) {
+            $response = substr($response, $body_start + 4);
         }
         
         // Parse response
@@ -163,7 +204,13 @@ class PortmanatAPI {
             return [
                 'success' => false,
                 'error' => 'Invalid JSON response: ' . json_last_error_msg(),
-                'raw_response' => $response
+                'raw_response' => $response,
+                'debug_info' => [
+                    'url' => $full_url,
+                    'request_data' => $data,
+                    'http_code' => $http_code,
+                    'json_error' => json_last_error_msg()
+                ]
             ];
         }
         
@@ -211,6 +258,14 @@ class PortmanatAPI {
                 'message' => 'API connection failed: ' . $e->getMessage()
             ];
         }
+    }
+    
+    /**
+     * Enable/disable debug mode
+     * @param bool $enabled
+     */
+    public function setDebugMode($enabled) {
+        $this->debug_mode = $enabled;
     }
 }
 ?>

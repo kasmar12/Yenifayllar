@@ -51,38 +51,62 @@ $portmanat = new PortmanatAPI();
 $callback_url = 'https://' . $_SERVER['HTTP_HOST'] . '/callback_portmanat.php';
 $description = $service['name'] . ' - ' . number_format($amount) . ' ədəd';
 
-$payment = $portmanat->createPayment($price, $order_id, $callback_url, $description);
+// Log order creation
+error_log("Creating order #$order_id: Service=$service_id, Amount=$amount, Price=$price, Callback=$callback_url");
 
-if ($payment && isset($payment['success']) && $payment['success']) {
-    // Payment created successfully
-    $payment_id = $payment['payment_id'] ?? $payment['id'] ?? null;
+try {
+    $payment = $portmanat->createPayment($price, $order_id, $callback_url, $description);
     
-    if ($payment_id) {
-        // Save payment info
-        $query = "INSERT INTO payments (transaction_id, amount, status) VALUES (?, ?, 'pending')";
-        $stmt = $db->prepare($query);
-        $stmt->execute([$payment_id, $price]);
+    // Log payment response
+    error_log("Portmanat payment response for order #$order_id: " . json_encode($payment));
+    
+    if ($payment && isset($payment['success']) && $payment['success']) {
+        // Payment created successfully
+        $payment_id = $payment['payment_id'] ?? $payment['id'] ?? null;
         
-        // Redirect to Portmanat
-        $payment_url = $portmanat->getPaymentUrl($payment_id);
-        header('Location: ' . $payment_url);
-        exit;
+        if ($payment_id) {
+            // Save payment info
+            $query = "INSERT INTO payments (transaction_id, amount, status) VALUES (?, ?, 'pending')";
+            $stmt = $db->prepare($query);
+            $stmt->execute([$payment_id, $price]);
+            
+            // Log successful payment creation
+            error_log("Payment created successfully for order #$order_id: Payment ID=$payment_id");
+            
+            // Redirect to Portmanat
+            $payment_url = $portmanat->getPaymentUrl($payment_id);
+            header('Location: ' . $payment_url);
+            exit;
+        } else {
+            // No payment ID in response
+            error_log("No payment ID in response for order #$order_id: " . json_encode($payment));
+            header('Location: index.php?error=payment_id_missing&debug=' . urlencode(json_encode($payment)));
+            exit;
+        }
     } else {
-        // No payment ID in response
-        header('Location: index.php?error=payment_id_missing');
+        // Payment creation failed
+        $error_msg = 'Payment creation failed';
+        if (isset($payment['error'])) {
+            $error_msg .= ': ' . $payment['error'];
+        }
+        
+        // Log detailed error
+        error_log("Payment creation failed for order #$order_id: " . json_encode($payment));
+        
+        // Include debug info in error message
+        $debug_info = '';
+        if (isset($payment['debug_info'])) {
+            $debug_info = '&debug=' . urlencode(json_encode($payment['debug_info']));
+        }
+        
+        header('Location: index.php?error=payment_failed&msg=' . urlencode($error_msg) . $debug_info);
         exit;
     }
-} else {
-    // Payment creation failed
-    $error_msg = 'Payment creation failed';
-    if (isset($payment['error'])) {
-        $error_msg .= ': ' . $payment['error'];
-    }
     
-    // Log error
-    error_log("Portmanat payment creation failed for order #$order_id: " . $error_msg);
-    
-    header('Location: index.php?error=payment_failed&msg=' . urlencode($error_msg));
+} catch (Exception $e) {
+    // Exception occurred
+    error_log("Exception during payment creation for order #$order_id: " . $e->getMessage());
+    header('Location: index.php?error=payment_exception&msg=' . urlencode($e->getMessage()));
     exit;
 }
 ?>
