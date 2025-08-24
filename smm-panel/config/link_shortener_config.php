@@ -23,8 +23,8 @@ switch (LINK_SHORTENER_SERVICE) {
         define('AYLIVE_SUCCESS_STATUS', 'success');
         define('AYLIVE_URL_PARAM', 'shortenedUrl');
         
-        // No callback needed - direct API response
-        define('AYLIVE_NO_CALLBACK', true);
+        // Ad verification flow
+        define('AYLIVE_AD_VERIFICATION', true);
         break;
         
     case 'linkvertise':

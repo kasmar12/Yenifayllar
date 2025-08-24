@@ -3,17 +3,16 @@
  * Direct Order Processing Page
  * 
  * This page:
- * 1. Creates the order in database
+ * 1. Stores order data in session (doesn't create order yet)
  * 2. Generates the AY.Live ad link
- * 3. Immediately redirects user to the ad page
- * 4. After ad completion, order is automatically processed
+ * 3. Redirects user to the ad page
+ * 4. After ad completion, order is created in ad_verification.php
  */
 
 // Disable output buffering to prevent headers already sent error
 ob_start();
 
 session_start();
-require_once '../config/database.php';
 require_once '../config/link_shortener_config.php';
 require_once '../config/link_shortener.php';
 
@@ -32,53 +31,21 @@ if (empty($service_id) || empty($link) || empty($amount)) {
 }
 
 try {
-    $database = new Database();
-    $db = $database->getConnection();
-    
-    if (!$db) {
-        error_log("Database connection failed in process_order_direct.php");
-        throw new Exception("Database connection failed");
+    // Validate service details (without database connection)
+    if (!is_numeric($service_id) || !is_numeric($amount)) {
+        throw new Exception("Yanlış məlumat formatı!");
     }
     
-    // Get service details
-    $query = "SELECT * FROM services WHERE id = ?";
-    $stmt = $db->prepare($query);
-    $stmt->execute([$service_id]);
-    $service = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$service) {
-        throw new Exception("Xidmət tapılmadı!");
-    }
-
-    if ($amount < $service['min_amount'] || $amount > $service['max_amount']) {
-        throw new Exception("Miqdar yanlışdır!");
-    }
-    
-    // Calculate price (now free)
-    $price = 0.00; // Free orders
-    
-    // Create order in database
-    $query = "INSERT INTO orders (service_id, link, amount, price, status) VALUES (?, ?, ?, ?, 'pending')";
-    $stmt = $db->prepare($query);
-    $result = $stmt->execute([$service_id, $link, $amount, $price]);
-    
-    if (!$result) {
-        throw new Exception("Sifariş yaradıla bilmədi!");
-    }
-    
-    $order_id = $db->lastInsertId();
-    
-    if (!$order_id) {
-        throw new Exception("Sifariş ID alına bilmədi!");
+    if ($amount < 1) {
+        throw new Exception("Miqdar 1-dən az ola bilməz!");
     }
     
     // Store order data in session for ad completion
     $_SESSION['pending_order'] = [
         'service_id' => $service_id,
-        'service_name' => $service['name'],
         'link' => $link,
         'amount' => $amount,
-        'price' => $price
+        'price' => 0.00 // Free orders
     ];
     
     // Generate AY.Live ad link

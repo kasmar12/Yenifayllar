@@ -81,12 +81,15 @@ class LinkShortener {
      */
     private function generateAYLiveLink($target_url, $order_id, $custom_alias) {
         // AY.Live format: https://ay.live/st/?api=KEY&url=TARGET_URL
-        $short_url = $this->api_url . "?api=" . $this->api_key . "&url=" . urlencode($target_url);
+        // After ad completion, AY.Live will redirect to our verification page
+        $verification_url = 'http://192.168.100.184:8080/public/ad_verification.php?url=' . urlencode($target_url);
+        $short_url = $this->api_url . "?api=" . $this->api_key . "&url=" . urlencode($verification_url);
         
         $this->log("AY.Live short link generated", [
             'order_id' => $order_id,
             'short_url' => $short_url,
-            'target_url' => $target_url
+            'target_url' => $target_url,
+            'verification_url' => $verification_url
         ]);
         
         return [
