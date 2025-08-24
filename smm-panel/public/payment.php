@@ -1,8 +1,6 @@
 <?php
 session_start();
 require_once '../config/database.php';
-require_once '../config/portmanat_config.php';
-require_once '../config/portmanat_api.php';
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -32,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get service details
             $query = "SELECT * FROM services WHERE id = ?";
             $stmt = $db->prepare($query);
-            $stmt->execute([$service_id]);
+            $stmt->stmt->execute([$service_id]);
             $service = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$service) {
@@ -43,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Miqdar yanlışdır!");
             }
             
-            // Calculate price
-            $price = ($amount / 1000) * $service['price_per_1k'];
+            // Calculate price (now free)
+            $price = 0.00; // Free orders
             
             // Create order in database
             $query = "INSERT INTO orders (service_id, link, amount, price, status) VALUES (?, ?, ?, ?, 'pending')";
@@ -61,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Sifariş ID alına bilmədi!");
             }
             
-            // Store order data in session for payment
+            // Store order data in session for processing
             $_SESSION['current_order'] = [
                 'id' => $order_id,
                 'service_name' => $service['name'],
@@ -70,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'price' => $price
             ];
             
-            $message = 'Sifariş uğurla yaradıldı! İndi ödəniş edə bilərsiniz.';
+            $message = 'Sifariş uğurla yaradıldı! İndi link qısaltma servisi ilə işləyə bilərsiniz.';
             
         } catch (Exception $e) {
             $error = $e->getMessage();
@@ -89,11 +87,11 @@ if (isset($_SESSION['current_order'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMM Panel - Ödəniş</title>
+    <title>SMM Panel - Pulsuz Sifariş</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .payment-container {
+        .order-container {
             max-width: 800px;
             margin: 50px auto;
             padding: 20px;
@@ -105,51 +103,70 @@ if (isset($_SESSION['current_order'])) {
             border: 1px solid #dee2e6;
             margin-bottom: 30px;
         }
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+        .link-shortening {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
         }
-        .payment-method {
+        .shortened-link {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed rgba(255,255,255,0.3);
+        }
+        .free-badge {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .process-steps {
             background: white;
             padding: 25px;
             border-radius: 10px;
-            border: 2px solid #e9ecef;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            border: 1px solid #dee2e6;
+            margin: 20px 0;
         }
-        .payment-method:hover {
-            border-color: #007bff;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
-        .payment-method.selected {
-            border-color: #28a745;
-            background: #f8fff9;
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
         }
-        .payment-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        .portmanat-icon {
-            color: #f15b5c;
-        }
-        .card-icon {
-            color: #007bff;
-        }
-        .crypto-icon {
-            color: #ffc107;
+        .step-content {
+            flex: 1;
         }
     </style>
 </head>
 <body>
-    <div class="payment-container">
+    <div class="order-container">
         <!-- Header -->
         <div class="text-center mb-4">
-            <h1><i class="fas fa-credit-card text-primary"></i> SMM Panel Ödəniş</h1>
-            <p class="lead">Sifarişinizi təsdiqləyin və ödəniş metodunu seçin</p>
+            <h1><i class="fas fa-gift text-success"></i> SMM Panel - Pulsuz Sifariş</h1>
+            <p class="lead">Sifarişinizi təsdiqləyin və link qısaltma servisi ilə işləyin</p>
+            <span class="free-badge">
+                <i class="fas fa-check-circle"></i> TAMAMILƏ PULSUZ
+            </span>
         </div>
 
         <!-- Messages -->
@@ -176,7 +193,7 @@ if (isset($_SESSION['current_order'])) {
                 </div>
                 <div class="col-md-6">
                     <p><strong>Miqdar:</strong> <?php echo number_format($order_data['amount']); ?> ədəd</p>
-                    <p><strong>Qiymət:</strong> <span class="text-primary fw-bold"><?php echo number_format($order_data['price'], 2); ?> ₼</span></p>
+                    <p><strong>Qiymət:</strong> <span class="text-success fw-bold">PULSUZ! 🎉</span></p>
                 </div>
             </div>
             <div class="text-center mt-3">
@@ -187,86 +204,82 @@ if (isset($_SESSION['current_order'])) {
             </div>
         </div>
 
-        <!-- Payment Methods -->
-        <div class="payment-methods">
-            <!-- Portmanat -->
-            <div class="payment-method" onclick="selectPaymentMethod('portmanat')" id="portmanat-method">
-                <div class="payment-icon portmanat-icon">
-                    <i class="fas fa-mobile-alt"></i>
+        <!-- Link Shortening Service -->
+        <div class="link-shortening">
+            <h3><i class="fas fa-link"></i> Link Qısaltma Servisi</h3>
+            <p class="mb-3">Sifarişinizi aktivləşdirmək üçün link qısaltma servisindən keçin</p>
+            
+            <div class="shortened-link">
+                <h5>Qısaldılmış Link:</h5>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="shortenedLink" 
+                           value="https://ay.live/api/?api=9556ddb32a7c865f06acf4f8950f64c5045ef2ab&url=<?php echo urlencode($order_data['link']); ?>&alias=order_<?php echo $order_data['id']; ?>" 
+                           readonly>
+                    <button class="btn btn-light" type="button" onclick="copyLink()">
+                        <i class="fas fa-copy"></i> Kopyala
+                    </button>
                 </div>
-                <h5>Portmanat</h5>
-                <p class="text-muted">Mobil ödəniş</p>
-                <small class="text-success">
-                    <i class="fas fa-check"></i> Təhlükəsiz
+                <small class="text-light">
+                    <i class="fas fa-info-circle"></i> 
+                    Bu linki kopyalayın və brauzerinizdə açın
                 </small>
             </div>
-
-            <!-- Bank Card -->
-            <div class="payment-method" onclick="selectPaymentMethod('card')" id="card-method">
-                <div class="payment-icon card-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <h5>Bank Kartı</h5>
-                <p class="text-muted">Visa, MasterCard</p>
-                <small class="text-success">
-                    <i class="fas fa-check"></i> Təhlükəsiz
-                </small>
-            </div>
-
-            <!-- Crypto -->
-            <div class="payment-method" onclick="selectPaymentMethod('crypto')" id="crypto-method">
-                <div class="payment-icon crypto-icon">
-                    <i class="fab fa-bitcoin"></i>
-                </div>
-                <h5>Kripto Valyuta</h5>
-                <p class="text-muted">Bitcoin, Ethereum</p>
-                <small class="text-warning">
-                    <i class="fas fa-clock"></i> Tezliklə
-                </small>
+            
+            <div class="mt-4">
+                <a href="https://ay.live/api/?api=9556ddb32a7c865f06acf4f8950f64c5045ef2ab&url=<?php echo urlencode($order_data['link']); ?>&alias=order_<?php echo $order_data['id']; ?>" 
+                   class="btn btn-light btn-lg" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Link Qısaltma Servisinə Get
+                </a>
             </div>
         </div>
 
-        <!-- Payment Form -->
-        <div class="mt-4" id="payment-form" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <h5 id="payment-form-title">Ödəniş</h5>
-                </div>
-                <div class="card-body">
-                    <div id="portmanat-form" style="display: none;">
-                        <p>Portmanat ilə ödəniş üçün aşağıdakı düyməni basın:</p>
-                        <form action="process_payment.php" method="POST">
-                            <input type="hidden" name="payment_method" value="portmanat">
-                            <input type="hidden" name="order_id" value="<?php echo $order_data['id']; ?>">
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-mobile-alt"></i> Portmanat ilə Ödə
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div id="card-form" style="display: none;">
-                        <p>Bank kartı ilə ödəniş üçün aşağıdakı düyməni basın:</p>
-                        <form action="process_payment.php" method="POST">
-                            <input type="hidden" name="payment_method" value="card">
-                            <input type="hidden" name="order_id" value="<?php echo $order_data['id']; ?>">
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-credit-card"></i> Bank Kartı ilə Ödə
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div id="crypto-form" style="display: none;">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Kripto valyuta ilə ödəniş tezliklə əlçatan olacaq.
-                        </div>
-                    </div>
+        <!-- Process Steps -->
+        <div class="process-steps">
+            <h5><i class="fas fa-list-ol"></i> Sifariş Prosesi</h5>
+            
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <strong>Sifariş Yaradıldı</strong>
+                    <p class="mb-0 text-muted">Sifarişiniz sistemə qəbul edildi</p>
                 </div>
             </div>
+            
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <strong>Link Qısaltma</strong>
+                    <p class="mb-0 text-muted">Yuxarıdakı linki açın və reklamı keçin</p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <strong>Sifariş Aktivləşir</strong>
+                    <p class="mb-0 text-muted">Reklam keçildikdən sonra sifariş avtomatik başlayır</p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <strong>Tamamlanır</strong>
+                    <p class="mb-0 text-muted">Xidmət tamamlandıqda bildiriş alacaqsınız</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Processing -->
+        <div class="text-center mt-4">
+            <a href="process_free_order.php?order_id=<?php echo $order_data['id']; ?>" 
+               class="btn btn-success btn-lg me-3">
+                <i class="fas fa-play"></i> Sifarişi Aktivləşdir
+            </a>
+            <a href="order_status.php?order_id=<?php echo $order_data['id']; ?>" 
+               class="btn btn-primary btn-lg">
+                <i class="fas fa-search"></i> Statusu Yoxla
+            </a>
         </div>
 
         <?php else: ?>
@@ -279,49 +292,32 @@ if (isset($_SESSION['current_order'])) {
 
         <!-- Back Button -->
         <div class="text-center mt-4">
-            <a href="index.php" class="btn btn-outline-secondary me-2">
+            <a href="index.php" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Ana Səhifəyə Qayıt
-            </a>
-            <a href="../test_portmanat_debug.php" class="btn btn-outline-warning" target="_blank">
-                <i class="fas fa-bug"></i> Portmanat Debug Test
             </a>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let selectedMethod = '';
-
-        function selectPaymentMethod(method) {
-            // Remove previous selection
-            document.querySelectorAll('.payment-method').forEach(el => {
-                el.classList.remove('selected');
-            });
+        function copyLink() {
+            const linkInput = document.getElementById('shortenedLink');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
             
-            // Add selection to clicked method
-            document.getElementById(method + '-method').classList.add('selected');
+            // Show success message
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Kopyalandı!';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-light');
             
-            // Show payment form
-            document.getElementById('payment-form').style.display = 'block';
-            
-            // Hide all form types
-            document.getElementById('portmanat-form').style.display = 'none';
-            document.getElementById('card-form').style.display = 'none';
-            document.getElementById('crypto-form').style.display = 'none';
-            
-            // Show selected form type
-            if (method === 'portmanat') {
-                document.getElementById('portmanat-form').style.display = 'block';
-                document.getElementById('payment-form-title').textContent = 'Portmanat Ödəniş';
-            } else if (method === 'card') {
-                document.getElementById('card-form').style.display = 'block';
-                document.getElementById('payment-form-title').textContent = 'Bank Kartı Ödəniş';
-            } else if (method === 'crypto') {
-                document.getElementById('crypto-form').style.display = 'block';
-                document.getElementById('payment-form-title').textContent = 'Kripto Valyuta Ödəniş';
-            }
-            
-            selectedMethod = method;
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-light');
+            }, 2000);
         }
     </script>
 </body>

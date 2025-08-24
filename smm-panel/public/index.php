@@ -272,18 +272,18 @@ if (isset($_GET['error'])) {
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p><strong>Miqdar:</strong> <span id="calcAmount">0</span></p>
-                                        <p><strong>Qiymət/1000:</strong> <span id="calcPrice">0</span> ₼</p>
+                                        <p><strong>Qiymət/1000:</strong> <span class="text-success">PULSUZ!</span></p>
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Ümumi Qiymət:</strong></p>
-                                        <h4 class="text-primary" id="totalPrice">0.00 ₼</h4>
+                                        <h4 class="text-success" id="totalPrice">PULSUZ! 🎉</h4>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="fas fa-credit-card"></i> Ödəniş Et
+                                    <i class="fas fa-gift"></i> Pulsuz Sifariş Et
                                 </button>
                             </div>
                         </form>
@@ -308,7 +308,7 @@ if (isset($_GET['error'])) {
             document.getElementById('amount').max = max;
             document.getElementById('amount').value = min;
             
-            currentPrice = pricePer1k;
+            currentPrice = 0; // Free orders
             minAmount = min;
             maxAmount = max;
             
@@ -322,10 +322,8 @@ if (isset($_GET['error'])) {
         function calculatePrice() {
             const amount = parseInt(document.getElementById('amount').value) || 0;
             if (amount >= minAmount && amount <= maxAmount) {
-                const total = (amount / 1000) * currentPrice;
                 document.getElementById('calcAmount').textContent = amount.toLocaleString();
-                document.getElementById('calcPrice').textContent = currentPrice.toFixed(2);
-                document.getElementById('totalPrice').textContent = total.toFixed(2) + ' ₼';
+                document.getElementById('totalPrice').textContent = 'PULSUZ! 🎉';
             }
         }
 
