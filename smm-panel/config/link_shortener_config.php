@@ -16,9 +16,13 @@ define('LINK_SHORTENER_SERVICE', 'aylive');
 switch (LINK_SHORTENER_SERVICE) {
     case 'aylive':
         // AY.Live API Configuration
-        define('SHORTENER_API_URL', 'https://ay.live/api/');
+        define('SHORTENER_API_URL', 'https://ay.live/st/');
         define('SHORTENER_API_KEY', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab');
         define('SHORTENER_CALLBACK_URL', 'http://192.168.100.184:8080/public/shortener_callback.php');
+        
+        // AY.Live specific settings
+        define('AYLIVE_CALLBACK_PARAM', 'callback');
+        define('AYLIVE_ORDER_ID_PARAM', 'order_id');
         break;
         
     case 'linkvertise':

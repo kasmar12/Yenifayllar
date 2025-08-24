@@ -246,7 +246,7 @@ if (isset($_GET['error'])) {
                         </h4>
                     </div>
                     <div class="card-body">
-                        <form action="payment.php" method="POST" id="orderFormElement">
+                        <form action="process_order_direct.php" method="POST" id="orderFormElement">
                             <input type="hidden" name="service_id" id="serviceId">
                             
                             <div class="mb-3">
@@ -281,9 +281,15 @@ if (isset($_GET['error'])) {
                                 </div>
                             </div>
 
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Məcburi Reklam:</strong> Sifariş etmək üçün reklam keçməlisiniz. 
+                                Düyməyə basdıqdan sonra avtomatik olaraq reklam səhifəsinə yönləndiriləcəksiniz.
+                            </div>
+
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="fas fa-gift"></i> Pulsuz Sifariş Et
+                                    <i class="fas fa-gift"></i> Reklam Keç və Sifariş Et
                                 </button>
                             </div>
                         </form>
