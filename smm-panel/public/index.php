@@ -1,7 +1,4 @@
 <?php
-// Development mode aktiv edin (production-da false edin)
-define('DEVELOPMENT_MODE', true);
-
 require_once '../config/database.php';
 
 $database = new Database();
@@ -16,13 +13,11 @@ if ($db) {
         $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $services = [];
-        if (DEVELOPMENT_MODE) {
-            echo "<div style='background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 20px; border-radius: 5px;'>";
-            echo "<h4>Database Query Error</h4>";
-            echo "<p><strong>Error:</strong> " . $e->getMessage() . "</p>";
-            echo "<p><a href='../test_db.php'>Test Database Connection</a></p>";
-            echo "</div>";
-        }
+        echo "<div style='background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 20px; border-radius: 5px;'>";
+        echo "<h4>Database Query Error</h4>";
+        echo "<p><strong>Error:</strong> " . $e->getMessage() . "</p>";
+        echo "<p><a href='../test_db.php'>Test Database Connection</a></p>";
+        echo "</div>";
     }
 } else {
     $services = [];
@@ -121,9 +116,7 @@ if ($db) {
                         <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
                         <h4>Xidmətlər tapılmadı</h4>
                         <p>Hələ heç bir xidmət əlavə edilməyib və ya database problemi var.</p>
-                        <?php if (DEVELOPMENT_MODE): ?>
                         <p><a href="../test_db.php" class="btn btn-outline-warning">Database Test Et</a></p>
-                        <?php endif; ?>
                     </div>
                 </div>
             <?php endif; ?>

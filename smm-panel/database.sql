@@ -1,7 +1,7 @@
 -- SMM Panel Database Schema
 -- Create database
-CREATE DATABASE IF NOT EXISTS smm_panel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE smm_panel;
+CREATE DATABASE IF NOT EXISTS smmaz2025 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE smmaz2025;
 
 -- Services table
 CREATE TABLE services (

@@ -13,17 +13,16 @@ $database = new Database();
 echo "<h3>Testing Database Connection...</h3>";
 
 try {
-    $result = $database->testConnection();
+    $db = $database->getConnection();
     
-    if ($result['status'] === 'success') {
+    if ($db) {
         echo "<div style='background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; margin: 20px; border-radius: 5px;'>";
         echo "<h4>✅ Database Connection Successful!</h4>";
-        echo "<p><strong>Message:</strong> " . $result['message'] . "</p>";
-        echo "<p><strong>MySQL Version:</strong> " . $result['server_info'] . "</p>";
+        echo "<p><strong>Message:</strong> Connection established successfully</p>";
+        echo "<p><strong>MySQL Version:</strong> " . $db->getAttribute(PDO::ATTR_SERVER_VERSION) . "</p>";
         echo "</div>";
         
         // Test if database exists and has tables
-        $db = $database->getConnection();
         $query = "SHOW TABLES";
         $stmt = $db->prepare($query);
         $stmt->execute();
@@ -33,7 +32,7 @@ try {
             echo "<div style='background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; margin: 20px; border-radius: 5px;'>";
             echo "<h4>⚠️ Database is empty</h4>";
             echo "<p>No tables found. Please run the database.sql file to create tables.</p>";
-            echo "<code>mysql -u root -p < database.sql</code>";
+            echo "<code>mysql -u root -p -h 192.168.100.184 -P 3306 smmaz2025 < database.sql</code>";
             echo "</div>";
         } else {
             echo "<div style='background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; margin: 20px; border-radius: 5px;'>";
@@ -49,7 +48,7 @@ try {
     } else {
         echo "<div style='background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 20px; border-radius: 5px;'>";
         echo "<h4>❌ Database Connection Failed</h4>";
-        echo "<p><strong>Error:</strong> " . $result['message'] . "</p>";
+        echo "<p>Connection object is null</p>";
         echo "</div>";
     }
     
@@ -68,8 +67,8 @@ echo "<div style='background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px;
 echo "<ul>";
 echo "<li><strong>PHP Version:</strong> " . phpversion() . "</li>";
 echo "<li><strong>OS:</strong> " . php_uname() . "</li>";
-echo "<li><strong>Server Software:</strong> " . $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown' . "</li>";
-echo "<li><strong>Document Root:</strong> " . $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown' . "</li>";
+echo "<li><strong>Server Software:</strong> " . ($_SERVER['SERVER_SOFTWARE'] ?? 'Unknown') . "</li>";
+echo "<li><strong>Document Root:</strong> " . ($_SERVER['DOCUMENT_ROOT'] ?? 'Unknown') . "</li>";
 echo "<li><strong>Current Directory:</strong> " . getcwd() . "</li>";
 echo "</ul>";
 echo "</div>";
@@ -97,7 +96,7 @@ echo "<div style='background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px;
 if (extension_loaded('mysqli')) {
     echo "<h4>Testing with mysqli:</h4>";
     try {
-        $mysqli = new mysqli('127.0.0.1', 'root', '', 'smm_panel', 3306);
+        $mysqli = new mysqli('192.168.100.184', 'root', 'root', 'smmaz2025', 3306);
         if ($mysqli->connect_error) {
             echo "<p>❌ mysqli connection failed: " . $mysqli->connect_error . "</p>";
         } else {
@@ -115,10 +114,10 @@ if (extension_loaded('mysqli')) {
 // Test with mysql command line
 echo "<h4>Testing MySQL Command Line:</h4>";
 echo "<p>Run this command in terminal:</p>";
-echo "<code>mysql -u root -p -h 127.0.0.1 -P 3306 -e 'SELECT VERSION();'</code>";
+echo "<code>mysql -u root -p -h 192.168.100.184 -P 3306 -e 'SELECT VERSION();'</code>";
 
 echo "</div>";
 
 echo "<hr>";
-echo "<p><a href='index.php'>← Back to main page</a></p>";
+echo "<p><a href='public/index.php'>← Back to main page</a></p>";
 ?>
