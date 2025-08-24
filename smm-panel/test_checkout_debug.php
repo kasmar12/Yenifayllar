@@ -181,7 +181,7 @@ try {
         echo "- Callback: $test_callback<br>";
         echo "- Description: $test_description<br>";
         
-        $payment = $portmanat->createPayment($test_amount, $test_order_id, $test_callback, $test_description);
+        $payment = $portmanat->createPayment($test_amount, $test_order_id, $test_callback, $test_description, '1');
         
         echo "Payment response: " . json_encode($payment) . "<br>";
         

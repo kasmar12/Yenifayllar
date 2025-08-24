@@ -35,11 +35,13 @@ class PortmanatAPI {
      * @param string $orderId Unique order ID
      * @param string $callbackUrl Callback URL for payment status
      * @param string $description Payment description
+     * @param string $serviceId Service ID (optional, defaults to '1')
      * @return array Response from Portmanat API
      */
-    public function createPayment($amount, $orderId, $callbackUrl, $description = '') {
+    public function createPayment($amount, $orderId, $callbackUrl, $description = '', $serviceId = '1') {
         $data = [
             'merchant_id' => $this->merchant_id,
+            'service_id' => $serviceId, // Service ID for payment
             'amount' => number_format($amount, 2, '.', ''), // Format amount properly
             'order_id' => $orderId,
             'callback_url' => $callbackUrl,

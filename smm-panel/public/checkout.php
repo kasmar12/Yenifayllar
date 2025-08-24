@@ -154,7 +154,7 @@ try {
     // Log order creation
     error_log("Creating Portmanat payment for order #$order_id: Service=$service_id, Amount=$amount, Price=$price, Callback=$callback_url");
 
-    $payment = $portmanat->createPayment($price, $order_id, $callback_url, $description);
+    $payment = $portmanat->createPayment($price, $order_id, $callback_url, $description, '1');
     
     // Log payment response
     error_log("Portmanat payment response for order #$order_id: " . json_encode($payment));
