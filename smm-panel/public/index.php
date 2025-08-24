@@ -59,6 +59,24 @@ if (isset($_GET['error'])) {
                 $error_message .= ' ' . htmlspecialchars($_GET['msg']);
             }
             break;
+        case 'system_error':
+            $error_message = 'Sistem xətası baş verdi!';
+            if (isset($_GET['msg'])) {
+                $error_message .= ' ' . htmlspecialchars($_GET['msg']);
+            }
+            break;
+        case 'database_error':
+            $error_message = 'Database xətası baş verdi!';
+            if (isset($_GET['msg'])) {
+                $error_message .= ' ' . htmlspecialchars($_GET['msg']);
+            }
+            break;
+        case 'order_creation_failed':
+            $error_message = 'Sifariş yaradıla bilmədi!';
+            if (isset($_GET['msg'])) {
+                $error_message .= ' ' . htmlspecialchars($_GET['msg']);
+            }
+            break;
         default:
             $error_message = 'Naməlum xəta baş verdi!';
     }

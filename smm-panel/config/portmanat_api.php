@@ -90,7 +90,7 @@ class PortmanatAPI {
      */
     public function getPaymentHistory($startDate, $endDate) {
         $data = [
-            'merchant_id' => 'YOUR_MERCHANT_ID',
+            'merchant_id' => $this->merchant_id,
             'start_date' => $startDate,
             'end_date' => $endDate
         ];

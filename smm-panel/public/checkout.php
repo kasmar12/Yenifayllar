@@ -25,14 +25,25 @@ try {
     // Redirect with error
     header('Location: index.php?error=system_error&msg=' . urlencode('System error occurred. Please try again.'));
     exit;
+} catch (Error $e) {
+    error_log("Fatal error in checkout.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    
+    // Clear any output buffer
+    ob_end_clean();
+    
+    // Redirect with error
+    header('Location: index.php?error=system_error&msg=' . urlencode('Fatal error occurred. Please try again.'));
+    exit;
 }
 
-
+// Check if it's a POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
     exit;
 }
 
+// Validate input data
 $service_id = $_POST['service_id'] ?? '';
 $link = $_POST['link'] ?? '';
 $amount = $_POST['amount'] ?? '';
@@ -98,20 +109,20 @@ try {
 }
 
 // Create Portmanat payment
-$portmanat = new PortmanatAPI();
-
-// Fix callback URL generation
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-$callback_url = $protocol . '://' . $host . '/callback_portmanat.php';
-$return_url = $protocol . '://' . $host . '/payment_success.php';
-
-$description = $service['name'] . ' - ' . number_format($amount) . ' ədəd';
-
-// Log order creation
-error_log("Creating order #$order_id: Service=$service_id, Amount=$amount, Price=$price, Callback=$callback_url");
-
 try {
+    $portmanat = new PortmanatAPI();
+    
+    // Fix callback URL generation
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+    $callback_url = $protocol . '://' . $host . dirname($_SERVER['REQUEST_URI']) . '/callback_portmanat.php';
+    $return_url = $protocol . '://' . $host . dirname($_SERVER['REQUEST_URI']) . '/payment_success.php';
+
+    $description = $service['name'] . ' - ' . number_format($amount) . ' ədəd';
+
+    // Log order creation
+    error_log("Creating order #$order_id: Service=$service_id, Amount=$amount, Price=$price, Callback=$callback_url");
+
     $payment = $portmanat->createPayment($price, $order_id, $callback_url, $description);
     
     // Log payment response
@@ -168,6 +179,15 @@ try {
     ob_end_clean();
     
     header('Location: index.php?error=payment_exception&msg=' . urlencode($e->getMessage()));
+    exit;
+} catch (Error $e) {
+    // Fatal error occurred
+    error_log("Fatal error during payment creation for order #$order_id: " . $e->getMessage());
+    
+    // Clear output buffer before redirect
+    ob_end_clean();
+    
+    header('Location: index.php?error=payment_exception&msg=' . urlencode('Fatal error: ' . $e->getMessage()));
     exit;
 }
 
