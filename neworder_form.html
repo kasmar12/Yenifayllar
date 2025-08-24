@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base href="https://royzasmm.com.tr/">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yeni Sipariş</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  
+    
+     
+          <link rel="stylesheet" type="text/css" href="css/panel/darky/bootstrap.css">
+          <link rel="stylesheet" type="text/css" href="css/panel/darky/style.css">
+          <link rel="stylesheet" type="text/css" href="js/datepicker/css/bootstrap-datepicker3.min.css">
+          <link rel="stylesheet" type="text/css" href="https://cdn.mypanel.link/css/font-awesome/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.2/umd/popper.min.js"></script>
+  </head>
+
+<body class="user">
+<nav class="app-navbar">
+   <ul class="app-navbar-link">
+      <li>
+         <a href="/addfunds"> 
+         <span class="balance">0$</span> 
+         <span>Bakiye</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/">
+         <i class="ri-add-box-line"></i> 
+         <span>Yeni Sipariş</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/orders"> 
+         <i class="ri-shopping-bag-3-line"></i>
+         <span>Siparişlerim</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/account"> 
+         <i class="ri-user-settings-line"></i>
+         <span>Hesabım</span> 
+         </a>
+      </li>
+   </ul>
+</nav>
+<div class="app-container">
+    <div class="app-sidebar">
+        <div class="close-sidebar-btn" onclick="dashMenuToggle()">
+            <i class="ri-arrow-go-back-line"></i>
+        </div>
+        <div class="sidebar-header">
+            <div class="app-logo">
+				<a href="/">
+				  					SMMPanel
+				  				</a>
+                <img src="../../../images/logo_sm.png" class="logo-sm" alt="">
+            </div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+								<li  class="active" >
+					<a href="/" class="menu-link">                        
+						<i class="menu-icon ri-add-box-line"></i>
+						<span class="menu-text">Yeni Sipariş</span>
+					</a>
+				</li>
+				<li >
+					<a href="/services" class="menu-link">                        
+						<i class="menu-icon ri-dashboard-line"></i>
+						<span class="menu-text">Servis Listesi</span>
+					</a>
+				</li>
+				<li >
+					<a href="/orders" class="menu-link">                        
+						<i class="menu-icon ri-shopping-bag-3-line"></i>
+						<span class="menu-text">Siparişler</span>
+					</a>
+				</li>	
+												<li >
+					<a href="/addfunds" class="menu-link">                        
+						<i class="menu-icon ri-wallet-3-line"></i>
+						<span class="menu-text">Bakiye Ekle</span>
+					</a>
+				</li>		
+								<li >
+					<a href="/affiliates" class="menu-link">                        
+						<i class="menu-icon ri-mail-star-line"></i>
+						<span class="menu-text">Davet Et Kazan</span>
+					</a>
+				</li>					
+												
+								<li >
+					<a href="/api" class="menu-link">                        
+						<i class="menu-icon ri-terminal-window-line"></i>
+						<span class="menu-text">API</span>
+					</a>
+				</li>					
+									
+								<li >
+					<a href="/tickets" class="menu-link">                        
+						<i class="menu-icon ri-customer-service-2-line"></i>
+						<span class="menu-text">Destek </span>
+					</a>
+				</li>					
+									
+					
+									
+								
+
+				
+            </ul>
+        </div>
+    </div>
+    <div class="app-header">
+        <div class="container-fluid">
+            <div class="row row-100">
+                <div class="col align-self-center">
+                    <div class="dash-menu-btn" onclick="dashMenuToggle()">
+						<span class="icon">
+							<i class="ri-menu-5-fill"></i>
+						</span>
+                    </div>
+                </div>
+                <div class="col-auto d-inline-block d-md-none align-self-center">
+                    <div class="app-logo">
+					  						SMMPanel
+					                      </div>
+                </div>
+                <div class="col-auto d-none d-md-block align-self-center">
+                    <div class="sc-badge">
+                        <div class="sc-icon green">
+                           <i class="ri-whatsapp-line"></i>
+                        </div>
+                        <div class="sc-text">
+                           Destek: <strong>+90 850 444 00 00</strong>
+                        </div>
+                     </div>
+                </div>
+                <div class="col-auto d-none d-md-block align-self-center">
+                    <div class="sc-badge">
+                        <div class="sc-icon">
+                           <i class="ri-thumb-up-line"></i>
+                        </div>
+                        <div class="sc-text">
+                           <strong>6</strong> siparişi başarıyla tamamladık!
+                        </div>
+                     </div>
+                </div>	
+				
+                <div class="col-auto align-self-center">
+                    <a class="header-btn" href="/logout">
+                        <span class="icon logout">
+                            <i class="ri-logout-circle-r-line"></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<style>
+  #dc-body .checkbox label {
+    color: white;
+}
+</style>
+<div class="app-content">
+   <div class="container-fluid">
+      <div class="row mb-4">
+         <div class="col-lg-7 col-md-12 col-12 mb-lg-0 d-none d-md-block">
+            <div class="head-box p-3 rounded bg-pattern text-white h-100">
+               <div class="h3 mb-3">Merhaba <span>kasmar</span> <i class="fas fa-badge-check"></i></div>
+               <div>En uygun fiyatlı sosyal medya hizmetleri için bizi tercih edebilirsiniz.</div>
+            </div>
+         </div>
+         <div class="col-lg-5 col-md-12 col-12 mb-lg-0">
+            <div class="p-3 rounded bg-pattern text-white h-100">
+               <div class="d-flex justify-content-between align-items-center">
+                  <div class="ulevel-c bar-25">
+                     <div class="ulevel-text">
+                        <i class="ri-shield-user-line"></i>
+                     </div>
+                  </div>
+                  <div class="col ml-3">
+                     <div>
+                        <h5 class="ulevel-t-1">Üyelik Statüsü</h5>
+                        <h3 class="ulevel-t-2">
+                           <span id="accStats"></span>
+                           <p id="spentBalance" style="display:none">0</p>
+                           <script>
+                              const cBalance = document.getElementById("spentBalance").innerText;
+                              var text;
+                              if (500 < cBalance && cBalance < 999) { text = "Gümüş"; }    
+                              if (1000 < cBalance && cBalance < 4999) { text = "Altın"; }    
+                              else if (4999 < cBalance && cBalance < 999999) { text = "Platin"; }    
+                              else {
+                                text = "Bronz";
+                              }
+                              document.getElementById("accStats").innerText = text;
+                               
+                           </script> 
+                        </h3>
+                     </div>
+                  </div>
+                  <div class="col-auto d-none d-md-block">
+                     <div>
+                        <h3 class="ulevel-t-3">0$</h3>
+                     </div>
+                     <a href="/addfunds" class="btn btn-primary">Bakiye Yükle</a>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <section class="u-stats mt-1">
+         <div class="row">
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 d-none d-md-block">
+               <div class="us-item bg-pattern us-item-a">
+                  <div class="row">
+                     <div class="col align-self-center">
+                        <div class="ui-title">
+                           Toplam Sipariş
+                        </div>
+                        <div class="ui-text">
+                           6
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0">
+               <div class="us-item bg-pattern us-item-b">
+                  <div class="row">
+                     <div class="col align-self-center">
+                        <div class="ui-title">
+                           Güncel Bakiye
+                        </div>
+                        <div class="ui-text">
+                           0$
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 d-none d-md-block">
+               <div class="us-item bg-pattern us-item-c">
+                  <div class="row">
+                     <div class="col align-self-center">
+                        <div class="ui-title">
+                           Toplam Harcama
+                        </div>
+                        <div class="ui-text">
+                           0
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 d-none d-md-block">
+               <div class="us-item bg-pattern us-item-d">
+                  <div class="row">
+                     <div class="col align-self-center">
+                        <div class="ui-title">
+                           Bakiye Durumu
+                        </div>
+                        <div class="ui-text">
+                                                      Düşük
+                                                   </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      <section>
+         <div class="row">
+            <div class="col-lg-7 col-12 mb-5 mb-lg-0">
+               <div class="g-card">
+                  <div class="g-card-body" id="dc-body">
+                     <div class="g-card-header">
+                        Sipariş Verin
+                        <div class="g-divider"></div>
+                     </div>
+                                                                                    <form method="post" action="/">
+                                                <div class="form-group">
+                           <label for="orderform-category" class="control-label">Kategori</label>
+                           <select class="form-control" id="neworder_category" name="categories" style="display: none">
+                                                      <option  selected  value="12" >YouTube Abone Sayısı | Sıfır Düşüş | Güncellemeden Sonra</option>
+                                                      <option  value="13" >YouTube Aboneleri | Yeniden Doldurma Yok</option>
+                                                      <option  value="14" >YouTube Aboneleri | 60 Günlük Dolum | 𝐎𝐰𝐧</option>
+                                                      <option  value="15" >YouTube Aboneleri | 90 Günlük Dolum | 𝐎𝐰𝐧</option>
+                                                      <option  value="16" >YouTube Aboneleri | Ömür Boyu 💎💎 | 𝐎𝐰𝐧</option>
+                                                      <option  value="17" >YouTube Beğenileri | Yeniden Doldurma Yok | 𝐎𝐰𝐧</option>
+                                                      <option  value="19" >YouTube Beğenileri | En Ucuz | 𝐎𝐰𝐧</option>
+                                                      <option  value="20" >YouTube Beğenileri | Düşmez | 𝐎𝐰𝐧</option>
+                                                      <option  value="21" >YouTube Beğenileri | Ömür Boyu💎💎 | 𝐎𝐰𝐧</option>
+                                                      <option  value="25" >YouTube Yorumları Beğenileri</option>
+                                                      <option  value="26" >YouTube Görüntülemeleri | %100 Sıfır Düşüş</option>
+                                                      <option  value="27" >YouTube Görüntülemeleri | Kararsız</option>
+                                                      <option  value="22" >TikTok Takipçileri | En İyi ⭐⭐</option>
+                                                      <option  value="23" >TikTok Beğen | Gerçek + Bot</option>
+                                                      <option  value="24" >TikTok Beğen | %100 Gizli Profiller</option>
+                                                      <option  value="28" >TikTok Beğen | Gerçek + Bot</option>
+                                                      <option  value="29" >TikTok Beğen | En İyi | Profil Fotoğrafı Hesabı</option>
+                                                      <option  value="30" >TikTok Beğen | İyi Kalite</option>
+                                                      <option  value="31" >TikTok Beğen | Yüksek Kalite | Sahip Ol</option>
+                                                      <option  value="32" >TikTok Beğen | Gerçek Yüksek Kalite</option>
+                                                      <option  value="33" >TikTok Yorumları</option>
+                                                      <option  value="34" >TikTok Canlı Yayın | Uygun Fiyatlar | Daha Az Teslimat - %10-30</option>
+                                                      <option  value="35" >Facebook Sayfası / Profil Takipçileri | Yeni</option>
+                                                      <option  value="37" >Facebook Sayfa Takipçileri</option>
+                                                      <option  value="38" >Facebook Profil Takipçileri</option>
+                                                      <option  value="39" >Facebook Beğeni + Takipçi</option>
+                                                      <option  value="40" >Facebook Grup Üyeleri</option>
+                                                      <option  value="41" >Facebook Reels Görüntülemeleri</option>
+                                                      <option  value="42" >Facebook Hikaye Görüntülemeleri</option>
+                                                      <option  value="44" >Telegram Üyeleri | Yeniden Doldurma Yok</option>
+                                                      <option  value="45" >Telegram Üyeleri | Hesapları Karıştır</option>
+                                                      <option  value="46" >Telegram Üyeleri | 30 Günlük Dolum</option>
+                                                      </select>
+                           <div class="dropdown">
+                              <button class="form-control text-left" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                              <span id="categoryTitle"></span>
+                              <i class="fas fa-chevron-down float-right" aria-hidden="true"></i>
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="dropdownMenu2" id="category-drop">
+                              </div>
+                           </div>
+                        </div>
+                                                <div class="form-group mb-4">
+                           <label id="orderform-service" for="orderform-service" class="control-label" data-label="Servis">Servis</label>
+                           <select class="form-control" id="neworder_services" name="services" style="display: none;"> </select>
+                           <div class="dropdown">
+                              <button class="form-control text-left" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                              <span id="serviceTitle"></span>
+                              <i class="fa fa-caret-down float-right" aria-hidden="true"></i>
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="dropdownMenu2" id="orders-drop">
+                              </div>
+                           </div>
+                        </div>
+                        <div id="neworder_fields"></div>
+                        <div class="form-group mb-4">
+                           <label>
+                           Ücret
+                           </label>
+                           <div class="form-group">
+                              <input type="text" class="form-control" id="charge" value="" placeholder="0.00₺" readonly="" />
+                           </div>
+                        </div>
+                                                <div class="checkbox">
+                           <label>
+                           <input type="checkbox" name="neworder_check">Siparişimi teyit ettim okudum ve onaylıyorum.
+                           </label>
+                        </div>
+                                                <button type="submit" class="btn btn-primary btn-lg btn-block mb-4">Sipariş Ver</button>
+                     </form>
+                  </div>
+               </div>
+            </div>
+            <div class="col-lg-5 col-12 mb-5 mb-lg-0">
+               <div class="g-card h-100">
+                  <div class="g-card-body" id="dc2-body"  style="max-height: 750px; overflow-y: auto;">
+                     <div>
+                        <ul class="nav nav-tabs cstm-nav" role="tablist">
+                           <li class="nav-item">
+                              <button class="nav-link active" data-toggle="pill" href="#timeline" role="tab" aria-controls="pills-timeline" aria-selected="true">
+                              <i class="icon ri-chat-new-line mr-3"></i>
+                              <span class="">Duyurular</span>
+                              </button>
+                           </li>
+                           <li class="nav-item">
+                              <button class="nav-link" data-toggle="pill" href="#updates" role="tab" aria-controls="pills-updates" aria-selected="false">
+                              <i class="icon ri-flag-line mr-3"></i>
+                              <span class="">Bakiye Kazan</span>
+                              </button>
+                           </li>
+                        </ul>
+                     </div>
+                     <div 
+                     <div class="tab-content mt-4" id="nav-pageTab">
+                        <div class="tab-pane fade active show" id="timeline" role="tabpanel" aria-labelledby="timeline">
+                                                   </div>
+                        <div class="tab-pane fade show" id="updates" role="tabpanel" aria-labelledby="updates">
+                           <span style="color: #fff">Aşağıdaki tablolarda ücretlendirme ve kurallarımız belirtilmektedir.</span>								
+                           <div class="tablepen mt-2">
+                              <div class="sira headers bx-none">
+                                 <div class="hucre">
+                                    Platform
+                                 </div>
+                                 <div class="hucre">
+                                    İşlem
+                                 </div>
+                                 <div class="hucre">
+                                    Ücret
+                                 </div>
+                                 <div class="hucre">
+                                    Süre
+                                 </div>
+                              </div>
+                              <div class="sira">
+                                 <div class="hucre" data-title="Platform">
+                                    Forumlar
+                                 </div>
+                                 <div class="hucre" data-title="İşlem">
+                                    Olumlu Yorum
+                                 </div>
+                                 <div class="hucre" data-title="Ücret">
+                                    1₺
+                                 </div>
+                                 <div class="hucre" data-title="Süre">
+                                    1 Gün
+                                 </div>
+                              </div>
+                              <div class="sira">
+                                 <div class="hucre" data-title="Platform">
+                                    Forumlar
+                                 </div>
+                                 <div class="hucre" data-title="İşlem">
+                                    Ticaret Puanı
+                                 </div>
+                                 <div class="hucre" data-title="Ücret">
+                                    1₺
+                                 </div>
+                                 <div class="hucre" data-title="Süre">
+                                    1 Gün
+                                 </div>
+                              </div>
+                              <div class="sira">
+                                 <div class="hucre" data-title="Platform">
+                                    Youtube
+                                 </div>
+                                 <div class="hucre" data-title="İşlem">
+                                    Video
+                                 </div>
+                                 <div class="hucre" data-title="Ücret">
+                                    25₺ (.dk)
+                                 </div>
+                                 <div class="hucre" data-title="Süre">
+                                    15 Gün
+                                 </div>
+                              </div>
+                              <div class="sira">
+                                 <div class="hucre" data-title="Platform">
+                                    Blog Sitesi
+                                 </div>
+                                 <div class="hucre" data-title="İşlem">
+                                    Makale
+                                 </div>
+                                 <div class="hucre" data-title="Ücret">
+                                    5₺
+                                 </div>
+                                 <div class="hucre" data-title="Süre">
+                                    15 Gün
+                                 </div>
+                              </div>
+                              <div class="sira">
+                                 <div class="hucre" data-title="Platform">
+                                    Haber Sitesi
+                                 </div>
+                                 <div class="hucre" data-title="İşlem">
+                                    Makale
+                                 </div>
+                                 <div class="hucre" data-title="Ücret">
+                                    7.5₺
+                                 </div>
+                                 <div class="hucre" data-title="Süre">
+                                    15 Gün
+                                 </div>
+                              </div>
+                           </div>
+                           <button type="button" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="#exon"><i class="ri-file-text-line"></i>Koşullar & Kurallar</button>
+
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+   </div>
+</div>
+
+
+                           <div class="modal fade" id="exon" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" style="display: none;" aria-hidden="true">
+                              <div class="modal-dialog modal-xl" role="document">
+                                 <div class="modal-content">
+                                    <div class="modal-header">
+                                       <h5 class="modal-title" id="exampleModalLongTitle">Koşullar & Kurullar</h5>
+                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                       <span aria-hidden="true">×</span>
+                                       </button>
+                                    </div>
+                                    <div class="modal-body">
+                                       <b>Kural 1</b>
+                                       <p>"Süre" onay süresi anlamına gelir. Paylaşımı yaptıktan sonra belirtilen gün süresinde ödemenizi alabilirsiinz.</p>
+                                       <b>Kural 2</b>
+                                       <p>Herhangi bir platformda yaptığınız işlem onaylandıktan sonra silinirse veya kaldırılırsa toskamedia.com üzerinden bakiyeniz iade edilmeksizin sınırsız olarak uzaklaştırılırsınız.</p>
+                                       <b>Kural 3</b>
+                                       <p>Paylaşım yaptıktan sonra onay süresini doldurmadan herhangi bir bildirim oluşturmanız durumunda paylaşımınız onaylanmayacaktır.</p>
+                                       <b>Kural 4</b>
+                                       <p>Sosyal medya platformları üzerinde paylaşılan gönderilerde gönderi istatistiklerinin ekran görüntülerini detaylı olarak bildirmek zorundasınız.</p>
+                                       <b>Kural 5</b>
+                                       <p>Sosyal medya platformları üzerinde paylaşılan gönderilerde ücretlendirmeler 1000 adet organik izlenme başınadır. Herhangi bir sanalizasyon kullanılmamalıdır. Bildiğiniz üzere bizim işimiz bu, herhangi bir kötüye kullanım keşfedersek gönderinizi onaylamayız.</p>
+                                       <b>Kural 6</b>
+                                       <p>Youtube üzerinden paylaştığınız gönderilerde referans linkinizle 1000 izlenme başına en az 100 kişinin sitemizi ziyaret etmesi gerekmektedir ve en az 10 kişinin referans linkiniz üzerinden bakiye yüklemesi gerekmektedir. Aksi taktirde herhangi bir gönderinizi onaylamayız.</p>
+                                       <b>Paylaşımlarda herhangi bir sınırlama yoktur. İstediğiniz kadar paylaşım yapabilir, bakiye kazanabilirsiniz.</b>
+                                    </div>
+                                    <div class="modal-footer">
+                                       <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Kapat</button>
+                                       <a href="/tickets" class="btn btn-sm btn-primary">Talep Oluştur</a>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+						   
+
+
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/panel/darky/script.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/panel/darky/bootstrap.js"></script>
+    <script type="text/javascript" src="js/datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="js/datepicker/locales/bootstrap-datepicker.tr.min.js"></script>
+<script type="text/javascript" src="js/main.js?v=19"></script>
+<style>
+    body{
+        font-family: 'Titillium Web', sans-serif;
+    }
+</style>
+</body>
+</html>
