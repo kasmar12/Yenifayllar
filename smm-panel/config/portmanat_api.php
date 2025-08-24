@@ -3,7 +3,7 @@ class PortmanatAPI {
     private $merchant_id;
     private $secret_key;
     private $api_url = 'https://partners.portmanat.az/api';
-    private $debug_mode = true; // Debug mode aktiv edin
+    private $debug_mode = false; // Debug mode deaktiv edin
 
     public function __construct() {
         // Check if constants are defined, otherwise use defaults

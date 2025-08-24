@@ -6,10 +6,23 @@ ini_set('display_errors', 1);
 // Start output buffering to catch any output before headers
 ob_start();
 
+// Simple error handler
+function handleError($error_type, $error_message, $file, $line) {
+    error_log("Error [$error_type]: $error_message in $file on line $line");
+    return true;
+}
+
+set_error_handler('handleError');
+
 try {
-    session_start();
+    // Start session
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    // Include required files
     require_once '../config/database.php';
-    require_once '../config/portmanat_config.php'; // Portmanat konfiqurasiyası
+    require_once '../config/portmanat_config.php';
     require_once '../config/portmanat_api.php';
     
     // Log the start of checkout process
@@ -102,6 +115,8 @@ try {
         throw new Exception("Failed to get order ID from database");
     }
     
+    error_log("Order created successfully: ID=$order_id, Service=$service_id, Amount=$amount, Price=$price");
+    
 } catch (Exception $e) {
     error_log("Order creation error in checkout.php: " . $e->getMessage());
     header('Location: index.php?error=order_creation_failed&msg=' . urlencode('Failed to create order. Please try again.'));
@@ -112,16 +127,14 @@ try {
 try {
     $portmanat = new PortmanatAPI();
     
-    // Fix callback URL generation
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-    $callback_url = $protocol . '://' . $host . dirname($_SERVER['REQUEST_URI']) . '/callback_portmanat.php';
-    $return_url = $protocol . '://' . $host . dirname($_SERVER['REQUEST_URI']) . '/payment_success.php';
+    // Use predefined callback URLs from config
+    $callback_url = PORTMANAT_CALLBACK_URL;
+    $return_url = PORTMANAT_RETURN_URL;
 
     $description = $service['name'] . ' - ' . number_format($amount) . ' ədəd';
 
     // Log order creation
-    error_log("Creating order #$order_id: Service=$service_id, Amount=$amount, Price=$price, Callback=$callback_url");
+    error_log("Creating Portmanat payment for order #$order_id: Service=$service_id, Amount=$amount, Price=$price, Callback=$callback_url");
 
     $payment = $portmanat->createPayment($price, $order_id, $callback_url, $description);
     

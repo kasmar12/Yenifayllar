@@ -169,6 +169,12 @@ if (isset($_GET['error'])) {
                 <a href="../test_portmanat.php" class="btn btn-outline-info btn-sm">
                     <i class="fas fa-bug"></i> Portmanat API Test
                 </a>
+                <a href="../test_checkout_simple.php" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-vial"></i> Checkout Test
+                </a>
+                <a href="../test_checkout_step_by_step.php" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-search"></i> Step-by-Step Test
+                </a>
             </p>
         </div>
         <?php endif; ?>
