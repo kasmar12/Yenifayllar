@@ -246,7 +246,7 @@ if (isset($_GET['error'])) {
                         </h4>
                     </div>
                     <div class="card-body">
-                        <form action="checkout.php" method="POST" id="orderFormElement">
+                        <form action="payment.php" method="POST" id="orderFormElement">
                             <input type="hidden" name="service_id" id="serviceId">
                             
                             <div class="mb-3">
