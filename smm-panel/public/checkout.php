@@ -1,8 +1,32 @@
 <?php
-session_start();
-require_once '../config/database.php';
-require_once '../config/portmanat_config.php'; // Portmanat konfiqurasiyası
-require_once '../config/portmanat_api.php';
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Start output buffering to catch any output before headers
+ob_start();
+
+try {
+    session_start();
+    require_once '../config/database.php';
+    require_once '../config/portmanat_config.php'; // Portmanat konfiqurasiyası
+    require_once '../config/portmanat_api.php';
+    
+    // Log the start of checkout process
+    error_log("Checkout process started for IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    
+} catch (Exception $e) {
+    error_log("Critical error in checkout.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    
+    // Clear any output buffer
+    ob_end_clean();
+    
+    // Redirect with error
+    header('Location: index.php?error=system_error&msg=' . urlencode('System error occurred. Please try again.'));
+    exit;
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
@@ -19,21 +43,32 @@ if (empty($service_id) || empty($link) || empty($amount)) {
 }
 
 // Validate amount
-$database = new Database();
-$db = $database->getConnection();
+try {
+    $database = new Database();
+    $db = $database->getConnection();
+    
+    if (!$db) {
+        throw new Exception("Database connection failed");
+    }
+    
+    $query = "SELECT * FROM services WHERE id = ?";
+    $stmt = $db->prepare($query);
+    $stmt->execute([$service_id]);
+    $service = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$query = "SELECT * FROM services WHERE id = ?";
-$stmt = $db->prepare($query);
-$stmt->execute([$service_id]);
-$service = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$service) {
+        header('Location: index.php?error=invalid_service');
+        exit;
+    }
 
-if (!$service) {
-    header('Location: index.php?error=invalid_service');
-    exit;
-}
-
-if ($amount < $service['min_amount'] || $amount > $service['max_amount']) {
-    header('Location: index.php?error=invalid_amount');
+    if ($amount < $service['min_amount'] || $amount > $service['max_amount']) {
+        header('Location: index.php?error=invalid_amount');
+        exit;
+    }
+    
+} catch (Exception $e) {
+    error_log("Database error in checkout.php: " . $e->getMessage());
+    header('Location: index.php?error=database_error&msg=' . urlencode('Database error occurred. Please try again.'));
     exit;
 }
 
@@ -41,11 +76,26 @@ if ($amount < $service['min_amount'] || $amount > $service['max_amount']) {
 $price = ($amount / 1000) * $service['price_per_1k'];
 
 // Create order in database
-$query = "INSERT INTO orders (service_id, link, amount, price, status) VALUES (?, ?, ?, ?, 'pending')";
-$stmt = $db->prepare($query);
-$stmt->execute([$service_id, $link, $amount, $price]);
-
-$order_id = $db->lastInsertId();
+try {
+    $query = "INSERT INTO orders (service_id, link, amount, price, status) VALUES (?, ?, ?, ?, 'pending')";
+    $stmt = $db->prepare($query);
+    $result = $stmt->execute([$service_id, $link, $amount, $price]);
+    
+    if (!$result) {
+        throw new Exception("Failed to create order in database");
+    }
+    
+    $order_id = $db->lastInsertId();
+    
+    if (!$order_id) {
+        throw new Exception("Failed to get order ID from database");
+    }
+    
+} catch (Exception $e) {
+    error_log("Order creation error in checkout.php: " . $e->getMessage());
+    header('Location: index.php?error=order_creation_failed&msg=' . urlencode('Failed to create order. Please try again.'));
+    exit;
+}
 
 // Create Portmanat payment
 $portmanat = new PortmanatAPI();
@@ -113,7 +163,14 @@ try {
 } catch (Exception $e) {
     // Exception occurred
     error_log("Exception during payment creation for order #$order_id: " . $e->getMessage());
+    
+    // Clear output buffer before redirect
+    ob_end_clean();
+    
     header('Location: index.php?error=payment_exception&msg=' . urlencode($e->getMessage()));
     exit;
 }
+
+// Clean up output buffer if we reach here
+ob_end_flush();
 ?>
