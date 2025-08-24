@@ -17,7 +17,7 @@ class LinkShortener {
     public function __construct() {
         $this->api_url = SHORTENER_API_URL;
         $this->api_key = SHORTENER_API_KEY;
-        $this->callback_url = SHORTENER_CALLBACK_URL;
+        $this->callback_url = defined('SHORTENER_CALLBACK_URL') ? SHORTENER_CALLBACK_URL : '';
         $this->service_type = LINK_SHORTENER_SERVICE;
         $this->debug_mode = SHORTENER_DEBUG_MODE;
         

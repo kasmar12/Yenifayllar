@@ -36,6 +36,7 @@ try {
     $db = $database->getConnection();
     
     if (!$db) {
+        error_log("Database connection failed in process_order_direct.php");
         throw new Exception("Database connection failed");
     }
     
