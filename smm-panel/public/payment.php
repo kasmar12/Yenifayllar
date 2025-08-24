@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get service details
             $query = "SELECT * FROM services WHERE id = ?";
             $stmt = $db->prepare($query);
-            $stmt->stmt->execute([$service_id]);
+            $stmt->execute([$service_id]);
             $service = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$service) {
