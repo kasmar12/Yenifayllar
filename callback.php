@@ -162,7 +162,7 @@ echo "OK";
  * Call SMM API to create order
  */
 function callSmmApi($order) {
-    $api_url = SMM_API_URL;
+    $api_url = SMM_ADD_ORDER_URL;
     $api_key = SMM_API_KEY;
     $service_id = SMM_SERVICE_ID;
     

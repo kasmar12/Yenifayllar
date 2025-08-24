@@ -12,6 +12,92 @@ try {
 
 $error = '';
 $success = '';
+$service_info = null;
+$price_per_1000 = 0;
+
+// Function to fetch service information from SMM API
+function getServiceInfo() {
+    $api_url = SMM_SERVICES_URL;
+    $api_key = SMM_API_KEY;
+    $service_id = SMM_SERVICE_ID;
+    
+    // Prepare API request data
+    $api_data = [
+        'key' => $api_key,
+        'action' => 'services'
+    ];
+    
+    // Initialize cURL
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($api_data));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/x-www-form-urlencoded',
+        'User-Agent: SMM-Panel/1.0'
+    ]);
+    
+    // Execute cURL request
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
+    curl_close($ch);
+    
+    if (DEBUG_MODE) {
+        error_log("SMM API Services Call - URL: " . $api_url);
+        error_log("SMM API Services Call - Response: " . $response);
+        error_log("SMM API Services Call - HTTP Code: " . $http_code);
+    }
+    
+    if ($curl_error) {
+        return ['error' => 'cURL Error: ' . $curl_error];
+    }
+    
+    if ($http_code !== 200) {
+        return ['error' => 'HTTP Error: ' . $http_code];
+    }
+    
+    // Parse response
+    $response_data = json_decode($response, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return ['error' => 'Invalid JSON response'];
+    }
+    
+    // Find our specific service
+    if (isset($response_data['services']) && is_array($response_data['services'])) {
+        foreach ($response_data['services'] as $service) {
+            if (isset($service['service']) && $service['service'] == $service_id) {
+                return [
+                    'success' => true,
+                    'service' => $service,
+                    'name' => $service['name'] ?? 'Unknown Service',
+                    'price' => floatval($service['rate'] ?? 0),
+                    'min' => intval($service['min'] ?? 100),
+                    'max' => intval($service['max'] ?? 100000)
+                ];
+            }
+        }
+    }
+    
+    return ['error' => 'Service not found in API response'];
+}
+
+// Fetch service information on page load
+$service_info = getServiceInfo();
+
+if ($service_info && isset($service_info['success'])) {
+    $price_per_1000 = $service_info['price'];
+} else {
+    if (DEBUG_MODE) {
+        error_log("Failed to fetch service info: " . print_r($service_info, true));
+    }
+    // Fallback price if API fails
+    $price_per_1000 = 25.00;
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -23,10 +109,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Link/Username is required';
     } elseif ($quantity <= 0) {
         $error = 'Quantity must be greater than 0';
+    } elseif ($service_info && isset($service_info['min']) && $quantity < $service_info['min']) {
+        $error = 'Minimum quantity is ' . $service_info['min'];
+    } elseif ($service_info && isset($service_info['max']) && $quantity > $service_info['max']) {
+        $error = 'Maximum quantity is ' . $service_info['max'];
     } else {
         try {
-            // Calculate amount automatically based on quantity
-            $amount = ($quantity / 1000) * PRICE_PER_1000;
+            // Calculate amount based on SMM API price
+            $amount = ($quantity / 1000) * $price_per_1000;
             
             // Generate unique order ID
             $order_id = 'ORD_' . time() . '_' . rand(1000, 9999);
@@ -47,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Calculate preview amount for display
 $preview_quantity = 1000;
-$preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
+$preview_amount = ($preview_quantity / 1000) * $price_per_1000;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -114,6 +204,13 @@ $preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
             margin: 15px 0;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .service-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -143,14 +240,36 @@ $preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
                             </div>
                         <?php endif; ?>
                         
+                        <?php if ($service_info && isset($service_info['success'])): ?>
+                            <div class="service-info text-center">
+                                <h6 class="text-white mb-2">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Service Information
+                                </h6>
+                                <p class="text-white-50 mb-1">
+                                    <strong><?php echo htmlspecialchars($service_info['name']); ?></strong>
+                                </p>
+                                <p class="text-white-50 mb-0">
+                                    Min: <?php echo number_format($service_info['min']); ?> | 
+                                    Max: <?php echo number_format($service_info['max']); ?>
+                                </p>
+                            </div>
+                        <?php endif; ?>
+                        
                         <div class="price-info text-center">
                             <h5 class="mb-2">
                                 <i class="fas fa-tags me-2"></i>
-                                Pricing Information
+                                Live Pricing from SMM API
                             </h5>
                             <p class="mb-0">
-                                <strong><?php echo PRICE_PER_1000 . ' ' . CURRENCY; ?></strong> per 1000 followers/likes/views
+                                <strong><?php echo number_format($price_per_1000, 2) . ' ' . CURRENCY; ?></strong> per 1000 followers/likes/views
                             </p>
+                            <?php if (!$service_info || !isset($service_info['success'])): ?>
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Using fallback price (API connection issue)
+                                </small>
+                            <?php endif; ?>
                         </div>
                         
                         <form method="POST" action="" id="orderForm">
@@ -180,16 +299,21 @@ $preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
                                        name="quantity" 
                                        placeholder="1000"
                                        value="<?php echo htmlspecialchars($_POST['quantity'] ?? '1000'); ?>"
-                                       min="100" 
+                                       min="<?php echo $service_info && isset($service_info['min']) ? $service_info['min'] : 100; ?>" 
+                                       max="<?php echo $service_info && isset($service_info['max']) ? $service_info['max'] : 100000; ?>"
                                        step="100"
                                        required>
-                                <div class="form-text">Number of followers, likes, or views to order (minimum 100)</div>
+                                <div class="form-text">
+                                    Number of followers, likes, or views to order 
+                                    (<?php echo $service_info && isset($service_info['min']) ? 'min: ' . number_format($service_info['min']) : 'min: 100'; ?>, 
+                                    <?php echo $service_info && isset($service_info['max']) ? 'max: ' . number_format($service_info['max']) : 'max: 100,000'; ?>)
+                                </div>
                             </div>
                             
                             <div class="price-calculator text-center">
                                 <h6 class="text-white mb-2">
                                     <i class="fas fa-calculator me-2"></i>
-                                    Price Calculation
+                                    Real-time Price Calculation
                                 </h6>
                                 <div class="row">
                                     <div class="col-6">
@@ -226,10 +350,13 @@ $preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Real-time price calculation
+        // Real-time price calculation using SMM API price
+        const pricePer1000 = <?php echo $price_per_1000; ?>;
+        const minQuantity = <?php echo $service_info && isset($service_info['min']) ? $service_info['min'] : 100; ?>;
+        const maxQuantity = <?php echo $service_info && isset($service_info['max']) ? $service_info['max'] : 100000; ?>;
+        
         document.getElementById('quantity').addEventListener('input', function() {
             const quantity = parseInt(this.value) || 0;
-            const pricePer1000 = <?php echo PRICE_PER_1000; ?>;
             const totalPrice = (quantity / 1000) * pricePer1000;
             
             document.getElementById('calcQuantity').textContent = quantity.toLocaleString();
@@ -239,9 +366,14 @@ $preview_amount = ($preview_quantity / 1000) * PRICE_PER_1000;
         // Form validation
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             const quantity = parseInt(document.getElementById('quantity').value);
-            if (quantity < 100) {
+            if (quantity < minQuantity) {
                 e.preventDefault();
-                alert('Minimum quantity is 100');
+                alert('Minimum quantity is ' + minQuantity.toLocaleString());
+                return false;
+            }
+            if (quantity > maxQuantity) {
+                e.preventDefault();
+                alert('Maximum quantity is ' + maxQuantity.toLocaleString());
                 return false;
             }
         });
