@@ -2,7 +2,7 @@
 class PortmanatAPI {
     private $merchant_id;
     private $secret_key;
-    private $api_url = 'https://partners.portmanat.az/api';
+    private $api_url = 'https://partners.portmanat.az';
     private $debug_mode = true; // Debug mode aktiv edin
 
     public function __construct() {
@@ -57,12 +57,18 @@ class PortmanatAPI {
         }
         
         // Make API request - try different endpoints
-        $response = $this->makeRequest('/create-payment', $data);
+        $response = $this->makeRequest('/payment/create', $data);
         
         // If first endpoint fails, try alternative
         if (!$response || (isset($response['success']) && !$response['success'])) {
             error_log("First endpoint failed, trying alternative endpoint");
-            $response = $this->makeRequest('/payment/create', $data);
+            $response = $this->makeRequest('/api/create-payment', $data);
+        }
+        
+        // If both fail, try the most common endpoint
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("Both endpoints failed, trying common endpoint");
+            $response = $this->makeRequest('/create', $data);
         }
         
         if ($this->debug_mode) {
@@ -85,7 +91,20 @@ class PortmanatAPI {
 
         $data['sign'] = $this->generateSignature($data);
         
-        return $this->makeRequest('/check-payment', $data);
+        // Try different check payment endpoints
+        $response = $this->makeRequest('/payment/check', $data);
+        
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("First check payment endpoint failed, trying alternative");
+            $response = $this->makeRequest('/api/check-payment', $data);
+        }
+        
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("Both check payment endpoints failed, trying common endpoint");
+            $response = $this->makeRequest('/check', $data);
+        }
+        
+        return $response;
     }
 
     /**
@@ -103,7 +122,20 @@ class PortmanatAPI {
 
         $data['sign'] = $this->generateSignature($data);
         
-        return $this->makeRequest('/payment-history', $data);
+        // Try different payment history endpoints
+        $response = $this->makeRequest('/payment/history', $data);
+        
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("First payment history endpoint failed, trying alternative");
+            $response = $this->makeRequest('/api/payment-history', $data);
+        }
+        
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("Both payment history endpoints failed, trying common endpoint");
+            $response = $this->makeRequest('/history', $data);
+        }
+        
+        return $response;
     }
 
     /**
@@ -234,6 +266,17 @@ class PortmanatAPI {
             ];
         }
         
+        // Check if response is HTML (means wrong endpoint)
+        if (strpos($response, '<html') !== false || strpos($response, '<!DOCTYPE') !== false) {
+            error_log("Portmanat API returned HTML instead of JSON - wrong endpoint");
+            return [
+                'success' => false,
+                'error' => 'API returned HTML instead of JSON - wrong endpoint',
+                'response' => $response,
+                'suggested_fix' => 'Check API endpoint URL'
+            ];
+        }
+        
         // Enhanced response parsing for debug mode
         if ($this->debug_mode) {
             // Try to separate headers from body
@@ -306,7 +349,20 @@ class PortmanatAPI {
 
         $data['sign'] = $this->generateSignature($data);
         
-        return $this->makeRequest('/balance', $data);
+        // Try different balance endpoints
+        $response = $this->makeRequest('/balance', $data);
+        
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("First balance endpoint failed, trying alternative");
+            $response = $this->makeRequest('/api/balance', $data);
+        }
+        
+        if (!$response || (isset($response['success']) && !$response['success'])) {
+            error_log("Both balance endpoints failed, trying common endpoint");
+            $response = $this->makeRequest('/account/balance', $data);
+        }
+        
+        return $response;
     }
 
     /**
