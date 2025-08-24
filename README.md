@@ -199,6 +199,11 @@ Sistemin düzgün işləməsini yoxlamaq üçün `test.php` faylından istifadə
 - Return və cancel URL-lərini yoxlayın
 - API açarının ödəniş sistemi üçün də düzgün olduğundan əmin olun
 - cURL xətalarını yoxlayın
+- **"Yönləndirmə URL-i tapılmadı" xətası üçün:**
+  - `test.php` səhifəsini açın və ödəniş endpoint-ini test edin
+  - API cavabında hansı sahələrin olduğunu yoxlayın
+  - Mümkün yönləndirmə sahələri: `payment_url`, `redirect_url`, `url`, `checkout_url`, `payment_page`
+  - Error log-ları yoxlayın (PHP error log)
 
 ### Form Göndərilmə Xətası
 - PHP xəta loglarını yoxlayın

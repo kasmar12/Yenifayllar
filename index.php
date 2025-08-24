@@ -128,6 +128,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message_type = 'error';
         } elseif ($httpCode === 200 || $httpCode === 201) {
             $result = json_decode($response, true);
+            
+            // Debug: Show API response for troubleshooting
+            error_log("Portmanat.az API Response: " . $response);
+            
             if ($result && isset($result['payment_url'])) {
                 // Redirect to payment page
                 header('Location: ' . $result['payment_url']);
@@ -136,9 +140,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Alternative redirect field
                 header('Location: ' . $result['redirect_url']);
                 exit;
+            } elseif ($result && isset($result['url'])) {
+                // Another possible redirect field
+                header('Location: ' . $result['url']);
+                exit;
+            } elseif ($result && isset($result['checkout_url'])) {
+                // Checkout URL field
+                header('Location: ' . $result['checkout_url']);
+                exit;
+            } elseif ($result && isset($result['payment_page'])) {
+                // Payment page field
+                header('Location: ' . $result['payment_page']);
+                exit;
             } else {
-                $message = "Ödəniş yaradıldı amma yönləndirmə URL-i tapılmadı";
+                // Show detailed error with API response
+                $message = "Ödəniş yaradıldı amma yönləndirmə URL-i tapılmadı. ";
+                $message .= "API cavabı: " . htmlspecialchars($response);
                 $message_type = 'error';
+                
+                // Also show the result structure for debugging
+                if ($result) {
+                    $message .= "<br><br>API cavab strukturu:<br>";
+                    $message .= "<pre>" . htmlspecialchars(json_encode($result, JSON_PRETTY_PRINT)) . "</pre>";
+                }
             }
         } else {
             $message = "Ödəniş yaradılarkən API xətası. HTTP Kodu: " . $httpCode;
@@ -147,6 +171,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($result && isset($result['message'])) {
                     $message .= " - " . $result['message'];
                 }
+                // Show full response for debugging
+                $message .= "<br><br>Tam API cavabı:<br>";
+                $message .= "<pre>" . htmlspecialchars($response) . "</pre>";
             }
             $message_type = 'error';
         }
@@ -401,6 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="api-info">
                 <strong>🔗 API:</strong> Portmanat.az Partners API istifadə edilir
+                <br><small>Debug: API cavabları error log-da saxlanılır</small>
             </div>
             
             <div class="payment-notice">

@@ -47,6 +47,13 @@ $CURRENT_SERVICE_NAME = $SERVICE_NAMES[$SERVICE_ID] ?? "Bilinməyən Xidmət";
 // - GET /api/services - Get available services
 // - GET /api/balance - Get account balance
 
+// Possible redirect URL fields from API response:
+// - payment_url - Main payment redirect URL
+// - redirect_url - Alternative redirect URL
+// - url - Generic redirect URL
+// - checkout_url - Checkout page URL
+// - payment_page - Payment page URL
+
 // Payment flow:
 // 1. User fills form with link and quantity
 // 2. System creates payment via /api/payment

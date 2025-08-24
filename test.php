@@ -125,6 +125,40 @@ if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
     } else {
         echo "<p><strong>HTTP Kodu:</strong> " . $httpCode . "</p>";
         echo "<p><strong>Endpoint Cavabı:</strong> " . htmlspecialchars($response) . "</p>";
+        
+        // Parse and analyze the response
+        if ($response) {
+            $result = json_decode($response, true);
+            if ($result) {
+                echo "<h4>API Cavab Analizi:</h4>";
+                echo "<p><strong>Mövcud sahələr:</strong></p>";
+                echo "<ul>";
+                foreach ($result as $key => $value) {
+                    echo "<li><strong>$key:</strong> " . (is_string($value) ? htmlspecialchars($value) : json_encode($value)) . "</li>";
+                }
+                echo "</ul>";
+                
+                // Check for redirect URLs
+                $redirectFields = ['payment_url', 'redirect_url', 'url', 'checkout_url', 'payment_page'];
+                $foundRedirects = [];
+                foreach ($redirectFields as $field) {
+                    if (isset($result[$field])) {
+                        $foundRedirects[] = $field . ': ' . $result[$field];
+                    }
+                }
+                
+                if (!empty($foundRedirects)) {
+                    echo "<p><strong>✅ Yönləndirmə sahələri tapıldı:</strong></p>";
+                    echo "<ul>";
+                    foreach ($foundRedirects as $redirect) {
+                        echo "<li>" . htmlspecialchars($redirect) . "</li>";
+                    }
+                    echo "</ul>";
+                } else {
+                    echo "<p><strong>❌ Heç bir yönləndirmə sahəsi tapılmadı</strong></p>";
+                }
+            }
+        }
     }
     
     // Test order endpoint structure
