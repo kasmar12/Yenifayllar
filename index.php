@@ -2,46 +2,22 @@
 // Include configuration
 require_once 'config.php';
 
+session_start();
+
 $message = '';
 $message_type = '';
+$order_data = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate and sanitize inputs
-    $username = trim($_POST['username'] ?? '');
-    $link = trim($_POST['link'] ?? '');
-    $quantity = intval($_POST['quantity'] ?? 0);
-    
-    $errors = [];
-    
-    // Validation
-    if (empty($username)) {
-        $errors[] = "Kullanıcı adı gereklidir";
-    }
-    
-    if (empty($link)) {
-        $errors[] = "Link gereklidir";
-    } elseif (!filter_var($link, FILTER_VALIDATE_URL)) {
-        $errors[] = "Geçerli bir link giriniz";
-    }
-    
-    if ($quantity <= 0) {
-        $errors[] = "Miktar 0'dan büyük olmalıdır";
-    }
-    
-    if (empty($errors)) {
-        // Prepare API request data
-        $postData = [
-            'service_id' => $SERVICE_ID,
-            'username' => $username,
-            'link' => $link,
-            'quantity' => $quantity
-        ];
+// Handle payment success callback
+if (isset($_GET['payment_status']) && $_GET['payment_status'] === 'success') {
+    if (isset($_SESSION['pending_order'])) {
+        $order_data = $_SESSION['pending_order'];
         
-        // Send request to API
+        // Now complete the SMM order
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($order_data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Authorization: Bearer ' . $API_KEY
@@ -56,16 +32,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($httpCode === 200) {
             $result = json_decode($response, true);
             if ($result && isset($result['success']) && $result['success']) {
-                $message = "Sipariş başarıyla oluşturuldu! Sipariş ID: " . ($result['order_id'] ?? 'N/A');
+                $message = "Ödəniş uğurlu! SMM sifarişi tamamlandı. Sifariş ID: " . ($result['order_id'] ?? 'N/A');
                 $message_type = 'success';
+                unset($_SESSION['pending_order']); // Clear pending order
             } else {
-                $message = "API hatası: " . ($result['message'] ?? 'Bilinmeyen hata');
+                $message = "Ödəniş uğurlu amma SMM sifarişi xətası: " . ($result['message'] ?? 'Bilinməyən xəta');
                 $message_type = 'error';
             }
         } else {
-            $message = "API bağlantı hatası. HTTP Kodu: " . $httpCode;
+            $message = "Ödəniş uğurlu amma SMM API xətası. HTTP Kodu: " . $httpCode;
             $message_type = 'error';
         }
+    } else {
+        $message = "Gözlənilən sifariş tapılmadı";
+        $message_type = 'error';
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validate and sanitize inputs
+    $username = trim($_POST['username'] ?? '');
+    $link = trim($_POST['link'] ?? '');
+    $quantity = intval($_POST['quantity'] ?? 0);
+    
+    $errors = [];
+    
+    // Validation
+    if (empty($username)) {
+        $errors[] = "İstifadəçi adı tələb olunur";
+    }
+    
+    if (empty($link)) {
+        $errors[] = "Link tələb olunur";
+    } elseif (!filter_var($link, FILTER_VALIDATE_URL)) {
+        $errors[] = "Düzgün link daxil edin";
+    }
+    
+    if ($quantity <= 0) {
+        $errors[] = "Miqdar 0-dan böyük olmalıdır";
+    }
+    
+    if (empty($errors)) {
+        // Calculate price from configuration
+        $total_price = $quantity * $PRICE_PER_UNIT;
+        
+        // Store order data in session for later use
+        $_SESSION['pending_order'] = [
+            'service_id' => $SERVICE_ID,
+            'username' => $username,
+            'link' => $link,
+            'quantity' => $quantity,
+            'total_price' => $total_price
+        ];
+        
+        // Redirect to payment page
+        $payment_url = $PAYMENT_ENDPOINT . "?" . http_build_query([
+            'amount' => $total_price,
+            'currency' => $CURRENCY,
+            'description' => $CURRENT_SERVICE_NAME . ' - ' . $quantity . ' ədəd',
+            'return_url' => $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?payment_status=success',
+            'cancel_url' => $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
+            'order_id' => uniqid('smm_'),
+            'api_key' => $API_KEY
+        ]);
+        
+        header('Location: ' . $payment_url);
+        exit;
     } else {
         $message = implode(', ', $errors);
         $message_type = 'error';
@@ -74,11 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMM Sipariş Formu</title>
+    <title>SMM Sifariş və Ödəniş Sistemi</title>
     <style>
         * {
             margin: 0;
@@ -214,6 +246,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 5px;
         }
         
+        .price-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .price-info h3 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .price-calculator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .total-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .payment-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
         @media (max-width: 480px) {
             body {
                 padding: 10px;
@@ -238,7 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             input[type="text"],
             input[type="number"] {
                 padding: 12px;
-                font-size: 16px; /* Prevents zoom on iOS */
+                font-size: 16px;
             }
         }
     </style>
@@ -246,8 +320,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="container">
         <div class="header">
-            <h1>SMM Sipariş Formu</h1>
-            <p>Hızlı ve güvenli sipariş verin</p>
+            <h1>SMM Sifariş və Ödəniş</h1>
+            <p>Təhlükəsiz ödəniş ilə sifariş verin</p>
         </div>
         
         <div class="form-container">
@@ -258,16 +332,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
             
             <div class="service-info">
-                <strong>Mevcut Servis:</strong> <?php echo $CURRENT_SERVICE_NAME; ?>
-                <div class="service-id">Servis ID: <?php echo $SERVICE_ID; ?></div>
+                <strong>Mövcud Xidmət:</strong> <?php echo $CURRENT_SERVICE_NAME; ?>
+                <div class="service-id">Xidmət ID: <?php echo $SERVICE_ID; ?></div>
             </div>
             
-            <form method="POST" action="">
+            <div class="payment-notice">
+                <strong>💳 Ödəniş:</strong> Sifarişiniz Portmanat.az tərəfindən təhlükəsiz şəkildə emal ediləcək
+            </div>
+            
+            <form method="POST" action="" id="orderForm">
                 <div class="form-group">
-                    <label for="username">Kullanıcı Adı:</label>
+                    <label for="username">İstifadəçi Adı:</label>
                     <input type="text" id="username" name="username" 
                            value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>"
-                           placeholder="Kullanıcı adınızı giriniz" required>
+                           placeholder="İstifadəçi adınızı daxil edin" required>
                 </div>
                 
                 <div class="form-group">
@@ -278,17 +356,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 
                 <div class="form-group">
-                    <label for="quantity">Miktar:</label>
+                    <label for="quantity">Miqdar:</label>
                     <input type="number" id="quantity" name="quantity" 
-                           value="<?php echo htmlspecialchars($_POST['quantity'] ?? ''); ?>"
+                           value="<?php echo htmlspecialchars($_POST['quantity'] ?? '100'); ?>"
                            min="1" placeholder="100" required>
                 </div>
                 
+                <div class="price-info">
+                    <h3>💰 Qiymət Hesablaması</h3>
+                    <div class="price-calculator">
+                        <span>Vahid qiyməti:</span>
+                        <span><?php echo $PRICE_PER_UNIT; ?> <?php echo $CURRENCY; ?></span>
+                    </div>
+                    <div class="price-calculator">
+                        <span>Ümumi qiymət:</span>
+                        <span class="total-price" id="totalPrice">1.00 AZN</span>
+                    </div>
+                </div>
+                
                 <button type="submit" class="submit-btn">
-                    Sipariş Ver
+                    💳 Ödəniş Et və Sifariş Ver
                 </button>
             </form>
         </div>
     </div>
+
+    <script>
+        // Real-time price calculation
+        document.getElementById('quantity').addEventListener('input', function() {
+            const quantity = parseInt(this.value) || 0;
+            const pricePerUnit = <?php echo $PRICE_PER_UNIT; ?>;
+            const totalPrice = (quantity * pricePerUnit).toFixed(2);
+            document.getElementById('totalPrice').textContent = totalPrice + ' <?php echo $CURRENCY; ?>';
+        });
+        
+        // Form validation
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            if (quantity <= 0) {
+                e.preventDefault();
+                alert('Miqdar 0-dan böyük olmalıdır');
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>
