@@ -39,45 +39,54 @@ class PortmanatAPI {
      * @return array Response from Portmanat API
      */
     public function createPayment($amount, $orderId, $callbackUrl, $description = '', $serviceId = '1') {
-        $data = [
+        // Portmanat API requires form submission, not direct API call
+        // We need to get a token first, then redirect to checkout form
+        
+        // Step 1: Get payment token
+        $token_data = [
             'merchant_id' => $this->merchant_id,
-            'service_id' => $serviceId, // Service ID for payment
-            'amount' => number_format($amount, 2, '.', ''), // Format amount properly
+            'service_id' => $serviceId,
             'order_id' => $orderId,
+            'amount' => number_format($amount, 2, '.', ''),
             'callback_url' => $callbackUrl,
-            'currency' => 'AZN',
-            'description' => $description ?: 'SMM Panel Order #' . $orderId,
-            'language' => 'az', // Azerbaijani language
-            'return_url' => $callbackUrl // Return URL after payment
+            'return_url' => $callbackUrl,
+            'description' => $description ?: 'SMM Panel Order #' . $orderId
         ];
-
-        // Generate signature
-        $data['sign'] = $this->generateSignature($data);
+        
+        // Generate signature for token request
+        $token_data['sign'] = $this->generateSignature($token_data);
         
         if ($this->debug_mode) {
-            error_log("Portmanat API Request Data: " . json_encode($data));
+            error_log("Portmanat Token Request Data: " . json_encode($token_data));
         }
         
-        // Make API request - try different endpoints
-        $response = $this->makeRequest('/payment/create', $data);
-        
-        // If first endpoint fails, try alternative
-        if (!$response || (isset($response['success']) && !$response['success'])) {
-            error_log("First endpoint failed, trying alternative endpoint");
-            $response = $this->makeRequest('/api/create-payment', $data);
-        }
-        
-        // If both fail, try the most common endpoint
-        if (!$response || (isset($response['success']) && !$response['success'])) {
-            error_log("Both endpoints failed, trying common endpoint");
-            $response = $this->makeRequest('/create', $data);
-        }
+        // Get token from Portmanat
+        $token_response = $this->makeRequest('/operation/token', $token_data);
         
         if ($this->debug_mode) {
-            error_log("Portmanat API Response: " . json_encode($response));
+            error_log("Portmanat Token Response: " . json_encode($token_response));
         }
         
-        return $response;
+        if ($token_response && isset($token_response['token'])) {
+            return [
+                'success' => true,
+                'token' => $token_response['token'],
+                'checkout_url' => 'https://checkout.portmanat.az/create',
+                'form_data' => [
+                    'payment_type' => 'card', // Default payment type
+                    'service_id' => $serviceId,
+                    'order_id' => $orderId,
+                    'token' => $token_response['token'],
+                    'amount' => number_format($amount, 2, '.', '')
+                ]
+            ];
+        } else {
+            return [
+                'success' => false,
+                'error' => 'Failed to get payment token',
+                'response' => $token_response
+            ];
+        }
     }
 
     /**
@@ -337,7 +346,66 @@ class PortmanatAPI {
      * @return string Payment URL
      */
     public function getPaymentUrl($paymentId) {
-        return 'https://portmanat.az/payment/' . $paymentId;
+        return 'https://checkout.portmanat.az/create';
+    }
+    
+    /**
+     * Get payment status from transaction ID
+     * @param string $transactionId Transaction ID
+     * @return array Payment status
+     */
+    public function getPaymentStatus($transactionId) {
+        $url = "https://checkout.portmanat.az/operation/status/" . $transactionId;
+        
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/json',
+                'User-agent: Mozilla',
+            ),
+        ));
+        
+        $response = curl_exec($curl);
+        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($curl);
+        curl_close($curl);
+        
+        if ($curl_error) {
+            return [
+                'success' => false,
+                'error' => 'cURL Error: ' . $curl_error
+            ];
+        }
+        
+        if ($http_code !== 200) {
+            return [
+                'success' => false,
+                'error' => 'HTTP Error: ' . $http_code,
+                'response' => $response
+            ];
+        }
+        
+        $json_data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [
+                'success' => false,
+                'error' => 'Invalid JSON response: ' . json_last_error_msg(),
+                'response' => $response
+            ];
+        }
+        
+        return [
+            'success' => true,
+            'data' => $json_data
+        ];
     }
 
     /**

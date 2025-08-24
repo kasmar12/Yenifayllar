@@ -160,25 +160,24 @@ try {
     error_log("Portmanat payment response for order #$order_id: " . json_encode($payment));
     
     if ($payment && isset($payment['success']) && $payment['success']) {
-        // Payment created successfully
-        $payment_id = $payment['payment_id'] ?? $payment['id'] ?? null;
+        // Payment token received successfully
+        $token = $payment['token'] ?? null;
         
-        if ($payment_id) {
-            // Save payment info
+        if ($token) {
+            // Save payment info with token
             $query = "INSERT INTO payments (transaction_id, amount, status) VALUES (?, ?, 'pending')";
             $stmt = $db->prepare($query);
-            $stmt->execute([$payment_id, $price]);
+            $stmt->execute([$token, $price]);
             
-            // Log successful payment creation
-            error_log("Payment created successfully for order #$order_id: Payment ID=$payment_id");
+            // Log successful token creation
+            error_log("Payment token created successfully for order #$order_id: Token=$token");
             
-            // Redirect to Portmanat
-            $payment_url = $portmanat->getPaymentUrl($payment_id);
-            header('Location: ' . $payment_url);
+            // Create Portmanat checkout form
+            $this->createPortmanatCheckoutForm($payment['form_data']);
             exit;
         } else {
-            // No payment ID in response
-            error_log("No payment ID in response for order #$order_id: " . json_encode($payment));
+            // No token in response
+            error_log("No token in response for order #$order_id: " . json_encode($payment));
             header('Location: index.php?error=payment_id_missing&debug=' . urlencode(json_encode($payment)));
             exit;
         }
@@ -229,4 +228,98 @@ try {
 
 // Clean up output buffer if we reach here
 ob_end_flush();
+
+/**
+ * Create Portmanat checkout form
+ * @param array $formData Form data for Portmanat
+ */
+function createPortmanatCheckoutForm($formData) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="az">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Portmanat Ödəniş</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <style>
+            .checkout-container {
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+            }
+            .portmanat-logo {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .payment-form {
+                background: #f8f9fa;
+                padding: 30px;
+                border-radius: 10px;
+                border: 1px solid #dee2e6;
+            }
+            .form-info {
+                background: #e9ecef;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="checkout-container">
+            <div class="portmanat-logo">
+                <h2><i class="fas fa-credit-card text-primary"></i> Portmanat Ödəniş</h2>
+                <p class="text-muted">Təhlükəsiz ödəniş üçün Portmanat hesabınızla daxil olun</p>
+            </div>
+            
+            <div class="payment-form">
+                <div class="form-info">
+                    <h6><i class="fas fa-info-circle"></i> Ödəniş Məlumatları</h6>
+                    <p class="mb-1"><strong>Məbləğ:</strong> <?php echo $formData['amount']; ?> AZN</p>
+                    <p class="mb-1"><strong>Sifariş ID:</strong> <?php echo $formData['order_id']; ?></p>
+                    <p class="mb-0"><strong>Xidmət:</strong> SMM Panel</p>
+                </div>
+                
+                <form action="https://checkout.portmanat.az/create" method="POST" id="portmanatForm">
+                    <input type="hidden" name="payment_type" value="<?php echo $formData['payment_type']; ?>" />
+                    <input type="hidden" name="service_id" value="<?php echo $formData['service_id']; ?>" />
+                    <input type="hidden" name="order_id" value="<?php echo $formData['order_id']; ?>" />
+                    <input type="hidden" name="token" value="<?php echo $formData['token']; ?>" />
+                    <input type="hidden" name="amount" value="<?php echo $formData['amount']; ?>" />
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-credit-card"></i> Portmanat Hesab ilə ödə
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt"></i> 
+                        Ödəniş Portmanat tərəfindən təhlükəsiz şəkildə emal edilir
+                    </small>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="index.php" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri qayıt
+                </a>
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Auto-submit form after 2 seconds
+            setTimeout(function() {
+                document.getElementById('portmanatForm').submit();
+            }, 2000);
+        </script>
+    </body>
+    </html>
+    <?php
+}
 ?>
