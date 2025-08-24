@@ -1,14 +1,32 @@
 <?php
+// Development mode aktiv edin (production-da false edin)
+define('DEVELOPMENT_MODE', true);
+
 require_once '../config/database.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
 // Get all services
-$query = "SELECT * FROM services ORDER BY name";
-$stmt = $db->prepare($query);
-$stmt->execute();
-$services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($db) {
+    try {
+        $query = "SELECT * FROM services ORDER BY name";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $services = [];
+        if (DEVELOPMENT_MODE) {
+            echo "<div style='background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 20px; border-radius: 5px;'>";
+            echo "<h4>Database Query Error</h4>";
+            echo "<p><strong>Error:</strong> " . $e->getMessage() . "</p>";
+            echo "<p><a href='../test_db.php'>Test Database Connection</a></p>";
+            echo "</div>";
+        }
+    }
+} else {
+    $services = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +57,14 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 20px;
             margin: 20px 0;
         }
+        .error-banner {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -53,32 +79,54 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="container my-5">
+        <!-- Database Error Banner -->
+        <?php if (!$db): ?>
+        <div class="error-banner">
+            <h4><i class="fas fa-exclamation-triangle"></i> Database Connection Error</h4>
+            <p>Database bağlantısı uğursuz oldu. Zəhmət olmasa administrator ilə əlaqə saxlayın.</p>
+            <p><a href="../test_db.php" class="btn btn-outline-danger btn-sm">Database Test Et</a></p>
+        </div>
+        <?php endif; ?>
+
         <!-- Services Grid -->
         <div class="row">
-            <?php foreach ($services as $service): ?>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card service-card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="fab fa-<?php echo strtolower($service['name']); ?>"></i>
-                            <?php echo htmlspecialchars($service['name']); ?>
-                        </h5>
-                        <p class="card-text"><?php echo htmlspecialchars($service['description']); ?></p>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                Min: <?php echo number_format($service['min_amount']); ?> | 
-                                Max: <?php echo number_format($service['max_amount']); ?>
-                            </small>
-                        </div>
-                        <div class="d-grid">
-                            <button class="btn btn-primary" onclick="selectService(<?php echo $service['id']; ?>, '<?php echo htmlspecialchars($service['name']); ?>', <?php echo $service['price_per_1k']; ?>, <?php echo $service['min_amount']; ?>, <?php echo $service['max_amount']; ?>)">
-                                Seç <i class="fas fa-arrow-right"></i>
-                            </button>
+            <?php if (!empty($services)): ?>
+                <?php foreach ($services as $service): ?>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card service-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fab fa-<?php echo strtolower($service['name']); ?>"></i>
+                                <?php echo htmlspecialchars($service['name']); ?>
+                            </h5>
+                            <p class="card-text"><?php echo htmlspecialchars($service['description']); ?></p>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    Min: <?php echo number_format($service['min_amount']); ?> | 
+                                    Max: <?php echo number_format($service['max_amount']); ?>
+                                </small>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" onclick="selectService(<?php echo $service['id']; ?>, '<?php echo htmlspecialchars($service['name']); ?>', <?php echo $service['price_per_1k']; ?>, <?php echo $service['min_amount']; ?>, <?php echo $service['max_amount']; ?>)">
+                                    Seç <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12 text-center">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <h4>Xidmətlər tapılmadı</h4>
+                        <p>Hələ heç bir xidmət əlavə edilməyib və ya database problemi var.</p>
+                        <?php if (DEVELOPMENT_MODE): ?>
+                        <p><a href="../test_db.php" class="btn btn-outline-warning">Database Test Et</a></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Order Form -->
