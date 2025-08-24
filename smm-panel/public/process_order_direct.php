@@ -13,6 +13,7 @@
 ob_start();
 
 session_start();
+require_once '../config/database.php';
 require_once '../config/link_shortener_config.php';
 require_once '../config/link_shortener.php';
 
@@ -40,32 +41,48 @@ try {
         throw new Exception("Miqdar 1-dən az ola bilməz!");
     }
     
-    // Store order data in session for ad completion
+    // Get service details from database for session storage
+    $database = new Database();
+    $db = $database->getConnection();
+    
+    if (!$db) {
+        throw new Exception("Database connection failed");
+    }
+    
+    // Get service details
+    $query = "SELECT * FROM services WHERE id = ?";
+    $stmt = $db->prepare($query);
+    $stmt->execute([$service_id]);
+    $service = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$service) {
+        throw new Exception("Xidmət tapılmadı!");
+    }
+    
+    // Calculate total price (now free)
+    $totalPrice = 0.00; // Free orders
+    
+    // Store order data in session for ad verification
     $_SESSION['pending_order'] = [
         'service_id' => $service_id,
+        'service_name' => $service['name'],
         'link' => $link,
-        'amount' => $amount,
-        'price' => 0.00 // Free orders
+        'quantity' => $amount,
+        'price' => $service['price'],
+        'total_price' => $totalPrice,
+        'api_service_id' => $service['api_service_id'] ?? null
     ];
-    
-    // Generate AY.Live ad link
-    $link_shortener = new LinkShortener();
-    $short_link_result = $link_shortener->generateShortLink($link, 'temp_' . time());
-    
-    if (!$short_link_result['success']) {
-        throw new Exception("Reklam linki yaradıla bilmədi: " . $short_link_result['error']);
-    }
     
     // Log the pending order
     try {
-        $log_entry = date('Y-m-d H:i:s') . " - Pending order created, redirecting to AY.Live ad page\n";
+        $log_entry = date('Y-m-d H:i:s') . " - Pending order created, redirecting to ad verification\n";
         file_put_contents('../logs/orders_log.txt', $log_entry, FILE_APPEND);
     } catch (Exception $e) {
         error_log("Failed to write order log: " . $e->getMessage());
     }
     
-    // Redirect to AY.Live ad page
-    header('Location: ' . $short_link_result['short_url']);
+    // Redirect to ad verification
+    header('Location: ad-verification.php');
     exit;
     
 } catch (Exception $e) {

@@ -36,8 +36,8 @@ try {
     // Extract order details from session
     $service_id = $order_data['service_id'];
     $link = $order_data['link'];
-    $amount = $order_data['amount'];
-    $price = $order_data['price'];
+    $amount = $order_data['quantity'];
+    $price = $order_data['total_price'];
     
     // Create order in database
     $database = new Database();
