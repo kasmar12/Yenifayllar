@@ -1,0 +1,5 @@
+=== SMM Panel Orders Log ===
+Started: <?php echo date('Y-m-d H:i:s'); ?>
+
+Bu fayl bütün sifariş və ödəniş əməliyyatlarını qeyd edir.
+This file logs all order and payment operations.
