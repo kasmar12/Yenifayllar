@@ -140,6 +140,68 @@ $smm_data = [
 ];
 ```
 
+#### SMM API Configuration
+
+The system automatically tests multiple endpoint variations to find the correct one:
+
+**Services Endpoints (for fetching prices):**
+- `/services` - Standard endpoint
+- `/services.php` - PHP file endpoint
+- `/api/services` - API subdirectory
+- `/v2/services` - Versioned endpoint
+- `/getServices` - Descriptive endpoint
+- `/list` - Simple list endpoint
+- `/services.json` - JSON file endpoint
+- `/api.php` - Main API file
+- `/index.php` - Index file endpoint
+
+**Order Endpoints (for creating orders):**
+- `/add` - Standard endpoint
+- `/add.php` - PHP file endpoint
+- `/api/add` - API subdirectory
+- `/v2/add` - Versioned endpoint
+- `/create` - Descriptive endpoint
+- `/order` - Order endpoint
+
+#### Common SMM API Response Formats
+
+The system automatically detects these response formats:
+
+```json
+// Format 1: Standard with services array
+{
+  "services": [
+    {
+      "service": "123",
+      "name": "Instagram Followers",
+      "rate": "10.00",
+      "min": "100",
+      "max": "10000"
+    }
+  ]
+}
+
+// Format 2: Direct service array
+[
+  {
+    "service": "123",
+    "name": "Instagram Followers",
+    "rate": "10.00",
+    "min": "100",
+    "max": "10000"
+  }
+]
+
+// Format 3: Single service object
+{
+  "service": "123",
+  "name": "Instagram Followers",
+  "rate": "10.00",
+  "min": "100",
+  "max": "10000"
+}
+```
+
 ## Security Features
 
 - **SHA256 Signature Verification**: All Portmanat callbacks are verified

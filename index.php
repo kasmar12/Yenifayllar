@@ -28,7 +28,12 @@ function getServiceInfo() {
         SMM_SERVICES_URL,
         SMM_SERVICES_URL_ALT1,
         SMM_SERVICES_URL_ALT2,
-        SMM_SERVICES_URL_ALT3
+        SMM_SERVICES_URL_ALT3,
+        SMM_SERVICES_URL_ALT4,
+        SMM_SERVICES_URL_ALT5,
+        SMM_SERVICES_URL_ALT6,
+        SMM_SERVICES_URL_ALT7,
+        SMM_SERVICES_URL_ALT8
     ];
     
     $api_debug_info = "Trying endpoints:\n";

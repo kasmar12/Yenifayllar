@@ -151,39 +151,84 @@ if (defined('SITE_URL') && !empty(SITE_URL)) {
 
 echo "<h5>8. SMM API Connection Test</h5>";
 if (defined('SMM_API_KEY') && SMM_API_KEY !== 'YOUR_SMM_API_KEY') {
-    try {
-        // Test SMM API connection
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, SMM_SERVICES_URL);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-            'key' => SMM_API_KEY,
-            'action' => 'services'
-        ]));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        
-        $response = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curl_error = curl_error($ch);
-        curl_close($ch);
-        
-        if ($curl_error) {
-            echo "<div class='test-result error'>✗ SMM API cURL Error: " . $curl_error . "</div>";
-        } elseif ($http_code !== 200) {
-            echo "<div class='test-result error'>✗ SMM API HTTP Error: " . $http_code . "</div>";
-        } else {
-            $response_data = json_decode($response, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                echo "<div class='test-result success'>✓ SMM API connection successful (HTTP " . $http_code . ")</div>";
-                echo "<div class='test-result info'>ℹ Response contains " . count($response_data) . " items</div>";
+    echo "<div class='test-result info'>ℹ Testing multiple SMM API endpoints...</div>";
+    
+    // List of endpoints to test
+    $endpoints = [
+        'Standard' => SMM_SERVICES_URL,
+        'Alternative 1' => SMM_SERVICES_URL_ALT1,
+        'Alternative 2' => SMM_SERVICES_URL_ALT2,
+        'Alternative 3' => SMM_SERVICES_URL_ALT3,
+        'Alternative 4' => SMM_SERVICES_URL_ALT4,
+        'Alternative 5' => SMM_SERVICES_URL_ALT5,
+        'Alternative 6' => SMM_SERVICES_URL_ALT6,
+        'Alternative 7' => SMM_SERVICES_URL_ALT7,
+        'Alternative 8' => SMM_SERVICES_URL_ALT8
+    ];
+    
+    $working_endpoint = null;
+    
+    foreach ($endpoints as $name => $endpoint) {
+        try {
+            echo "<div class='test-result info'>ℹ Testing: $name - $endpoint</div>";
+            
+            // Test SMM API connection
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $endpoint);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+                'key' => SMM_API_KEY,
+                'action' => 'services'
+            ]));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/x-www-form-urlencoded',
+                'User-Agent: SMM-Panel/1.0'
+            ]);
+            
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curl_error = curl_error($ch);
+            $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
+            curl_close($ch);
+            
+            if ($curl_error) {
+                echo "<div class='test-result error'>✗ $name: cURL Error - " . $curl_error . "</div>";
+            } elseif ($http_code === 404) {
+                echo "<div class='test-result warning'>⚠ $name: Not Found (404)</div>";
+            } elseif ($http_code === 403) {
+                echo "<div class='test-result warning'>⚠ $name: Forbidden (403) - Check API key</div>";
+            } elseif ($http_code === 401) {
+                echo "<div class='test-result warning'>⚠ $name: Unauthorized (401) - Check API key</div>";
+            } elseif ($http_code !== 200) {
+                echo "<div class='test-result warning'>⚠ $name: HTTP Error - " . $http_code . "</div>";
             } else {
-                echo "<div class='test-result error'>✗ SMM API returned invalid JSON</div>";
+                $response_data = json_decode($response, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    echo "<div class='test-result success'>✓ $name: SUCCESS! (HTTP " . $http_code . ", " . round($total_time, 2) . "s)</div>";
+                    echo "<div class='test-result info'>ℹ Response contains " . count($response_data) . " items</div>";
+                    $working_endpoint = $endpoint;
+                    break; // Found working endpoint
+                } else {
+                    echo "<div class='test-result warning'>⚠ $name: Invalid JSON response</div>";
+                }
             }
+        } catch (Exception $e) {
+            echo "<div class='test-result error'>✗ $name: Exception - " . $e->getMessage() . "</div>";
         }
-    } catch (Exception $e) {
-        echo "<div class='test-result error'>✗ SMM API test failed: " . $e->getMessage() . "</div>";
+    }
+    
+    if ($working_endpoint) {
+        echo "<div class='test-result success'>🎉 Working endpoint found: $working_endpoint</div>";
+    } else {
+        echo "<div class='test-result error'>❌ No working endpoints found. Check your SMM API configuration.</div>";
+        echo "<div class='test-result info'>ℹ Common issues:</div>";
+        echo "<div class='test-result info'>  - Wrong API URL</div>";
+        echo "<div class='test-result info'>  - Invalid API key</div>";
+        echo "<div class='test-result info'>  - Wrong endpoint structure</div>";
+        echo "<div class='test-result info'>  - Provider's API is down</div>";
     }
 } else {
     echo "<div class='test-result warning'>⚠ SMM API Key not configured</div>";
