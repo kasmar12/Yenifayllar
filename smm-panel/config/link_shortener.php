@@ -409,7 +409,13 @@ class LinkShortener {
             mkdir($log_dir, 0755, true);
         }
         
-        file_put_contents($log_file, json_encode($log_entry) . "\n", FILE_APPEND | LOCK_EX);
+        // Use try-catch to handle file writing errors gracefully
+        try {
+            file_put_contents($log_file, json_encode($log_entry) . "\n", FILE_APPEND);
+        } catch (Exception $e) {
+            // If file writing fails, use error_log as fallback
+            error_log("LinkShortener log write failed: " . $e->getMessage());
+        }
         
         if ($this->debug_mode) {
             error_log("LinkShortener: " . $message . " - " . json_encode($data));

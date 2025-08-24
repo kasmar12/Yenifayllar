@@ -9,14 +9,18 @@
  * 4. After ad completion, order is automatically processed
  */
 
+// Disable output buffering to prevent headers already sent error
+ob_start();
+
 session_start();
 require_once '../config/database.php';
 require_once '../config/link_shortener_config.php';
 require_once '../config/link_shortener.php';
 
-// Enable error reporting for debugging
+// Enable error reporting for debugging but don't display
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 $service_id = $_POST['service_id'] ?? '';
 $link = $_POST['link'] ?? '';
@@ -87,8 +91,12 @@ try {
     ];
     
     // Log the order creation
-    $log_entry = date('Y-m-d H:i:s') . " - Order #$order_id created and redirecting to ad page\n";
-    file_put_contents('../logs/orders_log.txt', $log_entry, FILE_APPEND | LOCK_EX);
+    try {
+        $log_entry = date('Y-m-d H:i:s') . " - Order #$order_id created and redirecting to ad page\n";
+        file_put_contents('../logs/orders_log.txt', $log_entry, FILE_APPEND);
+    } catch (Exception $e) {
+        error_log("Failed to write order log: " . $e->getMessage());
+    }
     
     // Store callback URL for AY.Live
     $callback_data = [
@@ -110,7 +118,11 @@ try {
         'data' => $callback_data
     ];
     
-    file_put_contents($callback_file, json_encode($callbacks, JSON_PRETTY_PRINT));
+    try {
+        file_put_contents($callback_file, json_encode($callbacks, JSON_PRETTY_PRINT));
+    } catch (Exception $e) {
+        error_log("Failed to write callback file: " . $e->getMessage());
+    }
     
     // Redirect to AY.Live ad page
     header('Location: ' . $short_link_result['short_url']);
