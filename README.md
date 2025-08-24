@@ -71,8 +71,9 @@ define('SMM_API_URL', 'https://your-smm-provider.com/api/v2'); // Your SMM provi
 define('SMM_API_KEY', 'YOUR_SMM_API_KEY');                     // Your SMM provider API key
 define('SMM_SERVICE_ID', '123');                               // Your SMM service ID
 
-// Pricing Configuration
-define('PRICE_PER_1000', 25.00);                               // Price per 1000 followers/likes/views (in AZN)
+// SMM API Endpoints
+define('SMM_SERVICES_URL', SMM_API_URL . '/services');         // URL to fetch services and prices
+define('SMM_ADD_ORDER_URL', SMM_API_URL . '/add');            // URL to add new order
 
 // Application Configuration
 define('SITE_URL', 'https://yourdomain.com/smm-panel'); // Your website URL

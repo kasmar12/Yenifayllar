@@ -14,76 +14,147 @@ $error = '';
 $success = '';
 $service_info = null;
 $price_per_1000 = 0;
+$api_debug_info = '';
 
 // Function to fetch service information from SMM API
 function getServiceInfo() {
-    $api_url = SMM_SERVICES_URL;
+    global $api_debug_info;
+    
     $api_key = SMM_API_KEY;
     $service_id = SMM_SERVICE_ID;
     
-    // Prepare API request data
-    $api_data = [
-        'key' => $api_key,
-        'action' => 'services'
+    // List of endpoints to try
+    $endpoints = [
+        SMM_SERVICES_URL,
+        SMM_SERVICES_URL_ALT1,
+        SMM_SERVICES_URL_ALT2,
+        SMM_SERVICES_URL_ALT3
     ];
     
-    // Initialize cURL
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $api_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($api_data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/x-www-form-urlencoded',
-        'User-Agent: SMM-Panel/1.0'
-    ]);
+    $api_debug_info = "Trying endpoints:\n";
     
-    // Execute cURL request
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
-    curl_close($ch);
-    
-    if (DEBUG_MODE) {
-        error_log("SMM API Services Call - URL: " . $api_url);
-        error_log("SMM API Services Call - Response: " . $response);
-        error_log("SMM API Services Call - HTTP Code: " . $http_code);
-    }
-    
-    if ($curl_error) {
-        return ['error' => 'cURL Error: ' . $curl_error];
-    }
-    
-    if ($http_code !== 200) {
-        return ['error' => 'HTTP Error: ' . $http_code];
-    }
-    
-    // Parse response
-    $response_data = json_decode($response, true);
-    
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return ['error' => 'Invalid JSON response'];
-    }
-    
-    // Find our specific service
-    if (isset($response_data['services']) && is_array($response_data['services'])) {
-        foreach ($response_data['services'] as $service) {
-            if (isset($service['service']) && $service['service'] == $service_id) {
-                return [
-                    'success' => true,
-                    'service' => $service,
-                    'name' => $service['name'] ?? 'Unknown Service',
-                    'price' => floatval($service['rate'] ?? 0),
-                    'min' => intval($service['min'] ?? 100),
-                    'max' => intval($service['max'] ?? 100000)
-                ];
+    foreach ($endpoints as $endpoint) {
+        $api_debug_info .= "- " . $endpoint . "\n";
+        
+        // Prepare API request data
+        $api_data = [
+            'key' => $api_key,
+            'action' => 'services'
+        ];
+        
+        // Initialize cURL
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($api_data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/x-www-form-urlencoded',
+            'User-Agent: SMM-Panel/1.0'
+        ]);
+        
+        // Execute cURL request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
+        curl_close($ch);
+        
+        $api_debug_info .= "  Response: HTTP $http_code, Time: " . round($total_time, 2) . "s\n";
+        
+        if (DEBUG_MODE) {
+            error_log("SMM API Services Call - Endpoint: " . $endpoint);
+            error_log("SMM API Services Call - Response: " . $response);
+            error_log("SMM API Services Call - HTTP Code: " . $http_code);
+            error_log("SMM API Services Call - cURL Error: " . $curl_error);
+        }
+        
+        if ($curl_error) {
+            $api_debug_info .= "  cURL Error: " . $curl_error . "\n";
+            continue; // Try next endpoint
+        }
+        
+        if ($http_code !== 200) {
+            $api_debug_info .= "  HTTP Error: " . $http_code . "\n";
+            continue; // Try next endpoint
+        }
+        
+        // Parse response
+        $response_data = json_decode($response, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $api_debug_info .= "  JSON Parse Error: " . json_last_error_msg() . "\n";
+            $api_debug_info .= "  Raw Response: " . substr($response, 0, 200) . "...\n";
+            continue; // Try next endpoint
+        }
+        
+        // Try different response formats
+        $service_found = false;
+        
+        // Format 1: Standard format
+        if (isset($response_data['services']) && is_array($response_data['services'])) {
+            foreach ($response_data['services'] as $service) {
+                if (isset($service['service']) && $service['service'] == $service_id) {
+                    $service_found = true;
+                    $api_debug_info .= "  Service found in standard format\n";
+                    return [
+                        'success' => true,
+                        'service' => $service,
+                        'name' => $service['name'] ?? 'Unknown Service',
+                        'price' => floatval($service['rate'] ?? 0),
+                        'min' => intval($service['min'] ?? 100),
+                        'max' => intval($service['max'] ?? 100000),
+                        'endpoint' => $endpoint
+                    ];
+                }
             }
+        }
+        
+        // Format 2: Direct service array
+        if (isset($response_data[0]) && is_array($response_data[0])) {
+            foreach ($response_data as $service) {
+                if (isset($service['service']) && $service['service'] == $service_id) {
+                    $service_found = true;
+                    $api_debug_info .= "  Service found in direct array format\n";
+                    return [
+                        'success' => true,
+                        'service' => $service,
+                        'name' => $service['name'] ?? 'Unknown Service',
+                        'price' => floatval($service['rate'] ?? 0),
+                        'min' => intval($service['min'] ?? 100),
+                        'max' => intval($service['max'] ?? 100000),
+                        'endpoint' => $endpoint
+                    ];
+                }
+            }
+        }
+        
+        // Format 3: Single service object
+        if (isset($response_data['service']) && $response_data['service'] == $service_id) {
+            $service_found = true;
+            $api_debug_info .= "  Service found in single object format\n";
+            return [
+                'success' => true,
+                'service' => $response_data,
+                'name' => $response_data['name'] ?? 'Unknown Service',
+                'price' => floatval($response_data['rate'] ?? 0),
+                'min' => intval($response_data['min'] ?? 100),
+                'max' => intval($response_data['max'] ?? 100000),
+                'endpoint' => $endpoint
+            ];
+        }
+        
+        if (!$service_found) {
+            $api_debug_info .= "  Service ID $service_id not found in response\n";
+            $api_debug_info .= "  Available services: " . count($response_data) . "\n";
         }
     }
     
-    return ['error' => 'Service not found in API response'];
+    // If we get here, no endpoint worked
+    $api_debug_info .= "All endpoints failed\n";
+    return ['error' => 'All API endpoints failed', 'debug' => $api_debug_info];
 }
 
 // Fetch service information on page load
@@ -91,9 +162,13 @@ $service_info = getServiceInfo();
 
 if ($service_info && isset($service_info['success'])) {
     $price_per_1000 = $service_info['price'];
+    if (DEBUG_MODE) {
+        error_log("Successfully fetched service info: " . print_r($service_info, true));
+    }
 } else {
     if (DEBUG_MODE) {
         error_log("Failed to fetch service info: " . print_r($service_info, true));
+        error_log("API Debug Info: " . $api_debug_info);
     }
     // Fallback price if API fails
     $price_per_1000 = 25.00;
@@ -211,6 +286,17 @@ $preview_amount = ($preview_quantity / 1000) * $price_per_1000;
             margin: 15px 0;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .debug-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -253,6 +339,11 @@ $preview_amount = ($preview_quantity / 1000) * $price_per_1000;
                                     Min: <?php echo number_format($service_info['min']); ?> | 
                                     Max: <?php echo number_format($service_info['max']); ?>
                                 </p>
+                                <?php if (isset($service_info['endpoint'])): ?>
+                                    <small class="text-white-50">
+                                        API: <?php echo htmlspecialchars($service_info['endpoint']); ?>
+                                    </small>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                         
@@ -269,8 +360,23 @@ $preview_amount = ($preview_quantity / 1000) * $price_per_1000;
                                     <i class="fas fa-exclamation-triangle me-1"></i>
                                     Using fallback price (API connection issue)
                                 </small>
+                                <?php if (DEBUG_MODE): ?>
+                                    <br>
+                                    <button class="btn btn-sm btn-outline-warning mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#debugInfo">
+                                        <i class="fas fa-bug me-1"></i>Show Debug Info
+                                    </button>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
+                        
+                        <?php if (DEBUG_MODE && (!$service_info || !isset($service_info['success']))): ?>
+                            <div class="collapse" id="debugInfo">
+                                <div class="debug-info">
+                                    <h6 class="text-white mb-2">API Debug Information:</h6>
+                                    <pre class="text-white-50"><?php echo htmlspecialchars($api_debug_info); ?></pre>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                         
                         <form method="POST" action="" id="orderForm">
                             <div class="mb-3">

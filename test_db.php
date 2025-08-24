@@ -61,7 +61,9 @@ $config_constants = [
     'PORTMANAT_SECRET_KEY' => 'Portmanat Secret Key',
     'SMM_API_URL' => 'SMM API URL',
     'SMM_API_KEY' => 'SMM API Key',
-    'SMM_SERVICE_ID' => 'SMM Service ID'
+    'SMM_SERVICE_ID' => 'SMM Service ID',
+    'SMM_SERVICES_URL' => 'SMM Services URL',
+    'SMM_ADD_ORDER_URL' => 'SMM Add Order URL'
 ];
 
 foreach ($config_constants as $constant => $description) {
@@ -145,6 +147,46 @@ if (defined('SITE_URL') && !empty(SITE_URL)) {
     }
 } else {
     echo "<div class='test-result error'>✗ SITE_URL is not defined</div>";
+}
+
+echo "<h5>8. SMM API Connection Test</h5>";
+if (defined('SMM_API_KEY') && SMM_API_KEY !== 'YOUR_SMM_API_KEY') {
+    try {
+        // Test SMM API connection
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, SMM_SERVICES_URL);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'key' => SMM_API_KEY,
+            'action' => 'services'
+        ]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($curl_error) {
+            echo "<div class='test-result error'>✗ SMM API cURL Error: " . $curl_error . "</div>";
+        } elseif ($http_code !== 200) {
+            echo "<div class='test-result error'>✗ SMM API HTTP Error: " . $http_code . "</div>";
+        } else {
+            $response_data = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                echo "<div class='test-result success'>✓ SMM API connection successful (HTTP " . $http_code . ")</div>";
+                echo "<div class='test-result info'>ℹ Response contains " . count($response_data) . " items</div>";
+            } else {
+                echo "<div class='test-result error'>✗ SMM API returned invalid JSON</div>";
+            }
+        }
+    } catch (Exception $e) {
+        echo "<div class='test-result error'>✗ SMM API test failed: " . $e->getMessage() . "</div>";
+    }
+} else {
+    echo "<div class='test-result warning'>⚠ SMM API Key not configured</div>";
 }
 
 echo "<h5>8. Recommendations</h5>";
