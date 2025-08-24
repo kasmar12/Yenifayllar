@@ -178,7 +178,12 @@ try {
         $debug_info = '';
         if (isset($payment['debug_info'])) {
             $debug_info = '&debug=' . urlencode(json_encode($payment['debug_info']));
+        } elseif (isset($payment['extracted_info'])) {
+            $debug_info = '&debug=' . urlencode(json_encode($payment['extracted_info']));
         }
+        
+        // Log detailed error for debugging
+        error_log("Detailed payment error for order #$order_id: " . json_encode($payment));
         
         header('Location: index.php?error=payment_failed&msg=' . urlencode($error_msg) . $debug_info);
         exit;

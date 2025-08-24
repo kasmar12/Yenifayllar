@@ -156,6 +156,12 @@ if (isset($_GET['error'])) {
                 <div class="debug-info">
                     <pre><?php echo $debug_info; ?></pre>
                 </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        Bu məlumatı administrator ilə paylaşın
+                    </small>
+                </div>
             </details>
             <?php endif; ?>
             
