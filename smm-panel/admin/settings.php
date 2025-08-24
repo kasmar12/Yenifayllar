@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/portmanat_api.php';
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -64,6 +65,20 @@ if (!$settings) {
         'api_key' => 'YOUR_SMM_API_KEY',
         'secret_key' => 'YOUR_SECRET_KEY'
     ];
+}
+
+// Handle API test requests
+$test_result = null;
+if (isset($_POST['test_portmanat'])) {
+    try {
+        $portmanat = new PortmanatAPI();
+        $test_result = $portmanat->testConnection();
+    } catch (Exception $e) {
+        $test_result = [
+            'success' => false,
+            'message' => 'Test failed: ' . $e->getMessage()
+        ];
+    }
 }
 ?>
 
@@ -161,6 +176,41 @@ if (!$settings) {
                         
                         <hr class="my-4">
                         
+                        <!-- Portmanat API Test -->
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="fas fa-credit-card"></i> Portmanat API Test</h6>
+                                <p class="text-muted mb-3">Portmanat API ilə bağlantını yoxlamaq üçün aşağıdakı düyməni basın:</p>
+                                
+                                <form method="POST" style="display: inline;">
+                                    <button type="submit" name="test_portmanat" class="btn btn-outline-primary">
+                                        <i class="fas fa-play"></i> Portmanat API Test Et
+                                    </button>
+                                </form>
+                                
+                                <?php if ($test_result): ?>
+                                    <div class="mt-3">
+                                        <?php if ($test_result['success']): ?>
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-check-circle"></i> 
+                                                <strong>Portmanat API Test Uğurlu!</strong><br>
+                                                <?php echo $test_result['message']; ?>
+                                                <?php if (isset($test_result['balance'])): ?>
+                                                    <br><small>Balance: <?php echo json_encode($test_result['balance']); ?></small>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="alert alert-danger">
+                                                <i class="fas fa-exclamation-triangle"></i> 
+                                                <strong>Portmanat API Test Uğursuz!</strong><br>
+                                                <?php echo $test_result['message']; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
                         <!-- Configuration Files Info -->
                         <div class="alert alert-info">
                             <h6><i class="fas fa-info-circle"></i> Konfiqurasiya Faylları</h6>
@@ -171,16 +221,13 @@ if (!$settings) {
                             </ul>
                         </div>
                         
-                        <!-- Test Connection -->
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h6><i class="fas fa-plug"></i> API Bağlantısını Yoxla</h6>
-                                <p class="text-muted mb-3">SMM API ilə bağlantını yoxlamaq üçün aşağıdakı düyməni basın:</p>
-                                <button type="button" class="btn btn-outline-primary" onclick="testConnection()">
-                                    <i class="fas fa-play"></i> Bağlantını Yoxla
-                                </button>
-                                <div id="testResult" class="mt-3"></div>
-                            </div>
+                        <!-- Portmanat API Documentation -->
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-book"></i> Portmanat API Sənədləri</h6>
+                            <p class="mb-2">Portmanat API haqqında ətraflı məlumat üçün:</p>
+                            <a href="https://partners.portmanat.az/page/api" target="_blank" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-external-link-alt"></i> API Sənədləri
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -189,16 +236,5 @@ if (!$settings) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function testConnection() {
-            const resultDiv = document.getElementById('testResult');
-            resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Bağlantı yoxlanılır...</div>';
-            
-            // Simulate API test (in real implementation, make AJAX call to test endpoint)
-            setTimeout(() => {
-                resultDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Bu funksiya hələ tətbiq edilməyib. API konfiqurasiyasını yoxlamaq üçün sifariş yaradın.</div>';
-            }, 2000);
-        }
-    </script>
 </body>
 </html>

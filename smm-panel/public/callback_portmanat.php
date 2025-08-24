@@ -7,23 +7,28 @@ require_once '../config/smm_api.php';
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
+// If JSON parsing fails, try POST data
 if (!$data) {
-    error_log("Portmanat callback: Invalid JSON data");
-    http_response_code(400);
-    echo json_encode(['status' => 'fail', 'message' => 'Invalid data']);
-    exit;
+    $data = $_POST;
 }
 
-// Extract callback data
-$transaction_id = $data['transaction_id'] ?? '';
-$amount = $data['amount'] ?? '';
-$status = $data['status'] ?? '';
-$sign = $data['sign'] ?? '';
-$order_id = $data['order_id'] ?? '';
+if (!$data) {
+    error_log("Portmanat callback: No data received");
+    http_response_code(400);
+    echo json_encode(['status' => 'fail', 'message' => 'No data received']);
+    exit;
+}
 
 // Log callback data
 $log_data = date('Y-m-d H:i:s') . " - Callback received: " . json_encode($data) . "\n";
 file_put_contents('../logs/orders_log.txt', $log_data, FILE_APPEND | LOCK_EX);
+
+// Extract callback data based on Portmanat API documentation
+$payment_id = $data['payment_id'] ?? $data['id'] ?? '';
+$order_id = $data['order_id'] ?? '';
+$amount = $data['amount'] ?? '';
+$status = $data['status'] ?? '';
+$sign = $data['sign'] ?? '';
 
 // Verify signature
 $portmanat = new PortmanatAPI();
@@ -41,9 +46,28 @@ $db = $database->getConnection();
 
 $query = "UPDATE payments SET status = ? WHERE transaction_id = ?";
 $stmt = $db->prepare($query);
-$stmt->execute([$status, $transaction_id]);
+$stmt->execute([$status, $payment_id]);
 
-if ($status === 'success') {
+// Map Portmanat status to our status
+$order_status = 'pending';
+switch (strtolower($status)) {
+    case 'success':
+    case 'completed':
+    case 'paid':
+        $order_status = 'paid';
+        break;
+    case 'failed':
+    case 'cancelled':
+    case 'expired':
+        $order_status = 'payment_failed';
+        break;
+    case 'pending':
+    default:
+        $order_status = 'pending';
+        break;
+}
+
+if ($order_status === 'paid') {
     // Get order details
     $query = "SELECT o.*, s.api_service_id FROM orders o 
               JOIN services s ON o.service_id = s.id 
@@ -96,7 +120,7 @@ if ($status === 'success') {
         $log_order_not_found = date('Y-m-d H:i:s') . " - Order #$order_id not found in database\n";
         file_put_contents('../logs/orders_log.txt', $log_order_not_found, FILE_APPEND | LOCK_EX);
     }
-} else {
+} else if ($order_status === 'payment_failed') {
     // Payment failed
     $query = "UPDATE orders SET status = 'payment_failed' WHERE id = ?";
     $stmt = $db->prepare($query);

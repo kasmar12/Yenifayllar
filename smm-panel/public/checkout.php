@@ -49,22 +49,40 @@ $order_id = $db->lastInsertId();
 // Create Portmanat payment
 $portmanat = new PortmanatAPI();
 $callback_url = 'https://' . $_SERVER['HTTP_HOST'] . '/callback_portmanat.php';
+$description = $service['name'] . ' - ' . number_format($amount) . ' ədəd';
 
-$payment = $portmanat->createPayment($price, $order_id, $callback_url);
+$payment = $portmanat->createPayment($price, $order_id, $callback_url, $description);
 
-if ($payment && isset($payment['payment_id'])) {
-    // Save payment info
-    $query = "INSERT INTO payments (transaction_id, amount, status) VALUES (?, ?, 'pending')";
-    $stmt = $db->prepare($query);
-    $stmt->execute([$payment['payment_id'], $price]);
+if ($payment && isset($payment['success']) && $payment['success']) {
+    // Payment created successfully
+    $payment_id = $payment['payment_id'] ?? $payment['id'] ?? null;
     
-    // Redirect to Portmanat
-    $payment_url = $portmanat->getPaymentUrl($payment['payment_id']);
-    header('Location: ' . $payment_url);
-    exit;
+    if ($payment_id) {
+        // Save payment info
+        $query = "INSERT INTO payments (transaction_id, amount, status) VALUES (?, ?, 'pending')";
+        $stmt = $db->prepare($query);
+        $stmt->execute([$payment_id, $price]);
+        
+        // Redirect to Portmanat
+        $payment_url = $portmanat->getPaymentUrl($payment_id);
+        header('Location: ' . $payment_url);
+        exit;
+    } else {
+        // No payment ID in response
+        header('Location: index.php?error=payment_id_missing');
+        exit;
+    }
 } else {
     // Payment creation failed
-    header('Location: index.php?error=payment_failed');
+    $error_msg = 'Payment creation failed';
+    if (isset($payment['error'])) {
+        $error_msg .= ': ' . $payment['error'];
+    }
+    
+    // Log error
+    error_log("Portmanat payment creation failed for order #$order_id: " . $error_msg);
+    
+    header('Location: index.php?error=payment_failed&msg=' . urlencode($error_msg));
     exit;
 }
 ?>

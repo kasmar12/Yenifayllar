@@ -54,6 +54,12 @@ private $merchant_id = 'YOUR_MERCHANT_ID';
 private $secret_key = 'YOUR_SECRET_KEY';
 ```
 
+**Portmanat API məlumatlarını almaq üçün:**
+1. [https://partners.portmanat.az](https://partners.portmanat.az) saytına daxil olun
+2. Qeydiyyatdan keçin və merchant hesabı yaradın
+3. API bölməsindən `merchant_id` və `secret_key` alın
+4. Bu məlumatları konfiqurasiya faylında yeniləyin
+
 #### SMM API konfiqurasiyası
 `/config/smm_api.php` faylını redaktə edin:
 
@@ -92,24 +98,26 @@ location / {
 ```
 smm-panel/
 ├── config/
-│   ├── database.php          # Database konfiqurasiyası
-│   ├── portmanat_api.php     # Portmanat API sinifləri
-│   └── smm_api.php          # SMM API sinifləri
+│   ├── database.php                    # Database konfiqurasiyası
+│   ├── portmanat_api.php              # Portmanat API sinifləri
+│   ├── portmanat_config_example.php   # Portmanat konfiqurasiya nümunəsi
+│   └── smm_api.php                    # SMM API konfiqurasiyası
 ├── public/
-│   ├── index.php            # Ana səhifə
-│   ├── checkout.php         # Ödəniş səhifəsi
-│   └── callback_portmanat.php # Portmanat callback
+│   ├── index.php                      # Ana səhifə
+│   ├── checkout.php                   # Ödəniş səhifəsi
+│   ├── callback_portmanat.php        # Portmanat callback
+│   └── .htaccess                     # Apache konfiqurasiyası
 ├── admin/
-│   ├── login.php            # Admin giriş
-│   ├── services.php         # Xidmətlər idarəetməsi
-│   ├── orders.php           # Sifarişlər idarəetməsi
-│   ├── payments.php         # Ödənişlər idarəetməsi
-│   ├── settings.php         # Tənzimləmələr
-│   └── logout.php           # Çıxış
+│   ├── login.php                      # Admin giriş
+│   ├── services.php                   # Xidmətlər idarəetməsi
+│   ├── orders.php                     # Sifarişlər idarəetməsi
+│   ├── payments.php                   # Ödənişlər idarəetməsi
+│   ├── settings.php                   # Tənzimləmələr
+│   └── logout.php                     # Çıxış
 ├── logs/
-│   └── orders_log.txt       # Sifariş logları
-├── database.sql             # Database sxemi
-└── README.md               # Bu fayl
+│   └── orders_log.txt                 # Sifariş logları
+├── database.sql                       # Database sxemi
+└── README.md                          # Bu fayl
 ```
 
 ## 🔧 İstifadə
@@ -128,6 +136,7 @@ smm-panel/
 - Sifarişləri izləmək
 - Ödəniş tarixçəsini görmək
 - API tənzimləmələrini idarə etmək
+- Portmanat API test etmək
 
 ## 🔒 Təhlükəsizlik
 
@@ -135,6 +144,7 @@ smm-panel/
 - **XSS** qorunması (htmlspecialchars)
 - **CSRF** qorunması (session-based)
 - **Signature verification** Portmanat callback-lər üçün
+- **MD5 hash** imza yoxlaması
 
 ## 📊 Database sxemi
 
@@ -162,6 +172,32 @@ smm-panel/
 - `amount` - Məbləğ
 - `status` - Ödəniş statusu
 
+## 🔗 Portmanat API İnteqrasiyası
+
+### API Endpoint-lər
+- **Create Payment**: `/api/create-payment`
+- **Check Payment**: `/api/check-payment`
+- **Payment History**: `/api/payment-history`
+- **Balance**: `/api/balance`
+
+### Callback Parametrləri
+```json
+{
+  "payment_id": "12345",
+  "order_id": "67890",
+  "amount": "25.50",
+  "status": "success",
+  "sign": "md5_hash_signature"
+}
+```
+
+### Status Dəyərləri
+- `success` - Uğurlu ödəniş
+- `failed` - Uğursuz ödəniş
+- `pending` - Gözləyən ödəniş
+- `cancelled` - Ləğv edilmiş ödəniş
+- `expired` - Vaxtı keçmiş ödəniş
+
 ## 🚨 Xəta həlli
 
 ### Ümumi problemlər
@@ -173,6 +209,7 @@ smm-panel/
 2. **Portmanat callback xətası**
    - Secret key-in düzgün olduğunu yoxlayın
    - Callback URL-in düzgün olduğunu təsdiqləyin
+   - Admin panelində "Portmanat API Test Et" düyməsini basın
 
 3. **SMM API xətası**
    - API URL və key-in düzgün olduğunu yoxlayın
@@ -182,6 +219,12 @@ smm-panel/
 Bütün xətalar `/logs/orders_log.txt` faylında qeyd olunur.
 
 ## 🔄 Yeniləmələr
+
+### v1.1.0
+- Portmanat.az rəsmi API inteqrasiyası
+- Təkmilləşdirilmiş callback handler
+- Admin panelində API test funksiyası
+- Daha yaxşı xəta idarəetməsi
 
 ### v1.0.0
 - İlk buraxılış
@@ -196,6 +239,7 @@ Bütün xətalar `/logs/orders_log.txt` faylında qeyd olunur.
 1. GitHub Issues bölməsində problem yaradın
 2. Log fayllarını yoxlayın
 3. Database bağlantısını test edin
+4. Admin panelində Portmanat API test edin
 
 ## 📄 Lisenziya
 
