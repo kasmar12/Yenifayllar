@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base href="https://royzasmm.com.tr/">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ayarlar</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  
+    
+     
+          <link rel="stylesheet" type="text/css" href="css/panel/darky/bootstrap.css">
+          <link rel="stylesheet" type="text/css" href="css/panel/darky/style.css">
+          <link rel="stylesheet" type="text/css" href="js/datepicker/css/bootstrap-datepicker3.min.css">
+          <link rel="stylesheet" type="text/css" href="https://cdn.mypanel.link/css/font-awesome/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.2/umd/popper.min.js"></script>
+  </head>
+
+<body class="user">
+<nav class="app-navbar">
+   <ul class="app-navbar-link">
+      <li>
+         <a href="/addfunds"> 
+         <span class="balance">0$</span> 
+         <span>Bakiye</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/">
+         <i class="ri-add-box-line"></i> 
+         <span>Yeni Sipariş</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/orders"> 
+         <i class="ri-shopping-bag-3-line"></i>
+         <span>Siparişlerim</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/account"> 
+         <i class="ri-user-settings-line"></i>
+         <span>Hesabım</span> 
+         </a>
+      </li>
+   </ul>
+</nav>
+<div class="app-container">
+    <div class="app-sidebar">
+        <div class="close-sidebar-btn" onclick="dashMenuToggle()">
+            <i class="ri-arrow-go-back-line"></i>
+        </div>
+        <div class="sidebar-header">
+            <div class="app-logo">
+				<a href="/">
+				  					SMMPanel
+				  				</a>
+                <img src="../../../images/logo_sm.png" class="logo-sm" alt="">
+            </div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+								<li >
+					<a href="/" class="menu-link">                        
+						<i class="menu-icon ri-add-box-line"></i>
+						<span class="menu-text">Yeni Sipariş</span>
+					</a>
+				</li>
+				<li >
+					<a href="/services" class="menu-link">                        
+						<i class="menu-icon ri-dashboard-line"></i>
+						<span class="menu-text">Servis Listesi</span>
+					</a>
+				</li>
+				<li >
+					<a href="/orders" class="menu-link">                        
+						<i class="menu-icon ri-shopping-bag-3-line"></i>
+						<span class="menu-text">Siparişler</span>
+					</a>
+				</li>	
+												<li >
+					<a href="/addfunds" class="menu-link">                        
+						<i class="menu-icon ri-wallet-3-line"></i>
+						<span class="menu-text">Bakiye Ekle</span>
+					</a>
+				</li>		
+								<li >
+					<a href="/affiliates" class="menu-link">                        
+						<i class="menu-icon ri-mail-star-line"></i>
+						<span class="menu-text">Davet Et Kazan</span>
+					</a>
+				</li>					
+												
+								<li >
+					<a href="/api" class="menu-link">                        
+						<i class="menu-icon ri-terminal-window-line"></i>
+						<span class="menu-text">API</span>
+					</a>
+				</li>					
+									
+								<li >
+					<a href="/tickets" class="menu-link">                        
+						<i class="menu-icon ri-customer-service-2-line"></i>
+						<span class="menu-text">Destek </span>
+					</a>
+				</li>					
+									
+					
+									
+								
+
+				
+            </ul>
+        </div>
+    </div>
+    <div class="app-header">
+        <div class="container-fluid">
+            <div class="row row-100">
+                <div class="col align-self-center">
+                    <div class="dash-menu-btn" onclick="dashMenuToggle()">
+						<span class="icon">
+							<i class="ri-menu-5-fill"></i>
+						</span>
+                    </div>
+                </div>
+                <div class="col-auto d-inline-block d-md-none align-self-center">
+                    <div class="app-logo">
+					  						SMMPanel
+					                      </div>
+                </div>
+                <div class="col-auto d-none d-md-block align-self-center">
+                    <div class="sc-badge">
+                        <div class="sc-icon green">
+                           <i class="ri-whatsapp-line"></i>
+                        </div>
+                        <div class="sc-text">
+                           Destek: <strong>+90 850 444 00 00</strong>
+                        </div>
+                     </div>
+                </div>
+                <div class="col-auto d-none d-md-block align-self-center">
+                    <div class="sc-badge">
+                        <div class="sc-icon">
+                           <i class="ri-thumb-up-line"></i>
+                        </div>
+                        <div class="sc-text">
+                           <strong>6</strong> siparişi başarıyla tamamladık!
+                        </div>
+                     </div>
+                </div>	
+				
+                <div class="col-auto align-self-center">
+                    <a class="header-btn" href="/logout">
+                        <span class="icon logout">
+                            <i class="ri-logout-circle-r-line"></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="app-content">
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+
+            
+      <div class="g-card mb-3">
+        <div class="g-card-body">
+        <div class="form-group">
+          <label for="charge" class="control-label">Kullanıcı adı</label>
+          <input type="text" class="form-control" value="kasmar" readonly>
+        </div>
+        <div class="form-group">
+          <label for="charge" class="control-label">Harcanan tutar</label>
+          <input type="text" class="form-control" value="0$" readonly>
+        </div>
+      </div>
+    </div>
+
+      <div class="g-card mb-3">
+        <div class="g-card-body">
+        <form method="post" action="account">
+          <div class="form-group">
+            <label for="charge" class="control-label">Mevcut parola</label>
+            <input type="password" class="form-control" name="current_password">
+          </div>
+
+          <div class="form-group">
+            <label for="charge" class="control-label">Yeni Parola</label>
+            <input type="password" class="form-control" name="password">
+          </div>
+
+          <div class="form-group">
+            <label for="charge" class="control-label">Yeni Parola Tekrarı</label>
+            <input type="password" class="form-control" name="confirm_password">
+          </div>
+          <button type="submit" class="btn btn-primary">Parolamı Güncelle</button>
+        </form>
+      </div>
+    </div>
+
+      
+       <div class="g-card mb-3">
+        <div class="g-card-body">
+         <form method="post" action="account/timezone">
+
+           <div class="form-group">
+             <label for="charge" class="control-label">Zaman dilimi</label>
+             <select class="form-control" name="timezone">
+                                  <option  value="-54000">(UTC -12:00) Baker/Howland Island</option>
+                                  <option  value="-50400">(UTC -11:00) Niue</option>
+                                  <option  value="-46800">(UTC -10:00) Hawaii-Aleutian Standard Time, Cook Islands, Tahiti</option>
+                                  <option  value="-45000">(UTC -9:30) Marquesas Islands</option>
+                                  <option  value="-43200">(UTC -9:00) Alaska Standard Time, Gambier Islands</option>
+                                  <option  value="-39600">(UTC -8:00) Pacific Standard Time, Clipperton Island</option>
+                                  <option  value="-36000">(UTC -7:00) Mountain Standard Time</option>
+                                  <option  value="-32400">(UTC -6:00) Central Standard Time</option>
+                                  <option  value="-28800">(UTC -5:00) Eastern Standard Time, Western Caribbean Standard Time</option>
+                                  <option  value="-27000">(UTC -4:30) Venezuelan Standard Time</option>
+                                  <option  value="-25200">(UTC -4:00) Atlantic Standard Time, Eastern Caribbean Standard Time</option>
+                                  <option  value="-23400">(UTC -3:30) Newfoundland Standard Time</option>
+                                  <option  value="-21600">(UTC -3:00) Argentina, Brazil, French Guiana, Uruguay</option>
+                                  <option  value="-18000">(UTC -2:00) South Georgia/South Sandwich Islands</option>
+                                  <option  value="-14400">(UTC -1:00) Azores, Cape Verde Islands</option>
+                                  <option  value="-10800">(UTC) Greenwich Mean Time, Western European Time</option>
+                                  <option  value="-7200">(UTC +1:00) Central European Time, West Africa Time</option>
+                                  <option  value="-3600">(UTC +2:00) Central Africa Time, Eastern European Time, Kaliningrad Time</option>
+                                  <option  selected  value="0">(UTC +3:00) Moscow Time, East Africa Time, Arabia Standard Time</option>
+                                  <option  value="1800">(UTC +3:30) Iran Standard Time</option>
+                                  <option  value="3600">(UTC +4:00) Azerbaijan Standard Time, Samara Time</option>
+                                  <option  value="5400">(UTC +4:30) Afghanistan</option>
+                                  <option  value="7200">(UTC +5:00) Pakistan Standard Time, Yekaterinburg Time</option>
+                                  <option  value="9000">(UTC +5:30) Indian Standard Time, Sri Lanka Time</option>
+                                  <option  value="9900">(UTC +5:45) Nepal Time</option>
+                                  <option  value="10800">(UTC +6:00) Bangladesh Standard Time, Bhutan Time, Omsk Time</option>
+                                  <option  value="12600">(UTC +6:30) Cocos Islands, Myanmar</option>
+                                  <option  value="14400">(UTC +7:00) Krasnoyarsk Time, Cambodia, Laos, Thailand, Vietnam</option>
+                                  <option  value="18000">(UTC +8:00) Australian Western Standard Time, Beijing Time, Irkutsk Time</option>
+                                  <option  value="20700">(UTC +8:45) Australian Central Western Standard Time</option>
+                                  <option  value="21600">(UTC +9:00) Japan Standard Time, Korea Standard Time, Yakutsk Time</option>
+                                  <option  value="23400">(UTC +9:30) Australian Central Standard Time</option>
+                                  <option  value="25200">(UTC +10:00) Australian Eastern Standard Time, Vladivostok Time</option>
+                                  <option  value="27000">(UTC +10:30) Lord Howe Island</option>
+                                  <option  value="28800">(UTC +11:00) Srednekolymsk Time, Solomon Islands, Vanuatu</option>
+                                  <option  value="30600">(UTC +11:30) Norfolk Island</option>
+                                  <option  value="32400">(UTC +12:00) Fiji, Gilbert Islands, Kamchatka Time, New Zealand Standard Time</option>
+                                  <option  value="35100">(UTC +12:45) Chatham Islands Standard Time</option>
+                                  <option  value="36000">(UTC +13:00) Samoa Time Zone, Phoenix Islands Time, Tonga</option>
+                                  <option  value="39600">(UTC +14:00) Line Islands</option>
+                              </select>
+           </div>
+
+           <button type="submit" class="btn btn-primary">Zaman dilimi değiştir</button>
+         </form>
+       </div>
+      </div>
+
+      <div class="g-card mb-3">
+        <div class="g-card-body">
+        <form method="post" action="account/newapikey">
+          <div class="form-group">
+            <label for="charge" class="control-label">API Link</label>
+            <input type="text" class="form-control" value="https://royzasmm.com.tr/api/v2" readonly>
+          </div>
+
+          <div class="form-group">
+            <label for="charge" class="control-label">API Key</label>
+            <input type="text" class="form-control" value="2b5dcd0c66************0225fea674" readonly>
+          </div>
+          <button type="submit" class="btn btn-primary">Yeni API Key</button>
+        </form>
+      </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/panel/darky/script.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/panel/darky/bootstrap.js"></script>
+    <script type="text/javascript" src="js/datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="js/datepicker/locales/bootstrap-datepicker.tr.min.js"></script>
+<script type="text/javascript" src="js/main.js?v=19"></script>
+<style>
+    body{
+        font-family: 'Titillium Web', sans-serif;
+    }
+</style>
+</body>
+</html>

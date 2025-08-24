@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base href="https://royzasmm.com.tr/">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Siparişler</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  
+    
+     
+          <link rel="stylesheet" type="text/css" href="css/panel/darky/bootstrap.css">
+          <link rel="stylesheet" type="text/css" href="css/panel/darky/style.css">
+          <link rel="stylesheet" type="text/css" href="js/datepicker/css/bootstrap-datepicker3.min.css">
+          <link rel="stylesheet" type="text/css" href="https://cdn.mypanel.link/css/font-awesome/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.2/umd/popper.min.js"></script>
+  </head>
+
+<body class="user">
+<nav class="app-navbar">
+   <ul class="app-navbar-link">
+      <li>
+         <a href="/addfunds"> 
+         <span class="balance">0$</span> 
+         <span>Bakiye</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/">
+         <i class="ri-add-box-line"></i> 
+         <span>Yeni Sipariş</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/orders"> 
+         <i class="ri-shopping-bag-3-line"></i>
+         <span>Siparişlerim</span> 
+         </a>
+      </li>
+      <li>
+         <a href="/account"> 
+         <i class="ri-user-settings-line"></i>
+         <span>Hesabım</span> 
+         </a>
+      </li>
+   </ul>
+</nav>
+<div class="app-container">
+    <div class="app-sidebar">
+        <div class="close-sidebar-btn" onclick="dashMenuToggle()">
+            <i class="ri-arrow-go-back-line"></i>
+        </div>
+        <div class="sidebar-header">
+            <div class="app-logo">
+				<a href="/">
+				  					SMMPanel
+				  				</a>
+                <img src="../../../images/logo_sm.png" class="logo-sm" alt="">
+            </div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+								<li >
+					<a href="/" class="menu-link">                        
+						<i class="menu-icon ri-add-box-line"></i>
+						<span class="menu-text">Yeni Sipariş</span>
+					</a>
+				</li>
+				<li >
+					<a href="/services" class="menu-link">                        
+						<i class="menu-icon ri-dashboard-line"></i>
+						<span class="menu-text">Servis Listesi</span>
+					</a>
+				</li>
+				<li  class="active" >
+					<a href="/orders" class="menu-link">                        
+						<i class="menu-icon ri-shopping-bag-3-line"></i>
+						<span class="menu-text">Siparişler</span>
+					</a>
+				</li>	
+												<li >
+					<a href="/addfunds" class="menu-link">                        
+						<i class="menu-icon ri-wallet-3-line"></i>
+						<span class="menu-text">Bakiye Ekle</span>
+					</a>
+				</li>		
+								<li >
+					<a href="/affiliates" class="menu-link">                        
+						<i class="menu-icon ri-mail-star-line"></i>
+						<span class="menu-text">Davet Et Kazan</span>
+					</a>
+				</li>					
+												
+								<li >
+					<a href="/api" class="menu-link">                        
+						<i class="menu-icon ri-terminal-window-line"></i>
+						<span class="menu-text">API</span>
+					</a>
+				</li>					
+									
+								<li >
+					<a href="/tickets" class="menu-link">                        
+						<i class="menu-icon ri-customer-service-2-line"></i>
+						<span class="menu-text">Destek </span>
+					</a>
+				</li>					
+									
+					
+									
+								
+
+				
+            </ul>
+        </div>
+    </div>
+    <div class="app-header">
+        <div class="container-fluid">
+            <div class="row row-100">
+                <div class="col align-self-center">
+                    <div class="dash-menu-btn" onclick="dashMenuToggle()">
+						<span class="icon">
+							<i class="ri-menu-5-fill"></i>
+						</span>
+                    </div>
+                </div>
+                <div class="col-auto d-inline-block d-md-none align-self-center">
+                    <div class="app-logo">
+					  						SMMPanel
+					                      </div>
+                </div>
+                <div class="col-auto d-none d-md-block align-self-center">
+                    <div class="sc-badge">
+                        <div class="sc-icon green">
+                           <i class="ri-whatsapp-line"></i>
+                        </div>
+                        <div class="sc-text">
+                           Destek: <strong>+90 850 444 00 00</strong>
+                        </div>
+                     </div>
+                </div>
+                <div class="col-auto d-none d-md-block align-self-center">
+                    <div class="sc-badge">
+                        <div class="sc-icon">
+                           <i class="ri-thumb-up-line"></i>
+                        </div>
+                        <div class="sc-text">
+                           <strong>6</strong> siparişi başarıyla tamamladık!
+                        </div>
+                     </div>
+                </div>	
+				
+                <div class="col-auto align-self-center">
+                    <a class="header-btn" href="/logout">
+                        <span class="icon logout">
+                            <i class="ri-logout-circle-r-line"></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="app-content">
+
+<div class="container-fluid">
+  <div class="row">
+	<div class="col-lg-12">
+        <div class="p-4 rounded bg-pattern text-white text-center">
+            <div class="h3 mb-3">Siparişlerim</div>
+            <div>Mevcut siparişlerinizi bu sayfa üzerinden takip edebilirsiniz.</div>
+        </div>	
+	</div>
+    <div class="col-lg-12">
+                        <div class="orders-btn py-3">
+                           <ul class="nav nav-pills orderNav">
+                              <li class="mr-2">
+                                 <a   class="active" href="orders"><i class="ri-filter-3-line mr-1"></i>Tüm Siparişler</a>
+                              </li>
+                              <li class="mr-2">
+                                 <a  href="orders/pending"><i class="ri-file-damage-line mr-1"></i>Sipariş Alındı</a>
+                              </li>
+                              <li class="mr-2">
+                                 <a  href="orders/inprogress"><i class="ri-loader-2-line mr-1"></i>Yükleniyor</a>
+                              </li>
+                              <li class="mr-2">
+                                 <a  href="orders/completed"><i class="ri-checkbox-line mr-1"></i>Tamamlandı</a>
+                              </li>
+                              <li class="mr-2">
+								 <a  href="orders/partial"><i class="ri-star-half-line mr-1"></i>Kısmi Tamamlandı</a></li>
+                              <li class="mr-2">
+                                 <a  href="orders/processing"><i class="ri-remote-control-line mr-1"></i>Gönderim Sırasında</a>
+                              </li>
+                              <li class="mr-2">
+                                 <a  href="orders/canceled"><i class="ri-qr-scan-line mr-1"></i>İptal Edildi</a>
+                              </li>
+                              <li class="pull-right search mr-2">
+                                 <form action="" method="get">
+                                    <div class="dfb-search">
+                                       <input type="text" name="search" value="" placeholder="Siparişleri ara" class="dfb-input">
+                                       <button type="submit" class="dfb-submit">
+                                       <i class="fas fa-search"></i>
+                                       </button>
+                                    </div>
+                                 </form>
+                              </li>
+                           </ul>
+                        </div>
+			  <div class="">
+								  </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/panel/darky/script.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/panel/darky/bootstrap.js"></script>
+    <script type="text/javascript" src="js/datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="js/datepicker/locales/bootstrap-datepicker.tr.min.js"></script>
+<script type="text/javascript" src="js/main.js?v=6"></script>
+<style>
+    body{
+        font-family: 'Titillium Web', sans-serif;
+    }
+</style>
+</body>
+</html>
