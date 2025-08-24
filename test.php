@@ -1,12 +1,13 @@
 <?php
-// Test file to verify Portmanat.az API configuration
+// Test file to verify Portmanat.az Checkout API configuration
 require_once 'config.php';
 
 echo "<h1>SMM Sifariş və Ödəniş Sistemi - Test Səhifəsi</h1>";
-echo "<h2>Portmanat.az API Konfiqurasiyası</h2>";
+echo "<h2>Portmanat.az Checkout API Konfiqurasiyası</h2>";
 
 echo "<p><strong>API Base URL:</strong> " . $API_ENDPOINT . "</p>";
 echo "<p><strong>Ödəniş Endpoint:</strong> " . $PAYMENT_ENDPOINT . "</p>";
+echo "<p><strong>Ödəniş Status Endpoint:</strong> " . $PAYMENT_STATUS_ENDPOINT . "</p>";
 echo "<p><strong>API Key:</strong> " . (empty($API_KEY) ? "AYARLANMAMIŞ" : "AYARLANDI") . "</p>";
 echo "<p><strong>Valyuta:</strong> " . $CURRENCY . "</p>";
 echo "<p><strong>Vahid Qiyməti:</strong> " . $PRICE_PER_UNIT . " " . $CURRENCY . "</p>";
@@ -53,7 +54,7 @@ echo "</p>";
 
 // Test API connectivity (if API key is set)
 if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
-    echo "<h2>Portmanat.az API Bağlantı Testi</h2>";
+    echo "<h2>Portmanat.az Checkout API Bağlantı Testi</h2>";
     
     // Test services endpoint
     echo "<h3>1. Xidmətlər Endpoint Testi</h3>";
@@ -103,13 +104,13 @@ if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
         echo "<p><strong>API Cavabı:</strong> " . htmlspecialchars($response) . "</p>";
     }
     
-    // Test payment endpoint (without creating actual payment)
-    echo "<h3>3. Ödəniş Endpoint Testi (Bağlantı)</h3>";
+    // Test checkout payment endpoint (without creating actual payment)
+    echo "<h3>3. Checkout Ödəniş Endpoint Testi (Bağlantı)</h3>";
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $PAYMENT_ENDPOINT);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $API_KEY,
-        'Accept: application/json'
+        'Accept: application/json',
+        'User-agent: Mozilla'
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -178,14 +179,25 @@ if (!empty($API_KEY) && $API_KEY !== "your_api_key_here") {
     echo "<p>Test etmək üçün <code>config.php</code> faylında API açarınızı təyin edin.</p>";
 }
 
-echo "<h2>Portmanat.az API Endpoint-ləri</h2>";
+echo "<h2>Portmanat.az Checkout API Endpoint-ləri</h2>";
 echo "<ul>";
-echo "<li><strong>POST /api/order</strong> - Yeni sifariş yaratmaq</li>";
-echo "<li><strong>GET /api/order/{id}</strong> - Sifariş statusunu almaq</li>";
-echo "<li><strong>POST /api/payment</strong> - Ödəniş yaratmaq</li>";
-echo "<li><strong>GET /api/services</strong> - Mövcud xidmətləri almaq</li>";
-echo "<li><strong>GET /api/balance</strong> - Hesab balansını almaq</li>";
+echo "<li><strong>POST " . $PAYMENT_ENDPOINT . "</strong> - Ödəniş yaratmaq</li>";
+echo "<li><strong>GET " . $PAYMENT_STATUS_ENDPOINT . "{transaction}</strong> - Ödəniş statusunu yoxlamaq</li>";
+echo "<li><strong>POST " . $API_ENDPOINT . "/order</strong> - Yeni sifariş yaratmaq</li>";
+echo "<li><strong>GET " . $API_ENDPOINT . "/services</strong> - Mövcud xidmətləri almaq</li>";
+echo "<li><strong>GET " . $API_ENDPOINT . "/balance</strong> - Hesab balansını almaq</li>";
 echo "</ul>";
+
+echo "<h2>Ödəniş Axışı</h2>";
+echo "<ol>";
+echo "<li>İstifadəçi formu doldurur (link + miqdar)</li>";
+echo "<li>Sistem qiyməti hesablayır</li>";
+echo "<li>Checkout API-yə ödəniş sorğusu göndərilir</li>";
+echo "<li>İstifadəçi ödəniş səhifəsinə yönləndirilir</li>";
+echo "<li>Ödəniş uğurlu olduqdan sonra callback</li>";
+echo "<li>Ödəniş statusu yoxlanılır</li>";
+echo "<li>SMM sifarişi tamamlanır</li>";
+echo "</ol>";
 
 echo "<h2>Sonrakı Addımlar</h2>";
 echo "<ol>";

@@ -10,22 +10,29 @@ $order_data = null;
 
 // Handle payment success callback
 if (isset($_GET['payment_status']) && $_GET['payment_status'] === 'success') {
-    if (isset($_SESSION['pending_order'])) {
+    if (isset($_SESSION['pending_order']) && isset($_SESSION['transaction_id'])) {
         $order_data = $_SESSION['pending_order'];
+        $transaction_id = $_SESSION['transaction_id'];
         
-        // Now complete the SMM order using Portmanat.az API
+        // Check payment status via Portmanat.az checkout API
+        $status_url = $PAYMENT_STATUS_ENDPOINT . $transaction_id;
+        
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT . '/order');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($order_data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $API_KEY,
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $status_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/json',
+                'User-agent: Mozilla',
+            ),
+            CURLOPT_SSL_VERIFYPEER => false,
+        ));
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -33,30 +40,64 @@ if (isset($_GET['payment_status']) && $_GET['payment_status'] === 'success') {
         curl_close($ch);
         
         if ($error) {
-            $message = "cURL xətası: " . $error;
+            $message = "Ödəniş statusu yoxlanarkən cURL xətası: " . $error;
             $message_type = 'error';
-        } elseif ($httpCode === 200 || $httpCode === 201) {
+        } elseif ($httpCode === 200) {
             $result = json_decode($response, true);
-            if ($result && isset($result['success']) && $result['success']) {
-                $message = "Ödəniş uğurlu! SMM sifarişi tamamlandı. Sifariş ID: " . ($result['order_id'] ?? $result['id'] ?? 'N/A');
-                $message_type = 'success';
-                unset($_SESSION['pending_order']); // Clear pending order
+            
+            // Debug: Log payment status response
+            error_log("Payment Status Response: " . $response);
+            
+            if ($result && isset($result['status'])) {
+                $payment_status = $result['status'];
+                
+                if ($payment_status === 'completed' || $payment_status === 'success' || $payment_status === 'paid') {
+                    // Payment successful, now complete the SMM order
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $API_ENDPOINT . '/order');
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($order_data));
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        'Authorization: Bearer ' . $API_KEY,
+                        'Accept: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    
+                    $order_response = curl_exec($ch);
+                    $order_http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    
+                    if ($order_http_code === 200 || $order_http_code === 201) {
+                        $order_result = json_decode($order_response, true);
+                        if ($order_result && isset($order_result['success']) && $order_result['success']) {
+                            $message = "Ödəniş uğurlu! SMM sifarişi tamamlandı. Sifariş ID: " . ($order_result['order_id'] ?? $order_result['id'] ?? 'N/A');
+                            $message_type = 'success';
+                            unset($_SESSION['pending_order'], $_SESSION['transaction_id']); // Clear session data
+                        } else {
+                            $message = "Ödəniş uğurlu amma SMM sifarişi xətası: " . ($order_result['message'] ?? 'Bilinməyən xəta');
+                            $message_type = 'error';
+                        }
+                    } else {
+                        $message = "Ödəniş uğurlu amma SMM API xətası. HTTP Kodu: " . $order_http_code;
+                        $message_type = 'error';
+                    }
+                } else {
+                    $message = "Ödəniş statusu: " . $payment_status . " - Sifariş tamamlanmadı";
+                    $message_type = 'error';
+                }
             } else {
-                $message = "Ödəniş uğurlu amma SMM sifarişi xətası: " . ($result['message'] ?? 'Bilinməyən xəta');
+                $message = "Ödəniş statusu dəqiqləşdirilə bilmədi. API cavabı: " . htmlspecialchars($response);
                 $message_type = 'error';
             }
         } else {
-            $message = "Ödəniş uğurlu amma SMM API xətası. HTTP Kodu: " . $httpCode;
-            if ($response) {
-                $result = json_decode($response, true);
-                if ($result && isset($result['message'])) {
-                    $message .= " - " . $result['message'];
-                }
-            }
+            $message = "Ödəniş statusu yoxlanarkən xəta. HTTP Kodu: " . $httpCode;
             $message_type = 'error';
         }
     } else {
-        $message = "Gözlənilən sifariş tapılmadı";
+        $message = "Gözlənilən sifariş və ya transaction ID tapılmadı";
         $message_type = 'error';
     }
 }
@@ -91,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'total_price' => $total_price
         ];
         
-        // Create payment via Portmanat.az API
+        // Create payment via Portmanat.az checkout API
         $payment_data = [
             'amount' => $total_price,
             'currency' => $CURRENCY,
@@ -104,19 +145,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'quantity' => $quantity
         ];
         
-        // Send payment request to Portmanat.az API
+        // Send payment request to Portmanat.az checkout API
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $PAYMENT_ENDPOINT);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payment_data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $API_KEY,
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $PAYMENT_ENDPOINT,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payment_data),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'User-agent: Mozilla',
+            ),
+            CURLOPT_SSL_VERIFYPEER => false,
+        ));
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -130,26 +177,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = json_decode($response, true);
             
             // Debug: Show API response for troubleshooting
-            error_log("Portmanat.az API Response: " . $response);
+            error_log("Portmanat.az Checkout API Response: " . $response);
             
             if ($result && isset($result['payment_url'])) {
+                // Store transaction ID if available
+                if (isset($result['transaction_id'])) {
+                    $_SESSION['transaction_id'] = $result['transaction_id'];
+                }
                 // Redirect to payment page
                 header('Location: ' . $result['payment_url']);
                 exit;
             } elseif ($result && isset($result['redirect_url'])) {
                 // Alternative redirect field
+                if (isset($result['transaction_id'])) {
+                    $_SESSION['transaction_id'] = $result['transaction_id'];
+                }
                 header('Location: ' . $result['redirect_url']);
                 exit;
             } elseif ($result && isset($result['url'])) {
                 // Another possible redirect field
+                if (isset($result['transaction_id'])) {
+                    $_SESSION['transaction_id'] = $result['transaction_id'];
+                }
                 header('Location: ' . $result['url']);
                 exit;
             } elseif ($result && isset($result['checkout_url'])) {
                 // Checkout URL field
+                if (isset($result['transaction_id'])) {
+                    $_SESSION['transaction_id'] = $result['transaction_id'];
+                }
                 header('Location: ' . $result['checkout_url']);
                 exit;
             } elseif ($result && isset($result['payment_page'])) {
                 // Payment page field
+                if (isset($result['transaction_id'])) {
+                    $_SESSION['transaction_id'] = $result['transaction_id'];
+                }
                 header('Location: ' . $result['payment_page']);
                 exit;
             } else {
@@ -411,13 +474,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <div class="header">
             <h1>SMM Sifariş və Ödəniş</h1>
-            <p>Portmanat.az API ilə təhlükəsiz ödəniş</p>
+            <p>Portmanat.az Checkout API ilə təhlükəsiz ödəniş</p>
         </div>
         
         <div class="form-container">
             <?php if ($message): ?>
                 <div class="message <?php echo $message_type; ?>">
-                    <?php echo htmlspecialchars($message); ?>
+                    <?php echo $message; ?>
                 </div>
             <?php endif; ?>
             
@@ -427,12 +490,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="api-info">
-                <strong>🔗 API:</strong> Portmanat.az Partners API istifadə edilir
+                <strong>🔗 API:</strong> Portmanat.az Checkout API istifadə edilir
                 <br><small>Debug: API cavabları error log-da saxlanılır</small>
             </div>
             
             <div class="payment-notice">
-                <strong>💳 Ödəniş:</strong> Sifarişiniz Portmanat.az tərəfindən təhlükəsiz şəkildə emal ediləcək
+                <strong>💳 Ödəniş:</strong> Sifarişiniz Portmanat.az Checkout sistemi tərəfindən təhlükəsiz şəkildə emal ediləcək
             </div>
             
             <form method="POST" action="" id="orderForm">

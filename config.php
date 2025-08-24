@@ -1,13 +1,14 @@
 <?php
 // Portmanat.az API Configuration
-// Based on official API documentation: https://partners.portmanat.az/page/api
+// Based on official API documentation and checkout endpoints
 
 // API Configuration
 $API_KEY = "your_api_key_here"; // Replace with your actual API key
 $API_ENDPOINT = "https://partners.portmanat.az/api"; // Base API endpoint
 
 // Payment Configuration
-$PAYMENT_ENDPOINT = "https://partners.portmanat.az/api/payment"; // Payment endpoint
+$PAYMENT_ENDPOINT = "https://checkout.portmanat.az/operation/create"; // Payment creation endpoint
+$PAYMENT_STATUS_ENDPOINT = "https://checkout.portmanat.az/operation/status/"; // Payment status endpoint
 $CURRENCY = "AZN"; // Currency for payments
 $PRICE_PER_UNIT = 0.01; // Price per unit in AZN
 
@@ -47,6 +48,10 @@ $CURRENT_SERVICE_NAME = $SERVICE_NAMES[$SERVICE_ID] ?? "Bilinməyən Xidmət";
 // - GET /api/services - Get available services
 // - GET /api/balance - Get account balance
 
+// Portmanat.az Checkout API endpoints:
+// - POST https://checkout.portmanat.az/operation/create - Create payment
+// - GET https://checkout.portmanat.az/operation/status/{transaction} - Check payment status
+
 // Possible redirect URL fields from API response:
 // - payment_url - Main payment redirect URL
 // - redirect_url - Alternative redirect URL
@@ -56,7 +61,7 @@ $CURRENT_SERVICE_NAME = $SERVICE_NAMES[$SERVICE_ID] ?? "Bilinməyən Xidmət";
 
 // Payment flow:
 // 1. User fills form with link and quantity
-// 2. System creates payment via /api/payment
+// 2. System creates payment via checkout.portmanat.az/operation/create
 // 3. User is redirected to payment page
 // 4. After successful payment, user returns with payment_status=success
 // 5. System completes the SMM order using /api/order
