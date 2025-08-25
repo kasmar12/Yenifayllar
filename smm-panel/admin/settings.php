@@ -40,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 updateSetting('smm_api_key', $smm_api_key);
             }
             
-            // Update AY.Live API settings
-            $aylive_api_key = sanitizeInput($_POST['aylive_api_key'] ?? '');
-            if (!empty($aylive_api_key)) {
-                updateSetting('aylive_api_key', $aylive_api_key);
+            // Update ShrinkMe.io API settings
+            $shrinkme_api_key = sanitizeInput($_POST['shrinkme_api_key'] ?? '');
+            if (!empty($shrinkme_api_key)) {
+                updateSetting('shrinkme_api_key', $shrinkme_api_key);
             }
             
             // Update site settings
@@ -87,7 +87,7 @@ try {
     $currentSettings = [
         'smm_api_url' => 'https://medyabayim.com/api/v2',
         'smm_api_key' => 'your_api_key_here',
-        'aylive_api_key' => '9556ddb32a7c865f06acf4f8950f64c5045ef2ab',
+        'shrinkme_api_key' => '42921b191cac14ebf135b63cb91bbba5a5adebfb',
         'site_name' => 'SMM Panel',
         'site_description' => 'Social Media Marketing Panel',
         'currency' => 'USD',
@@ -97,7 +97,7 @@ try {
 
 // Test API connections
 $smmApiTest = null;
-$ayliveApiTest = null;
+$shrinkmeApiTest = null;
 
 if (isset($_POST['test_smm_api'])) {
     try {
@@ -110,14 +110,14 @@ if (isset($_POST['test_smm_api'])) {
     }
 }
 
-if (isset($_POST['test_aylive_api'])) {
+if (isset($_POST['test_shrinkme_api'])) {
     try {
-        $result = createAYLiveLink('https://example.com', 'test');
-        $ayliveApiTest = $result['success'] ? 'success' : 'error';
-        $ayliveApiTestMessage = $result['success'] ? 'API connection successful!' : 'API connection failed: ' . $result['message'];
+        $result = createShrinkMeLink('https://example.com', 'test');
+        $shrinkmeApiTest = $result['success'] ? 'success' : 'error';
+        $shrinkmeApiTestMessage = $result['success'] ? 'API connection successful!' : 'API connection failed: ' . $result['message'];
     } catch (Exception $e) {
-        $ayliveApiTest = 'error';
-        $ayliveApiTestMessage = 'API test failed: ' . $e->getMessage();
+        $shrinkmeApiTest = 'error';
+        $shrinkmeApiTestMessage = 'API test failed: ' . $e->getMessage();
     }
 }
 ?>
@@ -230,19 +230,19 @@ if (isset($_POST['test_aylive_api'])) {
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="aylive_api_key" class="form-label">AY.Live API Key</label>
-                                        <input type="text" class="form-control" id="aylive_api_key" name="aylive_api_key" 
-                                               value="<?php echo htmlspecialchars($currentSettings['aylive_api_key'] ?? ''); ?>" 
-                                               placeholder="Enter your AY.Live API key">
-                                        <div class="form-text">AY.Live URL shortener API key</div>
+                                        <label for="shrinkme_api_key" class="form-label">ShrinkMe.io API Key</label>
+                                        <input type="text" class="form-control" id="shrinkme_api_key" name="shrinkme_api_key" 
+                                               value="<?php echo htmlspecialchars($currentSettings['shrinkme_api_key'] ?? ''); ?>" 
+                                               placeholder="Enter your ShrinkMe.io API key">
+                                        <div class="form-text">ShrinkMe.io URL shortener API key</div>
                                     </div>
 
                                     <div class="d-flex gap-2">
                                         <button type="submit" name="test_smm_api" class="btn btn-outline-info">
                                             <i class="fas fa-test-tube me-2"></i>Test SMM API
                                         </button>
-                                        <button type="submit" name="test_aylive_api" class="btn btn-outline-info">
-                                            <i class="fas fa-test-tube me-2"></i>Test AY.Live API
+                                        <button type="submit" name="test_shrinkme_api" class="btn btn-outline-info">
+                                            <i class="fas fa-test-tube me-2"></i>Test ShrinkMe.io API
                                         </button>
                                     </div>
 
@@ -255,11 +255,11 @@ if (isset($_POST['test_aylive_api'])) {
                                         </div>
                                     <?php endif; ?>
 
-                                    <?php if ($ayliveApiTest): ?>
+                                    <?php if ($shrinkmeApiTest): ?>
                                         <div class="mt-3">
-                                            <div class="alert alert-<?php echo $ayliveApiTest === 'success' ? 'success' : 'danger'; ?>" role="alert">
-                                                <i class="fas fa-<?php echo $ayliveApiTest === 'success' ? 'check-circle' : 'exclamation-triangle'; ?> me-2"></i>
-                                                <?php echo htmlspecialchars($ayliveApiTestMessage); ?>
+                                            <div class="alert alert-<?php echo $shrinkmeApiTest === 'success' ? 'success' : 'danger'; ?>" role="alert">
+                                                <i class="fas fa-<?php echo $shrinkmeApiTest === 'success' ? 'check-circle' : 'exclamation-triangle'; ?> me-2"></i>
+                                                <?php echo htmlspecialchars($shrinkmeApiTestMessage); ?>
                                             </div>
                                         </div>
                                     <?php endif; ?>

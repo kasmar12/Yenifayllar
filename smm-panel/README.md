@@ -1,13 +1,13 @@
 # SMM Panel - Professional Social Media Marketing Panel
 
-A complete PHP-based SMM (Social Media Marketing) panel that allows users to place orders for social media services like followers, likes, and views. The system includes mandatory advertisement verification through AY.Live API and integrates with SMM provider APIs.
+A complete PHP-based SMM (Social Media Marketing) panel that allows users to place orders for social media services like followers, likes, and views. The system includes mandatory advertisement verification through ShrinkMe.io API and integrates with SMM provider APIs.
 
 ## 🚀 Features
 
 ### User Side
 - **Simple Interface**: Clean, responsive design with Bootstrap 5
 - **Service Selection**: Choose from various social media services organized by categories
-- **Mandatory Ad Verification**: Users must pass through AY.Live advertisements before placing orders
+- **Mandatory Ad Verification**: Users must pass through ShrinkMe.io advertisements before placing orders
 - **Order Tracking**: Check order status using unique order IDs
 - **No Registration Required**: Users can place orders without creating accounts
 
@@ -16,11 +16,11 @@ A complete PHP-based SMM (Social Media Marketing) panel that allows users to pla
 - **Dashboard Overview**: Statistics, recent orders, and system information
 - **Service Management**: Add, edit, and delete services and categories
 - **Order Management**: View and manage all orders
-- **API Configuration**: Update SMM provider and AY.Live API settings
+- **API Configuration**: Update SMM provider and ShrinkMe.io API settings
 - **System Settings**: Configure site name, currency, timezone, etc.
 
 ### API Integration
-- **AY.Live API**: For advertisement verification and link shortening
+- **ShrinkMe.io API**: For advertisement verification and link shortening
 - **SMM Provider API**: For placing orders and checking status
 - **Medyabayim API v2**: Default SMM provider integration
 
@@ -96,7 +96,7 @@ mysql -u root -p < database.sql
    ```
 
 ### 3. API Configuration
-1. Get your AY.Live API key from [ay.live](https://ay.live)
+1. Get your ShrinkMe.io API key from [shrinkme.io](https://shrinkme.io)
 2. Get your SMM provider API key and URL
 3. Update settings through admin panel or directly in database
 
@@ -126,7 +126,7 @@ chmod 644 smm-panel/includes/config.php
 1. Login to admin panel
 2. Manage services and categories ✅ (Fully functional - add, edit, delete with status control)
 3. View and update orders ✅ (Complete order management system)
-4. Configure API settings ✅ (SMM API and AY.Live API configuration)
+4. Configure API settings ✅ (SMM API and ShrinkMe.io API configuration)
 5. Monitor system statistics ✅ (Dashboard with real-time data)
 
 **Admin Panel Features Confirmed Working:**
@@ -144,7 +144,7 @@ chmod 644 smm-panel/includes/config.php
 ## 🔧 Configuration
 
 ### API Keys
-- **AY.Live API Key**: For advertisement verification
+- **ShrinkMe.io API Key**: For advertisement verification
 - **SMM Provider API Key**: For placing orders
 - **SMM Provider URL**: API endpoint for your SMM provider
 
@@ -165,7 +165,7 @@ chmod 644 smm-panel/includes/config.php
 ## 📊 Order Flow
 
 1. **User Selection**: User selects service and enters details
-2. **Ad Verification**: User is redirected through AY.Live advertisement
+2. **Ad Verification**: User is redirected through ShrinkMe.io advertisement
 3. **Order Processing**: After ad completion, order is sent to SMM provider
 4. **Database Storage**: Order details are saved locally
 5. **Status Tracking**: Order status is updated from SMM provider API
@@ -185,8 +185,8 @@ chmod 644 smm-panel/includes/config.php
 - Ensure cURL extension is enabled
 
 **Ad Verification Not Working**
-- Check AY.Live API key is valid
-- Verify AY.Live service is accessible
+- Check ShrinkMe.io API key is valid
+- Verify ShrinkMe.io service is accessible
 - Check network connectivity
 
 ### Debug Mode
@@ -198,9 +198,9 @@ ini_set('display_errors', 1);
 
 ## 🔄 API Endpoints
 
-### AY.Live API
+### ShrinkMe.io API
 ```
-GET https://ay.live/api/?api=YOUR_KEY&url=VERIFICATION_URL&alias=OPTIONAL_ALIAS
+GET https://shrinkme.io/api?api=YOUR_KEY&url=VERIFICATION_URL&alias=OPTIONAL_ALIAS
 ```
 
 ### SMM Provider API

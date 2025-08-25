@@ -123,8 +123,8 @@ SELECT 'smm_api_key', 'YOUR_SMM_API_KEY', 'SMM Provider API Key'
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'smm_api_key');
 
 INSERT INTO settings (setting_key, setting_value, description) 
-SELECT 'aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'
-WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'aylive_api_key');
+SELECT 'shrinkme_api_key', '42921b191cac14ebf135b63cb91bbba5a5adebfb', 'ShrinkMe.io API Key for ad redirects'
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE setting_key = 'shrinkme_api_key');
 
 INSERT INTO settings (setting_key, setting_value, description) 
 SELECT 'site_name', 'SMM Panel', 'Website name'

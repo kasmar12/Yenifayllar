@@ -1,20 +1,20 @@
 <?php
 /**
  * API Functions for SMM Panel
- * Handles AY.Live and SMM Provider API calls
+ * Handles ShrinkMe.io and SMM Provider API calls
  */
 
 require_once 'config.php';
 
 /**
- * Create shortened ad link using AY.Live API
+ * Create shortened ad link using ShrinkMe.io API
  * @param string $url URL to shorten
  * @param string $alias Optional alias for the link
  * @return array Response with success status and shortened URL
  */
-function createAYLiveLink($url, $alias = '') {
-    $apiKey = getSetting('aylive_api_key', AYLIVE_API_KEY);
-    $apiUrl = AYLIVE_API_URL . '?' . http_build_query([
+function createShrinkMeLink($url, $alias = '') {
+    $apiKey = getSetting('shrinkme_api_key', SHRINKME_API_KEY);
+    $apiUrl = SHRINKME_API_URL . '?' . http_build_query([
         'api' => $apiKey,
         'url' => $url,
         'alias' => $alias
@@ -71,7 +71,7 @@ function createAYLiveLink($url, $alias = '') {
         } else {
             return [
                 'success' => false,
-                'error' => $data['message'] ?? 'Unknown error from AY.Live API',
+                'error' => $data['message'] ?? 'Unknown error from ShrinkMe.io API',
                 'response' => $data
             ];
         }

@@ -19,8 +19,8 @@ $error = '';
 // Create verification URL for after ad completion
 $verificationUrl = SITE_URL . '/public/process-order.php';
 
-// Create shortened ad link using AY.Live API
-$adLinkResult = createAYLiveLink($verificationUrl);
+// Create shortened ad link using ShrinkMe.io API
+$adLinkResult = createShrinkMeLink($verificationUrl);
 
 if (!$adLinkResult['success']) {
     $error = 'Reklam doğrulama linki oluşturulamadı: ' . $adLinkResult['error'];

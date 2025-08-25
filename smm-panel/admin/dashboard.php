@@ -364,7 +364,7 @@ try {
                                         <span class="badge bg-success">Connected</span>
                                     </div>
                                     <div class="col-6">
-                                        <p><strong>AY.Live API:</strong></p>
+                                        <p><strong>ShrinkMe.io API:</strong></p>
                                         <span class="badge bg-success">Connected</span>
                                     </div>
                                 </div>

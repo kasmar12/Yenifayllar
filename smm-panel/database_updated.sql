@@ -92,4 +92,4 @@ INSERT INTO `services` (`category_id`, `api_service_id`, `name`, `description`, 
 INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`, `description`) VALUES 
 ('smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Panel API URL'),
 ('smm_api_key', 'your_api_key_here', 'SMM Panel API Key'),
-('aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key');
+('shrinkme_api_key', '42921b191cac14ebf135b63cb91bbba5a5adebfb', 'ShrinkMe.io API Key');

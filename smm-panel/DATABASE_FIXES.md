@@ -52,7 +52,7 @@ UPDATE services SET status = CASE WHEN is_active = 1 THEN 'active' ELSE 'inactiv
 
 - Settings Management (`admin/settings.php`)
   - SMM API configuration
-  - AY.Live API configuration
+  - ShrinkMe.io API configuration
   - Site settings
   - API connection testing
 
