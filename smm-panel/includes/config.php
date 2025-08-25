@@ -25,8 +25,8 @@ define('CSRF_TOKEN_NAME', 'csrf_token');
 define('PASSWORD_COST', 12);
 
 // API Configuration
-define('AYLIVE_API_KEY', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab');
-define('AYLIVE_API_URL', 'https://ay.live/api/');
+define('SHRINKME_API_KEY', '42921b191cac14ebf135b63cb91bbba5a5adebfb');
+define('SHRINKME_API_URL', 'https://shrinkme.io/api');
 
 // Error Reporting
 error_reporting(E_ALL);
@@ -148,7 +148,7 @@ function getDBConnection() {
             $pdo->exec("INSERT INTO settings (setting_key, setting_value, description) VALUES 
                 ('smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Panel API URL'),
                 ('smm_api_key', 'your_api_key_here', 'SMM Panel API Key'),
-                ('aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key')");
+                ('shrinkme_api_key', '42921b191cac14ebf135b63cb91bbba5a5adebfb', 'ShrinkMe.io API Key')");
         }
         
         return $pdo;
@@ -361,7 +361,7 @@ function initializeDatabase() {
             $defaultSettings = [
                 ['smm_api_url', 'https://medyabayim.com/api/v2', 'SMM Provider API URL'],
                 ['smm_api_key', 'YOUR_SMM_API_KEY', 'SMM Provider API Key'],
-                ['aylive_api_key', '9556ddb32a7c865f06acf4f8950f64c5045ef2ab', 'AY.Live API Key for ad redirects'],
+                ['shrinkme_api_key', '42921b191cac14ebf135b63cb91bbba5a5adebfb', 'ShrinkMe.io API Key for ad redirects'],
                 ['site_name', 'SMM Panel', 'Website name'],
                 ['site_description', 'Professional SMM Services', 'Website description'],
                 ['currency', 'AZN', 'Default currency'],
