@@ -36,6 +36,10 @@ $currentUser = $auth->getCurrentUser();
                         <i class="fas fa-folder"></i>
                         My Projects
                     </a>
+                    <a href="user/audio-editor.php" class="nav-link">
+                        <i class="fas fa-edit"></i>
+                        Audio Editor
+                    </a>
                     <div class="nav-user">
                         <span class="credits">
                             <i class="fas fa-coins"></i>

@@ -77,12 +77,20 @@ class MusicCreator {
         this.updateGenerateButton(true);
 
         try {
-            // Simulate AI generation (replace with actual API call)
-            const result = await this.simulateAIGeneration(prompt, genre, mood, tempo);
+            // Call AI generation API
+            const result = await this.callAIGenerationAPI(prompt, genre, mood, tempo);
             
             if (result.success) {
                 this.showNotification('Music generated successfully!', 'success');
-                this.addNewCreation(result.music);
+                this.addNewCreation({
+                    title: this.generateMusicTitle(prompt, genre, mood),
+                    description: `${mood} ${genre} song`,
+                    genre: genre,
+                    mood: mood,
+                    tempo: tempo,
+                    audioUrl: result.download_url,
+                    duration: result.duration
+                });
                 this.updateCredits();
             } else {
                 this.showNotification(result.message || 'Generation failed', 'error');
@@ -94,6 +102,28 @@ class MusicCreator {
             this.isGenerating = false;
             this.updateGenerateButton(false);
         }
+    }
+
+    async callAIGenerationAPI(prompt, genre, mood, tempo) {
+        const response = await fetch('../api/generate.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                genre: genre,
+                mood: mood,
+                tempo: tempo
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'API request failed');
+        }
+
+        return await response.json();
     }
 
     async simulateAIGeneration(prompt, genre, mood, tempo) {
