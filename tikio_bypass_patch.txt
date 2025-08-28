@@ -1,0 +1,25 @@
+
+# Tikio Premium Bypass Patch
+# Bu patch premium status-u bypass edir
+
+# 1. SharedPreferences patch
+echo '{"isPremium": true, "expiryDate": "2099-12-31"}' > /data/data/com.tikio.app/shared_prefs/premium_status.xml
+
+# 2. Memory patch (Frida script)
+Java.perform(function() {
+    var userClass = Java.use('com.tikio.app.User');
+    if (userClass.isPremiumUser) {
+        userClass.isPremiumUser.implementation = function() {
+            console.log('[+] Premium check bypassed');
+            return true;
+        };
+    }
+});
+
+# 3. Billing client patch
+Java.perform(function() {
+    var billingClient = Java.use('com.android.billingclient.api.BillingClient');
+    billingClient.isReady.implementation = function() {
+        return true;
+    };
+});
