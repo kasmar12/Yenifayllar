@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+    <boolean name="is_premium_user" value="true" />
+    <boolean name="has_active_subscription" value="true" />
+    <long name="subscription_start_date">1735689600000</long>
+    <string name="subscription_status">active</string>
+    <boolean name="premium_badge_visible" value="true" />
+    <boolean name="no_ads_mode" value="true" />
+    <boolean name="unlimited_access" value="true" />
+</map>

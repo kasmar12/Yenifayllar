@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+    <boolean name="premium_enabled" value="true" />
+    <boolean name="subscription_valid" value="true" />
+    <string name="subscription_end_date">2099-12-31</string>
+    <boolean name="all_features_unlocked" value="true" />
+    <boolean name="pro_version" value="true" />
+</map>

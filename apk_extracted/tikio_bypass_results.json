@@ -1,0 +1,87 @@
+{
+  "apk_structure": {
+    "status": "✅ Tamam",
+    "found_files": [
+      "AndroidManifest.xml",
+      "classes.dex",
+      "classes2.dex",
+      "classes3.dex",
+      "billing.properties",
+      "resources.arsc"
+    ],
+    "missing_files": []
+  },
+  "billing_implementation": {
+    "status": "✅ Aktiv",
+    "version": "6.1.0",
+    "found_keywords": [
+      "classes.dex:BillingClient",
+      "classes.dex:purchase",
+      "classes.dex:subscription",
+      "classes.dex:billing",
+      "classes2.dex:BillingClient",
+      "classes2.dex:purchase",
+      "classes2.dex:subscription",
+      "classes2.dex:billing",
+      "classes3.dex:subscription"
+    ],
+    "vulnerability_level": "Yüksək"
+  },
+  "premium_checks": {
+    "status": "✅ Tapıldı",
+    "premium_keywords": [
+      "classes.dex:premium",
+      "classes.dex:subscription",
+      "classes2.dex:subscription",
+      "classes3.dex:subscription"
+    ],
+    "storage_keywords": [
+      "classes.dex:SharedPreferences",
+      "classes.dex:SQLite",
+      "classes.dex:database",
+      "classes.dex:getBoolean",
+      "classes.dex:getString",
+      "classes2.dex:SharedPreferences",
+      "classes2.dex:SQLite",
+      "classes2.dex:database",
+      "classes2.dex:getBoolean",
+      "classes2.dex:getString",
+      "classes3.dex:getBoolean",
+      "classes3.dex:getString"
+    ],
+    "bypass_difficulty": "Asan"
+  },
+  "network_security": {
+    "status": "⚠️ Zəif",
+    "has_network_config": false,
+    "ssl_keywords": [
+      "classes.dex:SSL",
+      "classes.dex:TLS",
+      "classes.dex:certificate",
+      "classes2.dex:SSL",
+      "classes2.dex:TLS",
+      "classes2.dex:certificate",
+      "classes3.dex:SSL",
+      "classes3.dex:TLS",
+      "classes3.dex:certificate",
+      "classes3.dex:pinning",
+      "classes3.dex:X509TrustManager"
+    ],
+    "interception_possibility": "Aşağı"
+  },
+  "code_obfuscation": {
+    "status": "✅ Güclü",
+    "obfuscation_level": "Güclü",
+    "readable_strings_count": 300,
+    "reverse_engineering_difficulty": "Çətin"
+  },
+  "bypass_strategy": {
+    "overall_risk": "Yüksək",
+    "recommended_methods": [
+      "SharedPreferences Manipulation",
+      "Billing Client Interception"
+    ],
+    "difficulty": "Asan",
+    "estimated_time": "5-10 dəqiqə"
+  }
+}
