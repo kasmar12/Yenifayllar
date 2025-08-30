@@ -1,0 +1,31 @@
+{
+  "ssl_keywords": {},
+  "web_urls": [],
+  "firebase_domains": [],
+  "ssl_bypass_vulns": [],
+  "network_security_configs": [],
+  "api_endpoints": [],
+  "url_categories": {
+    "firebase": [],
+    "google_services": [],
+    "social_media": [],
+    "payment": [],
+    "analytics": [],
+    "other": []
+  },
+  "report": {
+    "summary": {
+      "total_ssl_keywords": 0,
+      "total_web_urls": 0,
+      "total_firebase_domains": 0,
+      "total_ssl_bypass_vulns": 0,
+      "total_network_security_configs": 0,
+      "total_api_endpoints": 0
+    },
+    "ssl_bypass_likelihood": "Yüksək",
+    "recommended_actions": [
+      "SSL bypass mümkün ola bilər",
+      "Network security config yoxdur - SSL bypass asan ola bilər"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="is_premium_user" value="true" />
+    <string name="premium_expiry">2099-12-31T23:59:59Z</string>
+    <boolean name="subscription_active" value="true" />
+    <string name="last_payment_date">2025-08-28T00:00:00Z</string>
+    <boolean name="billing_client_ready" value="true" />
+    <string name="premium_type">premium</string>
+    <boolean name="ads_disabled" value="true" />
+    <boolean name="unlimited_features" value="true" />
+</map>

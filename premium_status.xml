@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+    <boolean name="is_premium_user" value="true" />
+    <boolean name="subscription_active" value="true" />
+    <string name="expiry_date">2099-12-31</string>
+    <boolean name="has_active_subscription" value="true" />
+    <long name="subscription_start_date">1735689600000</long>
+    <string name="subscription_type">premium_monthly</string>
+    <boolean name="ads_disabled" value="true" />
+    <boolean name="premium_features_enabled" value="true" />
+</map>
