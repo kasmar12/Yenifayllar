@@ -1,0 +1,9 @@
+[build]
+  functions = "netlify/functions"
+  publish   = "public"   # frontend varsa
+
+# İstəyə görə pretty URL
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
